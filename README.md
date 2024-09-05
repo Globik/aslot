@@ -1,0 +1,2 @@
+# aslot
+Slot game
