@@ -5,6 +5,6 @@ const server = createServer((req, res) => {
   res.end('Hello World!\n');
 });
 // starts a simple http server locally on port 3000
-server.listen(80, () => {
+server.listen(80, 'chatikon.ru',() => {
   console.log('Listening on chatikon.ru');
 });
