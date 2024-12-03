@@ -102,8 +102,11 @@ try{
 }
 }
 some();
-const dkey = "/etc/letsencrypt/live/rouletka.ru-0001/privkey.pem";
-const dcert = "/etc/letsencrypt/live/rouletka.ru-0001/fullchain.pem";
+//etc/letsencrypt/live/chatikon.ru/fullchain.pem
+//Key is saved at:         /etc/letsencrypt/live/chatikon.ru/privkey.pem
+
+const dkey = "/etc/letsencrypt/live/chatikon.ru/privkey.pem";
+const dcert = "/etc/letsencrypt/live/chatikon.ru/fullchain.pem";
 
 const port = process.env.DEVELOPMENT=='yes'?3000:443;
 var servi;
