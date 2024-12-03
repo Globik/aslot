@@ -1,0 +1,138 @@
+
+ body {
+                font-family: 'Roboto Condensed', sans-serif;
+                font-size: 12px;
+            }
+  article.slot{
+				width:100%;
+				height:98vh;
+				border:1px solid green;
+			}
+			footer#foot{
+	background:violet;
+	height:100px;
+	width:100%;
+}
+			section#hauptcontainer{
+				width:100%;
+				adding:20px;
+				mrgin:0 auto;
+				height:calc(100% - 100px);
+				border:1px solid black;
+				display:grid;
+				grid-template-columns: repeat(2, 1fr);
+				position:relative;
+				background:violet;
+						}
+						
+						aside#slotinfo{
+							background:green;
+							
+						}
+						aside#boxinfo{
+							background:red;
+							width:100%;
+							height:100%;
+							lign-self: flex-end;
+							border:1px solid green;
+						}
+		#stagecontainer{
+							background:pink;
+							display:flex;
+							width:100%;
+							height:100%;
+							align-items: center;
+				justify-content: center;
+						}
+						
+            #stage {
+                argin: 150px;
+                display: flex;
+				align-items: center;
+				justify-content: center;
+                -webkit-perspective: 600;
+                isplay: inline-block;
+                transform-style: preserve-3d;
+            }
+
+            .ring {
+                loat: left;
+                argin: 0 auto;
+                height: 100px;
+                width: 100px;
+                transform-style: preserve-3d;
+                animation-iteration-count: infinite;
+                animation-timing-function: linear;
+                padding: 15px;
+            }
+
+            .ring > :nth-child(odd) {
+                background-color: #445d71;
+            }
+
+            .ring > :nth-child(even) {
+                background-color: #406983;
+            }
+
+            .face {
+                position: absolute;
+                width: 100px;
+                height: 100px;
+                /*opacity: 0.7;*/
+                color: #ffffff; /*rgba(0,0,0,0.9);*/
+                border-radius: 10px;
+                backface-visibility: hidden;
+            }
+
+            .face > p {
+                font-family: 'Roboto Condensed', sans-serif;
+                font-size: 36px;
+                font-weight: bold;
+                text-align: center;
+                margin-top: 28px;
+            }
+
+            .numberInput{
+                dsplay: none;
+            }
+/*321 */
+	@media screen and (max-width: calc(452px * 60)) and (orientation: portrait){
+							html{
+								background:black;
+							}
+							article.slot{
+								eight:100vh;
+							}
+							
+							section#hauptcontainer{
+							display:block;
+							height:100%;
+							background:black;
+							}
+							#stagecontainer{
+								background:black;
+							}
+							aside#slotinfo{
+							background:green;
+							display:block;
+							height:50%;
+							width:100%;
+							
+						}
+							aside#boxinfo{
+							background:yellow;
+							width:100%;
+							height:calc(50% - 100px);
+							margin-top:100px;
+							}
+				
+						}
+
+@media screen and (max-width: calc(334px * 60)) and (orientation: portrait){
+	html{
+		background: red;
+	}
+	#stage{
+		width:80%;
+	}
+}

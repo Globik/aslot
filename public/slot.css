@@ -1,0 +1,55 @@
+body {
+                font-family: 'Roboto Condensed', sans-serif;
+                font-size: 12px;
+            }
+
+            #stage {
+                margin: 150px;
+                -webkit-perspective: 600;
+                  margin: 150px;
+                
+                display: inline-block;
+                /* Ensure that we're in 3D space */
+                transform-style: preserve-3d;
+            }
+
+            .ring {
+                float: left;
+                margin: 0 auto;
+                height: 100px;
+                width: 100px;
+                transform-style: preserve-3d;
+                animation-iteration-count: infinite;
+                animation-timing-function: linear;
+                padding: 15px;
+            }
+
+            .ring > :nth-child(odd) {
+                background-color: #445d71;
+            }
+
+            .ring > :nth-child(even) {
+                background-color: #406983;
+            }
+
+            .face {
+                position: absolute;
+                width: 100px;
+                height: 100px;
+                /*opacity: 0.7;*/
+                color: #ffffff; /*rgba(0,0,0,0.9);*/
+                border-radius: 10px;
+                backface-visibility: hidden;
+            }
+
+            .face > p {
+                font-family: 'Roboto Condensed', sans-serif;
+                font-size: 36px;
+                font-weight: bold;
+                text-align: center;
+                margin-top: 28px;
+            }
+
+            .numberInput{
+                dsplay: none;
+            }
