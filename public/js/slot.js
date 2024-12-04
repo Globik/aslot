@@ -12,6 +12,7 @@ var fln= 200;//120;
                 for (var i = 0; i < FACES_PER_RING; i ++) {
                     var face = document.createElement('div');
                     face.className = 'face';
+                    //face.setAttribute('data-number', i);
                     // compute and assign the transform for this face
                     var transform = 'rotateX(' + getDefaultRotation(i) + 'deg) translateZ(' + RING_RADIUS + 'px)';
                     face.style.transform = transform;
@@ -43,12 +44,15 @@ var fln= 200;//120;
                     styleElement.innerHTML = css;
                 }
             }
-
+		var arr = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11];
+		//let k = arr[Math.floor(Math.random()*arr.length)];
+		//alert(k);
             var timeRun = 0;
             var defaultAnimationStuff = 'animation-duration: 5s; animation-iteration-count: 1; animation-fill-mode: forwards; animation-timing-function: ease-in-out;';
 
             var currentState = [0,0,0];
-
+			var winarr = []
+			var si = 0;
             function init ()
             {
                 setup_faces(document.getElementById('ring-1'));
@@ -63,7 +67,13 @@ var fln= 200;//120;
                         var input = document.getElementById('input'+i);
 
                         //var num = Number(input.value) || 0;
-                        var num = 0;
+                       
+		var  ka = arr[Math.floor(Math.random()*arr.length)];
+	
+						
+                        var num = ka;
+                        winarr[si]=num;
+                        si++;
                         var nextState = num = (0 - getDefaultRotation(num));    
                         num -= (5 * 360);                       
 
@@ -71,7 +81,7 @@ var fln= 200;//120;
 
                         var ring = document.getElementById('ring-' + i);                  
                         ring.setAttribute('style', 'transform: rotateX(' + currentState[i] + 'deg);'); 
-
+						//ring.setAttribute('data-number', i );
                         currentState[i] = nextState;
                     }
 
@@ -82,8 +92,17 @@ var fln= 200;//120;
                         window.setTimeout(function(i, timeRun){ 
                             return function() {
                                 document.getElementById('ring-' + i).setAttribute('style', 'animation-name: ringAnimation' + i + '' + timeRun +';' + defaultAnimationStuff); 
+                                var li = document.getElementById('ring-' + i).getAttribute('data-number');
+                                document.getElementById('ring-' + i).onanimationend=function(){
+									//alert("end " + li);
+									if(i === 1){
+										alert(' end ' + winarr.reverse().join(' '));
+										winarr = [];
+										si = 0;
+									}
+									}
                             }
-                        }(i, timeRun), 50 + (Math.random() * /*750*/1000));
+                        }(i, timeRun), 50 + (Math.random() * 750));
                     }
 
                     timeRun+=1;

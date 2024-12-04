@@ -16,10 +16,11 @@ const main_page = function(n){
     <input type="submit" value="login"/>
     </form> -->
     <main><nav></nav>
+    <header><H1 class="a">Сыграть в слот<?h1></header>
     <article class="slot">
     <section id="hauptcontainer">
     <aside id="slotinfo">
-    <div id="stagecontainer">
+    <div id="stagecontainer"><div id="proem"></div>
     <div id="stage">
             <div id="ring-1" class="ring"></div>
             <div id="ring-2" class="ring"></div>
@@ -27,10 +28,13 @@ const main_page = function(n){
         </div>
         </div>
         <footer id="foot">
-        <input type="button" class="startSpinn" value="Start">
+        <input type="button" class="st" value="СДЕЛАТЬ СТАВКУ">
+        <input type="button" class="startSpinn" value="КРУТИТЬ">
         </footer>
         </aside>
-        <aside id="boxinfo"></aside>
+        <aside id="boxinfo"><footer id="pdf">
+        <input type="button" class="startpdf" value="PDF">
+        </footer></aside>
         </section>
        </article>
         <footer></footer>
