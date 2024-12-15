@@ -5,8 +5,26 @@ const main_page = function(n){
     <title>Слот машина - игра</title>
     <!-- <meta name="viewport" content="width=device-width,initial-scale=1.0"> -->
     <meta name="viewport" content="initial-scale=0.60, minimum-scale=0.60, maximum-scale=0.60">
+    
+    <meta name="description" content="Але, братан, а где поднять бабла? На чатикон три топора! Крути барабан и выигрывай сто миллиардов рублей!" />
+ 
+  <meta property="og:title" content="Игра слот машина чатикон" />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="//chatikon.ru/" />
+  <meta property="og:image" content="//chatikon.ru/img/home.jpg" />
+  <meta property="og:site_name" content="Игра слот машина чатикон" />
+  <meta property="og:description" content="Але, братан, а где поднять бабла? На чатикон три топора! Крути барабан и выигрывай сто миллиардов рублей!" />
+  
+  <meta itemprop="name" content="Игра слот машина чатикон"/>
+<meta itemprop="description" content="Але, братан, а где поднять бабла? На чатикон три топора! Крути барабан и выигрывай сто миллиардов рублей!" />
+<meta name="description" content="Але, братан, а где поднять бабла? На чатикон три топора! Крути барабан и выигрывай сто миллиардов рублей!"/>
+    
     <link rel="icon" href="/img/w4.png">
     <link href="/css/slot.css" rel="stylesheet">
+    <link href="/css/tables.css" rel="stylesheet">
+    <style>
+   
+    </style>
     <script src="/js/globalik.js"></script>
     </head><body>
     <!-- hello world 
@@ -16,7 +34,7 @@ const main_page = function(n){
     <input type="submit" value="login"/>
     </form> -->
     <main><nav></nav>
-    <header><H1 class="a">Сыграть в слот<?h1></header>
+    <header><H1 class="a">Сыграть в слот и выиграть 100 000 000 000 рублей!<?h1></header>
     <article class="slot">
     <section id="hauptcontainer">
     <aside id="slotinfo">
@@ -37,6 +55,28 @@ const main_page = function(n){
         </footer></aside>
         </section>
        </article>
+       <section>
+       <h2>Таблица выигрышей.</h2>
+
+<table style="width:100%">
+  <tr>
+    <th>Комбинация</th>
+    <th>Выигрыш</th>
+    
+  </tr>
+  
+  <tr>
+    <td>777</td>
+    <td>100 000 000 000 рублей</td>
+    </tr><tr>
+    <td>666</td>
+    <td>100 000 биткоинов</td></tr><tr>
+    <td>Любые две одинаковые цифры(например, 055 или 550)</td>
+    <td>100 биткоинов</td>
+    
+  </tr>
+</table>
+       </section>
         <footer></footer>
         </main>
     <script src="/js/login.js"></script>
