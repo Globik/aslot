@@ -13,13 +13,19 @@ html,body{
             main{
 				padding:10px;
 			}
+			header.h{
+				 background-image: url("/img/neu2.jpg");
+				 background-repeat: no-repeat;
+				  background-size: cover;  
+				  background-position: center center; 
+			}
             h1.a{
 				text-align:center;
 				line-height:2;
 				padding:20px;
 				margin:20px;
-				font-size:10rem;
-				color:rgba(20,40,10,0.9);
+				font-size:8rem;
+				color:orange;
 			}
 			h2{
 				text-align:center;
@@ -28,11 +34,11 @@ html,body{
   article.slot{
 				width:99.9%;
 				height:98vh;
-				border:1px solid green;
+				border:1px solid #445d71;
 				border-radius:10px;
 			}
 			footer#foot{
-	background:violet;
+	ackground:violet;
 	height:100px;
 	width:100%;
 	display:flex;
@@ -40,7 +46,7 @@ html,body{
 				justify-content: space-between;
 }
 footer#pdf{
-	background:blue;
+	ackground:blue;
 	width:100%;
 	height:100px;
 	left:0;
@@ -68,16 +74,16 @@ footer input[type=button]{
 				display:grid;
 				grid-template-columns: repeat(2, 1fr);
 				position:relative;
-				background:violet;
+				ackground:violet;
 						}
 						
 						aside#slotinfo{
-							background:green;
+							ackground:green;
 							
 						}
 						aside#boxinfo{
 						position:relative;
-							background:red;
+							ackground:red;
 							width:99.9%;
 							height:100%;
 							lign-self: flex-end;
@@ -85,7 +91,7 @@ footer input[type=button]{
 						}
 		#stagecontainer{
 		position:relative;
-							background:pink;
+							ackground:pink;
 							display:flex;
 							width:100%;
 							height:100%;
@@ -155,8 +161,12 @@ footer input[type=button]{
 /*321 */
 	@media screen and (max-width: calc(452px * 60)) and (orientation: portrait){
 							html{
-								background:black;
+								ackground:black;
 							}
+							 h1.a{
+								 font-size:4rem;
+								 padding:1rem;
+							 }
 							article.slot{
 								eight:100vh;
 							}
@@ -164,20 +174,20 @@ footer input[type=button]{
 							section#hauptcontainer{
 							display:block;
 							height:100%;
-							background:black;
+							ackground:black;
 							}
 							#stagecontainer{
-								background:black;
+								ackground:black;
 							}
 							aside#slotinfo{
-							background:green;
+							ackground:green;
 							display:block;
 							height:50%;
 							width:100%;
 							
 						}
 							aside#boxinfo{
-							background:yellow;
+							ackground:yellow;
 							width:100%;
 							height:calc(50% - 100px);
 							margin-top:100px;
@@ -187,7 +197,7 @@ footer input[type=button]{
 
 @media screen and (max-width: calc(334px * 60)) and (orientation: portrait){
 	html{
-		background: red;
+		ackground: red;
 	}
 	#stage{
 		width:80%;

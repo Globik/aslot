@@ -6,18 +6,18 @@ const main_page = function(n){
     <!-- <meta name="viewport" content="width=device-width,initial-scale=1.0"> -->
     <meta name="viewport" content="initial-scale=0.60, minimum-scale=0.60, maximum-scale=0.60">
     
-    <meta name="description" content="Але, братан, а где поднять бабла? На чатикон три топора! Крути барабан и выигрывай сто миллиардов рублей!" />
+    <meta name="description" content="Але, братан, а где поднять бабла? На чатикон три топора! Крути барабан и выиграй миллиард рублей!" />
  
   <meta property="og:title" content="Игра слот машина чатикон" />
   <meta property="og:type" content="website" />
   <meta property="og:url" content="//chatikon.ru/" />
   <meta property="og:image" content="//chatikon.ru/img/home.jpg" />
   <meta property="og:site_name" content="Игра слот машина чатикон" />
-  <meta property="og:description" content="Але, братан, а где поднять бабла? На чатикон три топора! Крути барабан и выигрывай сто миллиардов рублей!" />
+  <meta property="og:description" content="Але, братан, а где поднять бабла? На чатикон три топора! Крути барабан и выиграй миллиард рублей!" />
   
   <meta itemprop="name" content="Игра слот машина чатикон"/>
-<meta itemprop="description" content="Але, братан, а где поднять бабла? На чатикон три топора! Крути барабан и выигрывай сто миллиардов рублей!" />
-<meta name="description" content="Але, братан, а где поднять бабла? На чатикон три топора! Крути барабан и выигрывай сто миллиардов рублей!"/>
+<meta itemprop="description" content="Але, братан, а где поднять бабла? На чатикон три топора! Крути барабан и выиграй миллиард рублей!" />
+<meta name="description" content="Але, братан, а где поднять бабла? На чатикон три топора! Крути барабан и выиграй миллиард рублей!"/>
     
     <link rel="icon" href="/img/w4.png">
     <link href="/css/slot.css" rel="stylesheet">
@@ -34,7 +34,7 @@ const main_page = function(n){
     <input type="submit" value="login"/>
     </form> -->
     <main><nav></nav>
-    <header><H1 class="a">Сыграть в слот и выиграть 100 000 000 000 рублей!<?h1></header>
+    <header class="h"><h1 class="a">Сыграть в слот и выиграть 1 000 000 000 рублей!</h1></header>
     <article class="slot">
     <section id="hauptcontainer">
     <aside id="slotinfo">
@@ -46,7 +46,7 @@ const main_page = function(n){
         </div>
         </div>
         <footer id="foot">
-        <input type="button" class="st" value="СДЕЛАТЬ СТАВКУ">
+       <!-- <input type="button" class="st" value="СДЕЛАТЬ СТАВКУ"> -->
         <input type="button" class="startSpinn" value="КРУТИТЬ">
         </footer>
         </aside>
@@ -54,8 +54,8 @@ const main_page = function(n){
         <input type="button" class="startpdf" value="PDF">
         </footer></aside>
         </section>
-       </article>
-       <section>
+       </article><br><br>
+       <section class="table">
        <h2>Таблица выигрышей.</h2>
 
 <table style="width:100%">
@@ -67,7 +67,7 @@ const main_page = function(n){
   
   <tr>
     <td>777</td>
-    <td>100 000 000 000 рублей</td>
+    <td>1 000 000 000 рублей</td>
     </tr><tr>
     <td>666</td>
     <td>100 000 биткоинов</td></tr><tr>
