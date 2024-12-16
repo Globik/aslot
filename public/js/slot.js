@@ -70,10 +70,10 @@ var fln= 200;//120;
                     while(--i) {
                         var input = document.getElementById('input'+i);
 
-                        //var num = Number(input.value) || 0;
+                       // var num = Number(input.value) || 0;
                        
 		var  ka = arr[Math.floor(Math.random()*arr.length)];
-	
+	//var num = 7;
 						
                         var num = ka;
                         winarr[si]=num;
@@ -104,14 +104,14 @@ var fln= 200;//120;
 									//	alert(' end ' + winarr.reverse().join(' '));
 									insertMessage("У вас: "  + bu.join(', '));
 									//console.log(bu);
-									if(bu[0]===bu[1] || bu[1]===bu[2]){
-										insertMessage("<span class=\"doublewin\">Поздравляем, Вы выиграли 100 биткоинов!</span>");
+									if((bu[0]===bu[1]&&bu[2]!=6&&bu[2]!=7) || (bu[1]===bu[2] && bu[0]!=6&&bu[0]!=7)){
+										insertMessage("<span class=\"doublewin\">Поздравляем, Вы выиграли 0,009595 биткоинов!</span>");
 									}
-									if(bu[0]==bu[1]==bu[2]==6){
-										insertMessage("<span class=\"6win\">Вы выиграли 100 000 биткоинов!</span>");
+									if(bu[0]==6&&bu[1]==6&&bu[2]==6){
+										insertMessage("<span class=\"swin\">Вы выиграли 0,028786 биткоинов!</span>");
 									}
-									if(bu[0]==bu[1]==bu[2]==7){
-										insertMessage("<span class=\"7win\">Вы выиграли 1 000 000 000 рублей!</span>");
+									if(bu[0]==7&&bu[1]==7&&bu[2]==7){
+										insertMessage("<span class=\"sevenwin\">Вы выиграли 1 биткоин!</span>");
 									}
 										winarr = [];
 										si = 0;
@@ -138,3 +138,6 @@ var fln= 200;//120;
 				chatbox.appendChild(div);
 				chatbox.scrollTop = chatbox.clientHeight + chatbox.scrollHeight;
 			}
+function fuck(){
+	insertMessage("<span class=\"6win\">Вы выиграли 0,028786 биткоинов!</span>");
+}
