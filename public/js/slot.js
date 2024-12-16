@@ -45,6 +45,8 @@ var fln= 200;//120;
                 }
             }
 		var arr = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11];
+		var proem = document.getElementById("proem");
+		var chatbox = document.getElementById("chatbox");
 		//let k = arr[Math.floor(Math.random()*arr.length)];
 		//alert(k);
             var timeRun = 0;
@@ -59,7 +61,9 @@ var fln= 200;//120;
                 setup_faces(document.getElementById('ring-2'));
                 setup_faces(document.getElementById('ring-3'));
 
-                document.querySelector('.startSpinn').addEventListener('click', function(){
+                document.querySelector('.startSpinn').addEventListener('click', function(ev){
+					proem.className = "";
+					ev.target.disabled = true;
                     var cssStr = [];
 
                     var i = 4;
@@ -96,9 +100,23 @@ var fln= 200;//120;
                                 document.getElementById('ring-' + i).onanimationend=function(){
 									//alert("end " + li);
 									if(i === 1){
-										alert(' end ' + winarr.reverse().join(' '));
+										let bu = winarr.reverse();
+									//	alert(' end ' + winarr.reverse().join(' '));
+									insertMessage("У вас: "  + bu.join(', '));
+									//console.log(bu);
+									if(bu[0]===bu[1] || bu[1]===bu[2]){
+										insertMessage("<span class=\"doublewin\">Поздравляем, Вы выиграли 100 биткоинов!</span>");
+									}
+									if(bu[0]==bu[1]==bu[2]==6){
+										insertMessage("<span class=\"6win\">Вы выиграли 100 000 биткоинов!</span>");
+									}
+									if(bu[0]==bu[1]==bu[2]==7){
+										insertMessage("<span class=\"7win\">Вы выиграли 1 000 000 000 рублей!</span>");
+									}
 										winarr = [];
 										si = 0;
+										proem.className = "active";
+										ev.target.disabled = false;
 									}
 									}
                             }
@@ -111,3 +129,12 @@ var fln= 200;//120;
 
             // call init once the document is fully loaded
             window.addEventListener('load', init, false);
+            
+            function insertMessage(txt){
+				
+				let div = document.createElement("div");
+				div.className = "msg";
+				div.innerHTML = '<b>' + txt + '</b>';
+				chatbox.appendChild(div);
+				chatbox.scrollTop = chatbox.clientHeight + chatbox.scrollHeight;
+			}

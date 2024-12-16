@@ -38,7 +38,7 @@ const main_page = function(n){
     <article class="slot">
     <section id="hauptcontainer">
     <aside id="slotinfo">
-    <div id="stagecontainer"><div id="proem"></div>
+    <div id="stagecontainer"><div id="proem" class=""></div>
     <div id="stage">
             <div id="ring-1" class="ring"></div>
             <div id="ring-2" class="ring"></div>
@@ -50,7 +50,9 @@ const main_page = function(n){
         <input type="button" class="startSpinn" value="КРУТИТЬ">
         </footer>
         </aside>
-        <aside id="boxinfo"><footer id="pdf">
+        <aside id="boxinfo">
+        <div id="chatbox"></div>
+        <footer id="pdf">
         <input type="button" class="startpdf" value="PDF">
         </footer></aside>
         </section>
