@@ -26,6 +26,9 @@ const main_page = function(n){
    
     </style>
     <script src="/js/globalik.js"></script>
+  <!--  <script src="/js/pdfmake.min.js"></script> -->
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     </head><body>
     <!-- hello world 
     <form name="loginform" method="post" action="/login">
@@ -33,7 +36,7 @@ const main_page = function(n){
     <input type="password" name="password" required placeholder="your password"/><br>
     <input type="submit" value="login"/>
     </form> -->
-    <main><nav></nav>
+    <main id="somemain"><nav></nav>
     <header class="h"><h1 class="a">Сыграть в слот и выиграть 1 биткоин!</h1></header>
     <article class="slot">
    
@@ -87,6 +90,7 @@ const main_page = function(n){
         </main>
     <script src="/js/login.js"></script>
     <script src="/js/slot.js"></script>
+    
     </body>
     
     </html>`;

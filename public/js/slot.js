@@ -6,7 +6,7 @@ var fln= 200;//120;
  var FACES_PER_RING = 12;
             var RING_RADIUS = fln;//heightrad;//200;
             var FACE_ANGLE = 360 / FACES_PER_RING;
-
+var lets = [];
             function setup_faces (row)
             {
                 for (var i = 0; i < FACES_PER_RING; i ++) {
@@ -98,20 +98,27 @@ var fln= 200;//120;
                                 document.getElementById('ring-' + i).setAttribute('style', 'animation-name: ringAnimation' + i + '' + timeRun +';' + defaultAnimationStuff); 
                                 var li = document.getElementById('ring-' + i).getAttribute('data-number');
                                 document.getElementById('ring-' + i).onanimationend=function(){
-									//alert("end " + li);
+									
 									if(i === 1){
 										let bu = winarr.reverse();
-									//	alert(' end ' + winarr.reverse().join(' '));
+								
 									insertMessage("У вас: "  + bu.join(', '));
-									//console.log(bu);
+									lets.push({ type:"1", txt: "У вас: "  + bu.join(', ') });
+									
 									if((bu[0]===bu[1]&&bu[2]!=6&&bu[2]!=7) || (bu[1]===bu[2] && bu[0]!=6&&bu[0]!=7)){
-										insertMessage("<span class=\"doublewin\">Поздравляем, Вы выиграли 0,009595 биткоинов!</span>");
+										let ni = "Поздравляем Вы выиграли 0,009595 биткоинов!";
+										lets.push({ type: "2", txt: ni });
+										insertMessage("<span class=\"doublewin\">" + ni + "</span>");
 									}
 									if(bu[0]==6&&bu[1]==6&&bu[2]==6){
-										insertMessage("<span class=\"swin\">Вы выиграли 0,028786 биткоинов!</span>");
+										let ni1 = "Вы выиграли 0,028786 биткоинов!";
+										lets.push({ type: "3", txt: ni1 });
+										insertMessage("<span class=\"swin\">" + ni1 + "</span>");
 									}
 									if(bu[0]==7&&bu[1]==7&&bu[2]==7){
-										insertMessage("<span class=\"sevenwin\">Вы выиграли 1 биткоин!</span>");
+										let ni2 = "Вы выиграли 1 биткоин!";
+										lets.push({ type: "4", txt: ni2 });
+										insertMessage("<span class=\"sevenwin\"></span>");
 									}
 										winarr = [];
 										si = 0;
@@ -140,4 +147,41 @@ var fln= 200;//120;
 			}
 function fuck(){
 	insertMessage("<span class=\"6win\">Вы выиграли 0,028786 биткоинов!</span>");
+}
+//alert(new Date().toJSON())
+var pdf = document.querySelector(".pdf");
+pdf.addEventListener('click', makepdf, false);
+function makepdf(ev){
+	//alert('pdf');
+	if(lets.length == 0){
+		alert('No content!');
+		return;
+	}
+	const element = document.querySelector("#chatbox");
+	    const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            doc.addFont('/css/Roboto-Regular.ttf', 'Roboto', 'normal'); 
+    doc.setFont('Roboto');
+    let ot = 10;
+    let k = 0;
+    lets.forEach(function(el,i){
+		if(el.type == "1"){
+		doc.setTextColor(0, 0, 0);	
+		}else if(el.type == "2"){
+			doc.setTextColor(0, 255, 0);
+		}else if(el.type == "3"){
+			doc.setTextColor(0, 0, 255);
+		}else if(el.type == "4"){
+			doc.setTextColor(255, 0, 0);
+		}
+		if(k == 15){
+			doc.addPage();
+			k = 0;
+			ot = 10;
+		}
+            doc.text(el.txt, 10, ot);
+            ot+=20;
+            k++;
+		})
+            doc.save("chatikon_" + new Date().toJSON() + ".pdf"); 
 }
