@@ -16,6 +16,13 @@ html,body{
 				wdth:100%;
 				overflow:hidden;
 			}
+			header{
+				text-align:center;
+				font-size:3rem;
+			}
+			section{
+				margin-top:3rem;
+			}
 			header.h{
 				 background-image: url("/img/neu2.jpg");
 				 background-repeat: no-repeat;

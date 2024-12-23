@@ -1,3 +1,4 @@
+const btc = document.getElementById("btc");
  var stagecontainer = document.getElementById('stage');
  var heightrad = window.getComputedStyle(stagecontainer, null).getPropertyValue("height");
 console.log(parseFloat(heightrad));
@@ -60,6 +61,16 @@ var lets = [];
                 setup_faces(document.getElementById('ring-1'));
                 setup_faces(document.getElementById('ring-2'));
                 setup_faces(document.getElementById('ring-3'));
+              //  alert(0+Number(0.009595));
+				//	localStorage.clear();
+                const mybtc = localStorage.getItem("mybtc");
+                if(mybtc){
+					btc.textContent = mybtc;
+				}
+
+
+
+
 
                 document.querySelector('.startSpinn').addEventListener('click', function(ev){
 					proem.className = "";
@@ -101,22 +112,38 @@ var lets = [];
 									
 									if(i === 1){
 										let bu = winarr.reverse();
-								
+								//var b = 0;
 									insertMessage("У вас: "  + bu.join(', '));
 									lets.push({ type:"1", txt: "У вас: "  + bu.join(', ') });
 									
 									if((bu[0]===bu[1]&&bu[2]!=6&&bu[2]!=7) || (bu[1]===bu[2] && bu[0]!=6&&bu[0]!=7)){
-										let ni = "Поздравляем Вы выиграли 0,009595 биткоинов!";
+										var b = 0.009595;
+										//let a = Number.parseFloat(btc.textContent).toFixed(6);
+										let a = Number(btc.textContent);
+										let c = a + b;
+										btc.textContent = c.toFixed(6);
+										localStorage.setItem("mybtc", btc.textContent);
+										let ni = "Поздравляем Вы выиграли " + b + " биткоинов!";
 										lets.push({ type: "2", txt: ni });
 										insertMessage("<span class=\"doublewin\">" + ni + "</span>");
 									}
 									if(bu[0]==6&&bu[1]==6&&bu[2]==6){
-										let ni1 = "Вы выиграли 0,028786 биткоинов!";
+										var b = 0.028786;
+										let a = Number.parseFloat(btc.textContent).toFixed(6);
+										let c = a + b;
+										btc.textContent = c;
+										localStorage.setItem("mybtc", btc.textContent);
+										let ni1 = "Вы выиграли " + b + " биткоинов!";
 										lets.push({ type: "3", txt: ni1 });
 										insertMessage("<span class=\"swin\">" + ni1 + "</span>");
 									}
 									if(bu[0]==7&&bu[1]==7&&bu[2]==7){
-										let ni2 = "Вы выиграли 1 биткоин!";
+										var b = 1;
+										let a = Number.parseFloat(btc.textContent).toFixed(6);
+										let c = a + b;
+										btc.textContent = c;
+										localStorage.setItem("mybtc", btc.textContent);
+										let ni2 = "Вы выиграли " + b + " биткоин!";
 										lets.push({ type: "4", txt: ni2 });
 										insertMessage("<span class=\"sevenwin\"></span>");
 									}

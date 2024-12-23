@@ -86,6 +86,7 @@ const main_page = function(n){
   </tr>
 </table>
        </section>
+       <section><header>На балансе <span id="btc">0</span> биткоинов.</header></section>
         <footer></footer>
         </main>
     <script src="/js/login.js"></script>
