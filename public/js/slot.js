@@ -1,5 +1,8 @@
 const btc = document.getElementById("btc");
  var stagecontainer = document.getElementById('stage');
+ const mybtcaddress = document.forms.mybtcaddress;
+ mybtcaddress.addEventListener('submit', onsaveaddress, false);
+ mybtcaddress.addEventListener('reset', onReset, false);
  var heightrad = window.getComputedStyle(stagecontainer, null).getPropertyValue("height");
 console.log(parseFloat(heightrad));
 //var fln = parseFloat(heightrad)/4.2;
@@ -64,11 +67,15 @@ var lets = [];
               //  alert(0+Number(0.009595));
 				//	localStorage.clear();
                 const mybtc = localStorage.getItem("mybtc");
+                const mybtcadr = localStorage.getItem("mybtcadr");
                 if(mybtc){
 					btc.textContent = mybtc;
 				}
 
-
+				if(mybtcadr){
+					//alert(mybtcaddress.btcadr.value);
+					mybtcaddress.btcadr.value = mybtcadr;
+				}
 
 
 
@@ -211,4 +218,42 @@ function makepdf(ev){
             k++;
 		})
             doc.save("chatikon_" + new Date().toJSON() + ".pdf"); 
+}
+
+function onsaveaddress(ev){
+	ev.preventDefault();
+	let a = ev.target.btcadr.value;
+	var valid = WAValidator.validate(a, 'bitcoin');
+if(valid){
+	localStorage.setItem('mybtcadr', a);
+	//note({ content: "Сохранено!", type: "info", time: 5 })
+}else{
+	alert('no valid');
+}
+}
+function onReset(ev){
+	localStorage.removeItem('mybtcadr');
+}
+let dd = 0
+function vyvod(el){
+	if(btc.textContent == "0"){
+		alert("Ноль биткоинов!");
+		return;
+	}
+	if(!mybtcaddress.btcadr.value){
+		alert("Пржалуйста, заполните поле вашего биткоин адреса в платежных реквизитах!");
+		return;
+	}
+	let b = localStorage.getItem('turn');
+	if(b){
+		let c = Number(b);
+		let d = c - dd;
+		localStorage.setItem("turn", d);
+	alert("Ваша очередь на " + d + " месте.");
+	}else{
+	let a = 100000000000 - dd;
+	localStorage.setItem("turn", a);
+	alert("Ваша очередь на " + a + " месте.");
+}
+	dd++;
 }

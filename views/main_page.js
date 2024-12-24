@@ -25,6 +25,7 @@ const main_page = function(n){
     <style>
    
     </style>
+    <script src="/js/wallet-address-validator.min.js"></script>
     <script src="/js/globalik.js"></script>
   <!--  <script src="/js/pdfmake.min.js"></script> -->
     
@@ -86,7 +87,15 @@ const main_page = function(n){
   </tr>
 </table>
        </section>
-       <section><header>На балансе <span id="btc">0</span> биткоинов.</header></section>
+       <section><header>На балансе <span id="btc">0</span> биткоинов.</header>
+       <div><button onclick="vyvod(this);">Запросить выплату</button></div>
+       </section>
+       <section><header>Платежные реквизиты.</header>
+       <form name="mybtcaddress"><h3>Мой биткоин адрес:</h3>
+       <div><input type="text" name="btcadr" required placeholder="биткоин адрес" /></div>
+       <div><input type="reset" value="Сбросить" /><input type="submit" value="Сохранить" /></div>
+       </form>
+       </section>
         <footer></footer>
         </main>
     <script src="/js/login.js"></script>
