@@ -78,7 +78,7 @@ var lets = [];
                 setup_faces(document.getElementById('ring-2'));
                 setup_faces(document.getElementById('ring-3'));
               //  alert(0+Number(0.009595));
-				localStorage.clear();
+				//localStorage.clear();
                 const mybtc = localStorage.getItem("mybtc");
               //  const mybtcadr = localStorage.getItem("mybtcadr");
                 if(mybtc){
