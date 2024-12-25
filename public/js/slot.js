@@ -13,11 +13,11 @@ if (window.location.protocol === "https:") {
 const onlinecount = document.getElementById('onlinecount');
 const btc = document.getElementById("btc");
  var stagecontainer = document.getElementById('stage');
- const mybtcaddress = document.forms.mybtcaddress;
- mybtcaddress.addEventListener('submit', onsaveaddress, false);
- mybtcaddress.addEventListener('reset', onReset, false);
- var heightrad = window.getComputedStyle(stagecontainer, null).getPropertyValue("height");
-console.log(parseFloat(heightrad));
+// const mybtcaddress = document.forms.mybtcaddress;
+ //mybtcaddress.addEventListener('submit', onsaveaddress, false);
+// mybtcaddress.addEventListener('reset', onReset, false);
+ //var heightrad = window.getComputedStyle(stagecontainer, null).getPropertyValue("height");
+
 //var fln = parseFloat(heightrad)/4.2;
 var fln= 200;//120;
  var FACES_PER_RING = 12;
@@ -80,15 +80,15 @@ var lets = [];
               //  alert(0+Number(0.009595));
 				//	localStorage.clear();
                 const mybtc = localStorage.getItem("mybtc");
-                const mybtcadr = localStorage.getItem("mybtcadr");
+              //  const mybtcadr = localStorage.getItem("mybtcadr");
                 if(mybtc){
 					btc.textContent = mybtc;
 				}
 
-				if(mybtcadr){
+				//if(mybtcadr){
 					//alert(mybtcaddress.btcadr.value);
-					mybtcaddress.btcadr.value = mybtcadr;
-				}
+				//	mybtcaddress.btcadr.value = mybtcadr;
+				//}
 
 
 
@@ -137,33 +137,33 @@ var lets = [];
 									lets.push({ type:"1", txt: "У вас: "  + bu.join(', ') });
 									
 									if((bu[0]===bu[1]&&bu[2]!=6&&bu[2]!=7) || (bu[1]===bu[2] && bu[0]!=6&&bu[0]!=7)){
-										var b = 0.009595;
-										//let a = Number.parseFloat(btc.textContent).toFixed(6);
+										var b = 1;
+									
 										let a = Number(btc.textContent);
 										let c = a + b;
-										btc.textContent = c.toFixed(6);
+										btc.textContent = c;
 										localStorage.setItem("mybtc", btc.textContent);
-										let ni = "Поздравляем Вы выиграли " + b + " биткоинов!";
+										let ni = "Поздравляем Вы выиграли " + b + " сердечко!";
 										lets.push({ type: "2", txt: ni });
 										insertMessage("<span class=\"doublewin\">" + ni + "</span>");
 									}
 									if(bu[0]==6&&bu[1]==6&&bu[2]==6){
-										var b = 0.028786;
-										let a = Number.parseFloat(btc.textContent).toFixed(6);
+										var b = 2;
+										let a = Number(btc.textContent);
 										let c = a + b;
 										btc.textContent = c;
 										localStorage.setItem("mybtc", btc.textContent);
-										let ni1 = "Вы выиграли " + b + " биткоинов!";
+										let ni1 = "Вы выиграли " + b + " сердечка!";
 										lets.push({ type: "3", txt: ni1 });
 										insertMessage("<span class=\"swin\">" + ni1 + "</span>");
 									}
 									if(bu[0]==7&&bu[1]==7&&bu[2]==7){
-										var b = 1;
-										let a = Number.parseFloat(btc.textContent).toFixed(6);
+										var b = 3;
+										let a = Number(btc.textContent);
 										let c = a + b;
 										btc.textContent = c;
 										localStorage.setItem("mybtc", btc.textContent);
-										let ni2 = "Вы выиграли " + b + " биткоин!";
+										let ni2 = "Вы выиграли " + b + " сердечка!";
 										lets.push({ type: "4", txt: ni2 });
 										insertMessage("<span class=\"sevenwin\"></span>");
 									}
@@ -232,7 +232,7 @@ function makepdf(ev){
 		})
             doc.save("chatikon_" + new Date().toJSON() + ".pdf"); 
 }
-
+/*
 function onsaveaddress(ev){
 	ev.preventDefault();
 	let a = ev.target.btcadr.value;
@@ -273,7 +273,7 @@ function vyvod(el){
 	dd++;
 }
 
-
+*/
  if(!sock) sock = new  WebSocket(new_uri + "//" + loc3 + "/gesamt");
 
   sock.onopen = function () {

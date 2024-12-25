@@ -121,6 +121,21 @@ button,input[type=submit],input[type=text],input[type=reset]{
 #btcinp{
 	width:70%;
 }
+
+article.beschreibung{
+	margin-top:3rem;
+	padding:2rem;
+}
+article.beschreibung p{
+	font-size:2rem;
+}
+footer{
+	background: #cb6f6f;
+}
+footer section{
+padding:1rem;
+	font-size:1rem;
+}
 			section#hauptcontainer{
 				width:100%;
 				adding:20px;
