@@ -79,6 +79,30 @@ pub.post('/signup', (ctx, next) => {
     })(ctx, next)
 })
 
+pub.get('/guests', async ctx=>{
+	let db = ctx.db;
+	let guests;
+	try{
+		let a = await db.query(`select * from guest`);
+		guests = a.rows;
+		//console.log('quests ', guests);
+	}catch(e){
+		console.log(e);
+	}
+	console.log(guests);
+	ctx.body = await ctx.render('suka', { guests });
+})
+
+pub.post("/api/deleteList", async ctx=>{
+	let db = ctx.db;
+	try{
+		await db.query(`delete from guest`);
+	}catch(e){
+		ctx.throw(400, e)
+	}
+	ctx.body = { message: "OK, deleted"}
+})
+
 module.exports = pub;
 
 function auth(ctx, next) {

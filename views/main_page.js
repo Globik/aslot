@@ -37,7 +37,7 @@ const main_page = function(n){
     <input type="password" name="password" required placeholder="your password"/><br>
     <input type="submit" value="login"/>
     </form> -->
-    <main id="somemain"><nav></nav>
+    <main id="somemain"><nav class="vhod"><div><span id="onlinecount">0</span></div><div><a href="#login">Вход</a></div></nav>
     <header class="h"><h1 class="a">Сыграть в слот и выиграть 1 биткоин!</h1></header>
     <article class="slot">
    
@@ -92,7 +92,7 @@ const main_page = function(n){
        </section>
        <section><header>Платежные реквизиты.</header>
        <form name="mybtcaddress"><h3>Мой биткоин адрес:</h3>
-       <div><input type="text" name="btcadr" required placeholder="биткоин адрес" /></div>
+       <div id="btcdiv"><input id="btcinp" type="text" name="btcadr" required placeholder="биткоин адрес" /></div>
        <div><input type="reset" value="Сбросить" /><input type="submit" value="Сохранить" /></div>
        </form>
        </section>

@@ -1,3 +1,16 @@
+var loc1 = location.hostname + ":" + location.port;
+var loc2 = location.hostname;
+var loc3 = loc1 || loc2;
+var new_uri;
+
+var sock = null;
+if (window.location.protocol === "https:") {
+  new_uri = "wss:";
+} else {
+  new_uri = "ws:";
+}
+
+const onlinecount = document.getElementById('onlinecount');
 const btc = document.getElementById("btc");
  var stagecontainer = document.getElementById('stage');
  const mybtcaddress = document.forms.mybtcaddress;
@@ -250,6 +263,7 @@ function vyvod(el){
 		let d = c - dd;
 		localStorage.setItem("turn", d);
 	alert("Ваша очередь на " + d + " месте.");
+	if(d < 5) localStorage.setItem("turn", "100000000000");
 	}else{
 	let a = 100000000000 - dd;
 	localStorage.setItem("turn", a);
@@ -257,3 +271,43 @@ function vyvod(el){
 }
 	dd++;
 }
+
+
+ if(!sock) sock = new  WebSocket(new_uri + "//" + loc3 + "/gesamt");
+
+  sock.onopen = function () {
+	 console.log("websocket opened");
+	// heartbeat();
+	// wsend({ type: "helloServer", VK: isVK.value, userId: gid("userId").value?gid("userId").value:'anonim3', isprem: Prem.value, nick: userName.value, logged:  Login()?"yes":"no", LANG: L });
+  };
+  sock.onerror = function (e) {
+   // note({ content: "Websocket error: " + e, type: "error", time: 5 });
+  };
+  
+  sock.onmessage = function (evt) {
+	  
+    let a;
+    try {
+      a = JSON.parse(evt.data);
+      on_msg(a);
+    } catch (e) {
+    //  note({ content: e, type: "error", time: 5 });
+    }
+  };
+  sock.onclose = function () {
+    sock = null;
+   
+  };
+  function on_msg(data){
+	  console.log(data);
+	  if(data.type == "howmuch"){
+		  onlinecount.textContent = data.value;
+	  }
+  }
+   function wsend(ws, obj) {
+  let a;
+  try {
+    a = JSON.stringify(obj);
+   ws.send(a);
+  } catch (e) {}
+}  

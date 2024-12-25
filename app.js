@@ -12,6 +12,7 @@ const rmdir = util.promisify(fs.rmdir);
 const access = util.promisify(fs.access);
 const mkdir = util.promisify(fs.mkdir);
 const { koaBody } = require('koa-body');
+const axios = require("axios").default;
 
 const passport = require('koa-passport');
 const WebSocket = require('ws');
@@ -135,6 +136,97 @@ cb(false);
 	}
 	}*/
     });
-    
-    
-    
+    function noop() {}
+
+const interval = setInterval(function ping() {
+  wss.clients.forEach(function each(ws) {
+    if (ws.isAlive === false) return ws.terminate();
+    ws.isAlive = false;
+    ws.ping(noop);
+  });
+}, 1000 * 600);
+
+function heartbeat() {
+  this.isAlive = true;
+}
+  wss.on("connection", async function ws_connect(ws, req) {
+	  console.log("websocket connected");
+	const ip = req.socket.remoteAddress;
+	setGuest(ip);
+	 ws.isAlive = true;
+  ws.on("pong", heartbeat);
+   broadcast_all({ type: "howmuch", value: wss.clients.size });
+	ws.on('message', async function onMessage(msg){
+		console.log(msg);
+	});
+	ws.on('close', async function onClose(){
+		 broadcast_all({ type: "howmuch", value: wss.clients.size });
+	});
+	ws.on('error', function(er){console.log(er)});
+})
+  
+  function wsend(ws, obj) {
+  let a;
+  try {
+    a = JSON.stringify(obj);
+  //  console.log("type:", obj.type);
+    if (ws.readyState === WebSocket.OPEN) ws.send(a);
+  } catch (e) {}
+}  
+function broadcast_all(obj) {
+  wss.clients.forEach(function each(client) {
+    wsend(client, obj);
+  });
+}
+
+const abstract_key = "7f87b155a0ca434a9d43ac2266264ad6";
+
+const re = /([0-9]{1,3}[\.]){3}[0-9]{1,3}/;
+function setGuest(ip){
+	if(process.env.DEVELOPMENT == "yes"){return;}
+
+// = "78.81.155.17";
+//try{
+var a = ip.match(re);
+ var r = a[0];
+ //var r = "78.81.155.17"
+//}catch(e){
+	//console.log(e);
+//} 
+setTimeout(function(){
+	console.log('""R ', r );
+	axios.get(`https://ipgeolocation.abstractapi.com/v1/?api_key=${abstract_key}&ip_address=${r}&fields=country,city,flag`).then(async response=>{
+	//console.log('data: ', response.data, 'status', response.status, response.data.error);
+	if(response.status == 200){
+		//response.data.city response.data.country response.data.flag.unicode svg
+		
+		try{
+		//await db.db.insertAsync({city: response.data.city, country: response.data.country, date: new Date()});
+		await pool.query(`insert into guest(city,country) values($1,$2)`, [ response.data.city, response.data.country ]);
+	}catch(er){
+		console.log(er);
+		
+		}
+	}
+	
+}).catch(async error=>{
+	if (error.response) {
+      // The request was made and the server responded with a status code
+      // that falls out of the range of 2xx
+      console.log(error.response.data);
+      console.log(error.response.status);
+      console.log(error.response.headers);
+    } else if (error.request) {
+      // The request was made but no response was received
+      // `error.request` is an instance of XMLHttpRequest in the browser and an instance of
+      // http.ClientRequest in node.js
+      console.log(error.request);
+    } else {
+      // Something happened in setting up the request that triggered an Error
+      console.log('Error', error.message);
+    }
+    console.log(error.config);
+	
+})
+}, 1000)
+}
