@@ -105,7 +105,7 @@ const main_page = function(n){
           <div class="error-message" id="errormsg"></div>
          <form name="formlogin" id="myform">
             <label for="name" class="lb" style="margin-top: 5px;">Имя </label>
-            <input  class="inp" name="username" type="text" placeholder="Введите" id="name" required minlength="2" maxlength="20">
+            <input  class="inp" name="username" type="text" placeholder="Введите имя" id="name" required minlength="2" maxlength="20">
 
             <label for="name" class="lb">Пароль</label>
             <input  class="inp" name="userpassword" type="password" autocomplete="on" placeholder="Введите пароль" id="password" required minlength="2" maxlength="20">

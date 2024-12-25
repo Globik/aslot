@@ -23,7 +23,7 @@ passport.use(new LocalStrategy({usernameField:'username',passwordField:'password
 process.nextTick(async()=>{ 
 	try{ 
 let user=await db.query('select id from users where bname=$1 and pwd=$2',[username, password]) 
-if(!user.rows[0]){return done(null, false, {message:'Неправильный ник или пароль!'})} 
+if(!user.rows[0]){return done(null, false, {message:'Неправильный ник или пароль! Или юзера такого нет.'})} 
  return done(null,user.rows[0],{message: 'Авторизация прошла успешно!! ', nick: username, id: user.rows[0].id }) 
  }catch(err){return done(err)} }) }))
 

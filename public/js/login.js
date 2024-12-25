@@ -43,12 +43,12 @@ var r=await fetch(uri, {
   console.log('res ', r);
     if(r.ok){
 		console.log('ok');
-		alert('0k');
+		//alert('0k');
 		let data=await r.json();
 		console.log('data: ', data);
-		alert(data);
+		//alert(data);
 		if(data.success === false){
-			alert('data false');
+			//alert('data false');
 			//Missing credentials", status: 401
 			//'Пароль должен содержать минимум 6 символов, а Имя минимум 2!', status: 402
 			//'Имя должно быть меньше 20 букв.', status: 403
