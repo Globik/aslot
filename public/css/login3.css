@@ -1,0 +1,167 @@
+/*
+*,
+*:before,
+*:after{
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+}
+*/
+form * {
+  font-family: 'Poppins',sans-serif;
+  letter-spacing: 0.5px;
+  outline: none;
+  border: none;
+}
+
+#loginoutput{
+	background:white;
+	width:25vw;
+	border-radius:10px;
+}
+.modal-body{
+	background:white;
+}
+label.lb {
+  display: block;
+  margin-top: 15px;
+  font-size: 1.8rem;
+  font-weight: 500;
+  color:black;
+}
+
+input.inp {
+  display: block;
+  height: 50px;
+  width: 100%;
+  border-radius: 10px;
+  padding: 0px 8px;
+  margin-top: 8px;
+  font-size: 1.8rem;
+  font-weight: 300;
+  background: #ddd;
+  border: 0;
+}
+
+span.model-header-label {
+  float: right;
+  font-weight: bold;
+  color: #ff5722;
+  font-size:1.8rem;
+}
+
+.login-button {
+height:60px;
+  margin-top: 10px;
+  width: 100%;
+  background: linear-gradient(#446ca2,#446ca2 25%,#184076);
+  color: #fff;
+  padding: 12px 0;
+  font-size: 18px;
+  font-weight: 600;
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+.register-button {
+height:60px;
+  margin-top: 25px;
+  width: 100%;
+  background: green;/*#4caf50;*/
+  color: #fff;
+  padding: 12px 0;
+  font-size: 18px;
+  font-weight: 600;
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+.login-button:hover, .register-button:hover {
+  color: #ddd;
+}
+
+.center-button > button {
+  width: 230px;
+}
+.center-button {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+}
+
+.error-message {
+  display: block;
+  width: 100%;
+  border-radius: 10px;
+  padding: 12px 8px;
+  margin-top: 8px;
+  font-size: 2rem;
+  font-weight: 300;
+  bckground: #e91e4d;
+  border: 0;
+  color: red;
+}
+
+.modal-header {
+  padding: 14px;
+  font-size: 1.8rem;
+  font-weight: 600;
+  border-bottom: 1px solid rgba(0, 0, 0, .2);
+  color:black;
+}
+
+.modal-body {
+  padding: 14px;
+}
+
+
+/*
+li {
+  list-style-type: none;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
+*/
+/*
+button.login-button,button.register-button {
+  height: 100%;
+  border: none;
+  font-size: 2rem;
+  outline: none;
+  cursor: pointer;
+  color: #767676;
+  background-color: #fff;
+}
+*/ 
+/*
+  button:hover {
+    color: #333;
+  }
+
+  button:active {
+    color: #000;
+  }
+
+*/
+
+.flex {
+  display: flex;
+}
+@media screen and (max-width: calc(452px * 60)) and (orientation: portrait){
+
+html{
+
+}
+#loginoutput{
+	width:90%;
+	ackground:red;
+	font-size:5rem;
+}
+.modal-body{
+	width:95%;
+}
+}

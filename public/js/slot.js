@@ -239,9 +239,9 @@ function onsaveaddress(ev){
 	var valid = WAValidator.validate(a, 'bitcoin');
 if(valid){
 	localStorage.setItem('mybtcadr', a);
-	//note({ content: "Сохранено!", type: "info", time: 5 })
+	note({ content: "Сохранено!", type: "info", time: 5 })
 }else{
-	alert('no valid');
+	note({ content:'Not valid!', type: "info", time: 5 });
 }
 }
 function onReset(ev){
@@ -250,11 +250,11 @@ function onReset(ev){
 let dd = 0
 function vyvod(el){
 	if(btc.textContent == "0"){
-		alert("Ноль биткоинов!");
+		note({ content: "Ноль биткоинов!", type: "info", time: 5 });
 		return;
 	}
 	if(!mybtcaddress.btcadr.value){
-		alert("Пржалуйста, заполните поле вашего биткоин адреса в платежных реквизитах!");
+		note({ content: "Пoжалуйста, заполните поле вашего биткоин адреса в платежных реквизитах!", type: "info", time: 5 });
 		return;
 	}
 	let b = localStorage.getItem('turn');
@@ -262,12 +262,13 @@ function vyvod(el){
 		let c = Number(b);
 		let d = c - dd;
 		localStorage.setItem("turn", d);
-	alert("Ваша очередь на " + d + " месте.");
+	note({ content: "Ваша очередь на " + d + " месте.", type: "info", time: 5 });
 	if(d < 5) localStorage.setItem("turn", "100000000000");
 	}else{
 	let a = 100000000000 - dd;
 	localStorage.setItem("turn", a);
-	alert("Ваша очередь на " + a + " месте.");
+	//alert("Ваша очередь на " + a + " месте.");
+	note({ content: "Ваша очередь на " + d + " месте.", type: "info", time: 5 });
 }
 	dd++;
 }

@@ -12,7 +12,7 @@ pub.get('/', async ctx => {
 
 
 pub.post('/login', (ctx, next) => {
-  
+   if (!ctx.isAuthenticated()) {
     return passport.authenticate('local', function (err, user, info, status) {
 		console.log('err, user, info, staatus ', err, user, info, status);
             
@@ -22,7 +22,7 @@ pub.post('/login', (ctx, next) => {
                 }
                 if (user === false) {
                     ctx.body = {success: false, info: info.message}
-                    ctx.throw(401, info.message)
+                   // ctx.throw(401, info.message)
                 } else {
                     ctx.body = {
                         success: true,
@@ -36,11 +36,18 @@ pub.post('/login', (ctx, next) => {
            
         }
     )(ctx, next)
+}
 })
 
-pub.get('/logout', ctx => {
-    ctx.logout();
-    ctx.redirect('/');
+pub.post('/logout', async(ctx) => {
+
+    ctx.logout()
+    
+    ctx.body = { message:"ok"}
+   
+   
+   
+   
 });
 
 
@@ -63,7 +70,7 @@ pub.post('/signup', (ctx, next) => {
             }
 
             if (!user) {
-                ctx.body = {success: false, message: info.message, code: info.code, bcode: info.bcode}
+                ctx.body = {success: false, info: info.message, code: info.code, bcode: info.bcode}
             } else {
                 ctx.body = {
                     success: true,
@@ -89,7 +96,7 @@ pub.get('/guests', async ctx=>{
 	}catch(e){
 		console.log(e);
 	}
-	console.log(guests);
+	//console.log(guests);
 	ctx.body = await ctx.render('suka', { guests });
 })
 

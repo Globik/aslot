@@ -118,6 +118,9 @@ button,input[type=submit],input[type=text],input[type=reset]{
 	padding-top:2rem;
 	padding-bottom:2rem;
 }
+#btcinp{
+	width:70%;
+}
 			section#hauptcontainer{
 				width:100%;
 				adding:20px;
@@ -286,7 +289,7 @@ button,input[type=submit],input[type=text],input[type=reset]{
 							height:calc(50% - 100px);
 							margin-top:100px;
 							}
-							div#btcdiv{width:95%;}
+							div#btcdiv{width:100%;}
 				input#btcinp{
 					width:100%;
 				}

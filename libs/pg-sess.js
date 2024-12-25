@@ -108,10 +108,12 @@ async set(sid,sess,ttl){
         ttl = ttl || ms("45 minutes");
         const expiry = (Date.now() + ttl) / 1000;
 
-        //If there is a row, update it
+        console.log('if there is a row, update it sid ',sid,' ');
         if (await this.get(sid)){
+			console.log('there is a sid');
             await this.query(this.updateValueSql, [sess, expiry, sid]);
 		}else{
+			console.log('no sid');
             await this.query(this.insertValueSql, [sid, sess, expiry]);
 		}
     };
@@ -132,7 +134,7 @@ async set(sid,sess,ttl){
         let sess = this;
 //Each interval of cleanupTime, run the cleanup script
         setTimeout(function interval() {
-           // sess.query(sess.cleanupSql, Date.now() / 1000).then(()=> {
+           console.log('sess.query(sess.cleanupSql, Date.now() / 1000).then(()=> {')
 			sess.query(sess.cleanupSql/*,Date.now()/1000*/,(err,r)=>{
                 //Recurse so that the cleanupTime can be dynamic
 				//if(err)console.log('err: ',err)

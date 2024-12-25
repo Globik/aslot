@@ -1,0 +1,82 @@
+
+/*popup*/
+
+.overlay {
+    background-color: rgba(0, 0, 0, 0.9);
+    bottom: 0;
+    left: 0;
+    right: 0;
+    top: 0;
+    cursor: default;
+    opacity: 1.0;
+    position: fixed;
+    visibility: hidden;
+    z-index: 1;
+    transition: opacity 0s;
+
+}
+
+.overlay:target {
+    visibility: visible;
+    opacity: 1;
+    z-index: 100;
+}
+
+.popi {
+    border: 1px solid rgba(255, 245, 255, 0.2);
+    background: rgba(20, 20, 30, 1);
+    color: rgba(233, 240, 250, 0.9);
+    font-family: Arial, sans-serif;
+    left: 50%;
+    top: 25%;
+    width: auto;
+    padding: 10px 20px 20px 20px;
+    overflow: auto;
+    opacity: 0;
+    adding: 10em;
+    position: fixed;
+    height: auto;
+    visibility: hidden;
+    z-index: 100;
+    transform: translate(-50%, -25%);
+    -webkit-transform: translate(-50%, -25%);
+    -ms-transform: translate(-50%, -25%);
+    border-radius: 2px;
+    transition: opacity 0s, top 0s;
+}
+
+.overlay:target + .popi {
+    opacity: 1;
+    visibility: visible;
+}
+
+.wrap-close {
+    height: 0em;
+    margin-bottom: 0em;
+    display: block;
+    position: relative;
+}
+
+.close {
+    height: 0.9em;
+    text-align: center;
+    width: 0.9em;
+    position: absolute;
+    top: 0;
+    right: 0;
+    text-decoration: none;
+    font-size: 1.6em;
+
+}
+
+.close::before {
+    color: rgba(255, 255, 255, 0.9);
+    content: "\274c";
+    /* or x \d7 */
+}
+
+
+.close:hover::before {
+    color: brown;
+}
+

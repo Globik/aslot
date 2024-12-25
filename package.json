@@ -33,7 +33,7 @@
     "pg-pool": "^3.6.2",
     "pg-pubsub": "^0.8.1",
     "rate-limiter-flexible": "^5.0.3",
-    "shortid": "^2.2.16",
+    "shortid": "^2.2.8",
     "wallet-address-validator": "^0.2.4",
     "ws": "^8.18.0"
   }

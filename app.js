@@ -27,7 +27,6 @@ const render = require('./libs/render.js');
 
 const serve = require('koa-static');
 const session = require('koa-session');
-
 const pubrouter = require('./routes/pubrouter.js');
 const adminrouter = require('./routes/adminrouter.js');
 //const {meta, warnig, site_name} = require('./config/app.json');
@@ -57,7 +56,7 @@ const app = new Koa();
 
 app.keys = ['your-secret']
 app.use(serve(__dirname + '/public'));
-app.use(session({store: pg_store, maxAge: 24 * 60 * 60 * 1000}, app))
+app.use(session({/*store: pg_store,*/ maxAge: 24 * 60 * 60 * 1000}, app))
 
 render(app, {root: 'views', development: (process.env.DEVELOPMENT == "yes" ? false : false)})
 app.use(koaBody());

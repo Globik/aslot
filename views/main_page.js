@@ -20,8 +20,11 @@ const main_page = function(n){
 <meta name="description" content="Але, братан, а где поднять бабла? На чатикон! Крути бесплатно барабан и получай биткоины!"/>
     
     <link rel="icon" href="/img/w4.png">
+    <link href="/css/note.css" rel="stylesheet">
     <link href="/css/slot.css" rel="stylesheet">
     <link href="/css/tables.css" rel="stylesheet">
+    <link href="/css/output.css" rel="stylesheet">
+    <link href="/css/login3.css" rel="stylesheet"> 
     <style>
    
     </style>
@@ -31,14 +34,11 @@ const main_page = function(n){
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     </head><body>
-    <!-- hello world 
-    <form name="loginform" method="post" action="/login">
-    <input type="text" placeholder="your name" required name="username"/><br>
-    <input type="password" name="password" required placeholder="your password"/><br>
-    <input type="submit" value="login"/>
-    </form> -->
-    <main id="somemain"><nav class="vhod"><div><span id="onlinecount">0</span></div><div><a href="#login">Вход</a></div></nav>
+  
+    <main id="somemain"><nav class="vhod"><div><span id="onlinecount">0</span></div><div><a ${n.user?`onclick="logout(this);"`:''} href="${n.user?'#':'#login'}">${n.user?'Выход':'Вход'}</a></div></nav>
+    ${n.user&&n.user.brole=='admin'?`<div><a style="font-size:2rem;" href="/dashboard">Админка</a></div>`:''}
     <header class="h"><h1 class="a">Сыграть в слот и выиграть 1 биткоин!</h1></header>
+    ${n.user?`<div style="font-size:2rem;">Добро пожаловать, ${n.user.bname}!</div>`:''}
     <article class="slot">
    
     <aside id="slotinfo">
@@ -96,6 +96,25 @@ const main_page = function(n){
        <div><input type="reset" value="Сбросить" /><input type="submit" value="Сохранить" /></div>
        </form>
        </section>
+       
+       <a href="#."  class="overlay" id="login"></a>
+    <output id="loginoutput" class="popi">
+        <div class="modal-header">Авторизация / Регистрация'</div>
+      
+        <div class="modal-body">
+          <div class="error-message" id="errormsg"></div>
+         <form name="formlogin" id="myform">
+            <label for="name" class="lb" style="margin-top: 5px;">Имя </label>
+            <input  class="inp" name="username" type="text" placeholder="Введите" id="name" required minlength="2" maxlength="20">
+
+            <label for="name" class="lb">Пароль</label>
+            <input  class="inp" name="userpassword" type="password" autocomplete="on" placeholder="Введите пароль" id="password" required minlength="2" maxlength="20">
+			 <button  class="login-button" id="btnlogin">Войти</button>
+         <button class="register-button" id="btnregister">Зарегистрироваться</button>
+          </form> </div>
+    </output>
+       
+       
         <footer></footer>
         </main>
     <script src="/js/login.js"></script>
