@@ -78,7 +78,7 @@ var lets = [];
                 setup_faces(document.getElementById('ring-2'));
                 setup_faces(document.getElementById('ring-3'));
               //  alert(0+Number(0.009595));
-				//	localStorage.clear();
+				localStorage.clear();
                 const mybtc = localStorage.getItem("mybtc");
               //  const mybtcadr = localStorage.getItem("mybtcadr");
                 if(mybtc){
@@ -201,7 +201,7 @@ pdf.addEventListener('click', makepdf, false);
 function makepdf(ev){
 	//alert('pdf');
 	if(lets.length == 0){
-		alert('No content!');
+		note({ content: 'Нечего экспортировать в PDF файл!', type: "info", time: 5 });
 		return;
 	}
 	const element = document.querySelector("#chatbox");

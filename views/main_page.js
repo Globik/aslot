@@ -102,7 +102,7 @@ const main_page = function(n){
        -->
        <a href="#."  class="overlay" id="login"></a>
     <output id="loginoutput" class="popi">
-        <div class="modal-header">Авторизация / Регистрация'</div>
+        <div class="modal-header">Авторизация / Регистрация</div>
       
         <div class="modal-body">
           <div class="error-message" id="errormsg"></div>

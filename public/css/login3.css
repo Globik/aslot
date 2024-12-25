@@ -164,4 +164,13 @@ html{
 .modal-body{
 	width:95%;
 }
+.login-button , .register-button{
+	height:6rem;
+	font-size:2.5rem;
+	width:100%;
+	margin:0;
+}
+input.inp {
+	height:6rem;
+}
 }
