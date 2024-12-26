@@ -36,11 +36,14 @@ const main_page = function(n){
    <!-- <script>window.yaContextCb=window.yaContextCb||[]</script>
     <script src="https://yandex.ru/ads/system/context.js" async></script>
     -->
+    <script async src="https://yastatic.net/share2/share.js"></script>
     </head><body>
   
-    <main id="somemain"><nav class="vhod"><div><span id="onlinecount">0</span></div><div><a ${n.user?`onclick="logout(this);"`:''} href="${n.user?'#':'#login'}">${n.user?'Выход':'Вход'}</a></div></nav>
+    <main id="somemain"><nav class="vhod">
+<div class="ya-share2" data-curtain data-size="m" data-shape="round"  data-services="vkontakte,telegram,odnoklassniki" data-url="https://chatikon.ru" data-image="https://chatikon.ru/img/home.jpg"></div>
+    <div><span id="onlinecount">0</span></div><div><a ${n.user?`onclick="logout(this);"`:''} href="${n.user?'#':'#login'}">${n.user?'Выход':'Вход'}</a></div></nav>
     ${n.user&&n.user.brole=='admin'?`<div><a style="font-size:2rem;" href="/dashboard">Админка</a></div>`:''}
-    <header class="h"><h1 class="a">Крути руль и собирай по дороге сердечки &#x1f496</h1></header>
+    <header class="h"><h1 class="a">Рулить и собирать по дороге сердечки &#x1f496</h1></header>
     ${n.user?`<div style="font-size:2rem;">Добро пожаловать, ${n.user.bname}!</div>`:''}
     <article class="slot">
    
@@ -66,6 +69,7 @@ const main_page = function(n){
         </aside>
        
        </article>
+        <section><header>У Вас <span id="btc">0</span> сердечек &#x1f496.</header>
       <!-- <button onclick="fuck();">fuck</button> -->
        <br><br>
        <section class="table">
@@ -90,9 +94,9 @@ const main_page = function(n){
   </tr>
 </table>
        </section>
-       <section><header>У Вас <span id="btc">0</span> сердечек &#x1f496.</header>
+      
       <!-- <div><button onclick="vyvod(this);">Запросить выплату</button></div>
-       </section>
+      
        <section><header>Платежные реквизиты.</header>
        <form name="mybtcaddress"><h3>Мой биткоин адрес:</h3>
        <div id="btcdiv"><input id="btcinp" type="text" name="btcadr" required placeholder="биткоин адрес" /></div>
@@ -134,7 +138,17 @@ const main_page = function(n){
    })
 })
        </script> -->
-       
+       <section id="reklama">
+       <div class="reklama-box">
+       <div>Место для вашей рекламы от 500 руб/неделя. Обращаться в телеграм <a rel="nofollow" href="https://t.me/Globik2">@Globik2</a></div>
+       </div>
+       <div class="reklama-box">
+       <div>Место для вашей рекламы от 500 руб/неделя. Обращаться в телеграм <a rel="nofollow" href="https://t.me/Globik2">@Globik2</a></div>
+       </div>
+       <div class="reklama-box">
+       <div>Место для вашей рекламы от 500 руб/неделя. Обращаться в телеграм <a rel="nofollow" href="https://t.me/Globik2">@Globik2</a></div>
+       </div>
+       </section>
         <footer>
         <section>Сайт разработан искусственным интеллектом от ChatGPT OpenAI.</section>
         <section><span>&#9400; 2024 - </span><span>${new Date().getFullYear()} Chatikon.ru</span></section>

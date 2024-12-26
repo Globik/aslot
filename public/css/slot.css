@@ -23,6 +23,8 @@ html,body{
 				align-items: center;
 				justify-content: end;
 				bckground:red;
+				background: #cb6f6f;
+				border-radius:5px;
 				font-size:20px;
 				font-weight:bold;
 				color:rgb(6,9,8);
@@ -128,9 +130,11 @@ article.beschreibung{
 }
 article.beschreibung p{
 	font-size:2rem;
+	line-height:1.5;
 }
 footer{
 	background: #cb6f6f;
+	border-radius:5px;
 }
 footer section{
 padding:1rem;
@@ -268,6 +272,30 @@ padding:1rem;
 		span.sevenwin{
 			color:red;
 		}
+		section#reklama{
+			height:35rem;
+			width:100%;
+			ackground:red;
+			display:grid;
+			grid-template-columns:33.33% 33.33% 33.33%;
+			padding:0;
+		}
+		section#reklama div.reklama-box{
+			height:100%;
+			width:100%;
+			border:2px solid pink;
+			border-radius:10px;
+			display:flex;
+			margin:0;
+			background: #cb6f6f;
+		}
+		section#reklama div.reklama-box div{
+			margin:auto;
+			font-size:3rem;
+			line-height:1.5;
+			color:rgb(7,9,13);
+			padding:2rem;
+		}
 /*321 */
 	@media screen and (max-width: calc(452px * 60)) and (orientation: portrait){
 							html{
@@ -307,6 +335,15 @@ padding:1rem;
 							div#btcdiv{width:100%;}
 				input#btcinp{
 					width:100%;
+				}
+				section#reklama{
+					diplay:block;
+					height:105rem;
+					grid-template-columns:none;
+					grid-template-rows:33.33% 33.33% 33.33%;
+				}
+				section#reklama div.reklama-box{
+					diplay:block;
 				}
 						}
 
