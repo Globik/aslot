@@ -52,6 +52,7 @@ html,body{
 				  background-size: cover;  
 				  background-position: center center; 
 			}
+			
             h1.a{
 				text-align:center;
 				line-height:2;
@@ -288,7 +289,31 @@ padding:1rem;
 			display:flex;
 			margin:0;
 			background: #cb6f6f;
+			position:relative;
 		}
+		section#reklama div.reklama-box::after{
+		position:absolute;
+		left:6px;
+		top:0;
+		color:red;
+		content:"реклама";
+		font-size:2.5rem;
+		}
+		section#reklama div.reklama-box:first-child{
+		color:red;
+		font-size:700rem;
+	
+				background-image: url("/img/suki.jpg");
+				 background-repeat: no-repeat;
+				  background-size: cover;  
+				  background-position: center center; 
+			}
+			section#reklama div.reklama-box:first-child div{
+				color:green;
+				font-weight:bold;
+				font-size:4rem;
+				background:rgba(255,255,255,0.5);
+			}
 		section#reklama div.reklama-box div{
 			margin:auto;
 			font-size:3rem;

@@ -139,8 +139,9 @@ const main_page = function(n){
 })
        </script> -->
        <section id="reklama">
-       <div class="reklama-box">
-       <div>Место для вашей рекламы от 500 руб/неделя. Обращаться в телеграм <a rel="nofollow" href="https://t.me/Globik2">@Globik2</a></div>
+       <div id="suka1" class="reklama-box abba">
+      <!-- <div>Место для вашей рекламы от 500 руб/неделя. Обращаться в телеграм <a rel="nofollow" href="https://t.me/Globik2">@Globik2</a></div> -->
+       <div class="aa-control"><p>Видео чат-рулетка. <a rel="nofollow" href="https://rouletka.ru/about">Перейти на сайт</a></p></div>
        </div>
        <div class="reklama-box">
        <div>Место для вашей рекламы от 500 руб/неделя. Обращаться в телеграм <a rel="nofollow" href="https://t.me/Globik2">@Globik2</a></div>
@@ -150,7 +151,7 @@ const main_page = function(n){
        </div>
        </section>
         <footer>
-        <section>Сайт разработан искусственным интеллектом от ChatGPT OpenAI.</section>
+        <section>Сайт разработан искусственным интеллектом на базе ChatGPT от OpenAI.</section>
         <section><span>&#9400; 2024 - </span><span>${new Date().getFullYear()} Chatikon.ru</span></section>
         </footer>
         </main>
