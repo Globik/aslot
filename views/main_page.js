@@ -6,6 +6,15 @@ const main_page = function(n){
     <!-- <meta name="viewport" content="width=device-width,initial-scale=1.0"> -->
     <meta name="viewport" content="initial-scale=0.60, minimum-scale=0.60, maximum-scale=0.60">
     
+    <link rel="icon" type="image/png" href="/img3/favicon-96x96.png" sizes="96x96" />
+<link rel="icon" type="image/svg+xml" href="/img3/favicon.svg" />
+<link rel="shortcut icon" href="/img3/favicon.ico" />
+<link rel="apple-touch-icon" sizes="180x180" href="/img3/apple-touch-icon.png" />
+<meta name="apple-mobile-web-app-title" content="Chatikon" />
+<link rel="manifest" href="/img3/site.webmanifest" />
+    
+    
+    
     <meta name="description" content="Крути руль и собирай по дороге сердечки" />
  
   <meta property="og:title" content="Машина" />
@@ -19,7 +28,7 @@ const main_page = function(n){
 <meta itemprop="description" content="Крути руль и собирай по дороге сердечки" />
 <meta name="description" content="Крути руль и собирай по дороге сердечки"/>
     
-    <link rel="icon" href="/img/w4.png">
+    <!-- <link rel="icon" href="/img/w4.png"> -->
     <link href="/css/note.css" rel="stylesheet">
     <link href="/css/slot.css" rel="stylesheet">
     <link href="/css/tables.css" rel="stylesheet">
@@ -37,6 +46,7 @@ const main_page = function(n){
     <script src="https://yandex.ru/ads/system/context.js" async></script>
     -->
     <script async src="https://yastatic.net/share2/share.js"></script>
+     <script src="/pwabuilder-sw-register.js"></script>
     </head><body>
   
     <main id="somemain"><nav class="vhod">
