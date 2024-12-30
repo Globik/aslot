@@ -1,6 +1,7 @@
 {
   "name": "Chatikon",
   "short_name": "Chatikon",
+  "start_url": "https://chatikon.ru",
   "icons": [
     {
       "src": "/img3/web-app-manifest-192x192.png",
