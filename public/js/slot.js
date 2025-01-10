@@ -299,12 +299,13 @@ function vyvod(el){
     sock = null;
    
   };
+  /*
   function on_msg(data){
 	  console.log(data);
 	  if(data.type == "howmuch"){
 		  onlinecount.textContent = data.value;
 	  }
-  }
+  }*/
    function wsend(ws, obj) {
   let a;
   try {

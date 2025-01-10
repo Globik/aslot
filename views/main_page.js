@@ -39,6 +39,7 @@ const main_page = function(n){
     </style>
     <script src="/js/wallet-address-validator.min.js"></script>
     <script src="/js/globalik.js"></script>
+    <script src="/js/mediasoup-client.min.js"></script>
   <!--  <script src="/js/pdfmake.min.js"></script> -->
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -48,13 +49,14 @@ const main_page = function(n){
     <script async src="https://yastatic.net/share2/share.js"></script>
      <script src="/pwabuilder-sw-register.js"></script>
     </head><body>
-  
+  <video id="remote" playsinline autoplay></video>
+  <button id="Publish" onclick="startMedia(this);">publish</button> | <button id="Subscribe" onclick="subscribe(this);">subscribe</button>
     <main id="somemain"><nav class="vhod">
 <div class="ya-share2" data-curtain data-size="m" data-shape="round"  data-services="vkontakte,telegram,odnoklassniki" data-url="https://chatikon.ru" data-image="https://chatikon.ru/img/home.jpg"></div>
     <div><span id="onlinecount">0</span></div><div><a ${n.user?`onclick="logout(this);"`:''} href="${n.user?'#':'#login'}">${n.user?'Выход':'Вход'}</a></div></nav>
     ${n.user&&n.user.brole=='admin'?`<div><a style="font-size:2rem;" href="/dashboard">Админка</a></div>`:''}
-    <header class="h"><h1 class="a">Рулить и собирать по дороге сердечки &#x1f496</h1></header>
-    ${n.user?`<div style="font-size:2rem;">Добро пожаловать, ${n.user.bname}!</div>`:''}
+    <header class="h"><h1 class="a">${!n.user?'Рулить и собирать по дороге сердечки &#x1f496': 'Сыграть в слот на интерес'}</h1></header>
+    ${n.user?`<div style="font-size:2rem;">Привет, ${n.user.bname}! Удачи в игре!</div>`:''}
     <article class="slot">
    
     <aside id="slotinfo">
@@ -66,7 +68,7 @@ const main_page = function(n){
         </div>
         </div>
        <footer id="foot"> 
-       <!-- <input type="button" class="st" value="СДЕЛАТЬ СТАВКУ"> -->
+       ${n.user?'<input type="button" class="st" value="КУПИТЬ &#x1f496&#x1f496">':''}
        <input type="button" class="startSpinn" value="КРУТИТЬ">
         </footer> 
         </aside>
@@ -83,37 +85,9 @@ const main_page = function(n){
       <!-- <button onclick="fuck();">fuck</button> -->
        <br><br>
        <section class="table">
-       <h2>Сводная таблица.</h2>
-
-<table style="width:100%">
-  <tr>
-    <th>Комбинация</th>
-    <th>Эмодзи</th>
-    
-  </tr>
-  
-  <tr>
-    <td>777</td>
-    <td>3 сердечка &#x1f496&#x1f496&#x1f496</td>
-    </tr><tr>
-    <td>666</td>
-    <td>2 сердечка &#x1f496 &#x1f496</td></tr><tr>
-    <td>Любые две одинаковые цифры(например, 055 или 550)</td>
-    <td>1 сердечко &#x1f496</td>
-    
-  </tr>
-</table>
+       ${n.user?getProd():getTest()}
        </section>
       
-      <!-- <div><button onclick="vyvod(this);">Запросить выплату</button></div>
-      
-       <section><header>Платежные реквизиты.</header>
-       <form name="mybtcaddress"><h3>Мой биткоин адрес:</h3>
-       <div id="btcdiv"><input id="btcinp" type="text" name="btcadr" required placeholder="биткоин адрес" /></div>
-       <div><input type="reset" value="Сбросить" /><input type="submit" value="Сохранить" /></div>
-       </form>
-       </section>
-       -->
        <a href="#."  class="overlay" id="login"></a>
     <output id="loginoutput" class="popi">
         <div class="modal-header">Авторизация / Регистрация</div>
@@ -131,13 +105,14 @@ const main_page = function(n){
           </form> </div>
     </output>
     <article class="beschreibung">
+    ${!n.user?`
     <header>Добро пожаловать в машину!</header>
     <p> 
     Если Вам хочется расслабиться, то покрутите колесо. 
     В сводной таблице представлены нужные комбинации и их эквивалент в эмодзи. Собирайте сердечки
     и получайте положительные эмоции. Последовательность ходов можно экспортировать в pdf файл.
     Всем добра!
-    </p>
+    </p>`:getTxtArticle()}
     </article>
       <!-- <div id="yandex_rtb_R-A-13472717-1"></div>
        <script>
@@ -167,10 +142,70 @@ const main_page = function(n){
         </main>
     <script src="/js/login.js"></script>
     <script src="/js/slot.js"></script>
-    
+     <script src="/js/soupi2.js"></script>
     </body>
     
     </html>`;
 }
 
 module.exports = { main_page }
+
+function getTest(){
+	let s=`<h2>Сводная таблица.</h2>
+
+<table style="width:100%">
+  <tr>
+    <th>Комбинация</th>
+    <th>Эмодзи</th>
+    
+  </tr>
+  
+  <tr>
+    <td>777</td>
+    <td>3 сердечка &#x1f496&#x1f496&#x1f496</td>
+    </tr><tr>
+    <td>666</td>
+    <td>2 сердечка &#x1f496 &#x1f496</td></tr><tr>
+    <td>Любые две одинаковые цифры(например, 055 или 550)</td>
+    <td>1 сердечко &#x1f496</td>
+    
+  </tr>
+</table>`;
+return s;
+}
+
+function getProd(){
+	return `
+	<h3>Один прокрут - одно сердечко &#x1f496 сгорает</h3>
+	<h2>Таблица выигрышей.</h2>
+
+<table style="width:100%">
+  <tr>
+    <th>Комбинация</th>
+    <th>Выигрыш</th>
+    
+  </tr>
+  
+  <tr>
+    <td>777</td>
+    <td>Сердечки х3</td>
+    </tr><tr>
+    <td>666</td>
+    <td>Сердечки х2</td></tr><tr>
+    <td>Любые две одинаковые цифры(например, 055 или 550)</td>
+    <td>Бесплатный прокрут</td>
+    
+  </tr>
+</table>`;
+}
+function getTxtArticle(){
+	return `<header>Добро пожаловать в слот!</header>
+    <p> Один прокрут - одно сердечко &#x1f496 сгорает. 
+    В таблице представлены выигрышные комбинации и умножение количества сердечек.
+     Последовательность прокрутов можно экспортировать в pdf файл.
+     Сердечко &#x1f496 это внутрисайтовая валюта.
+     Одно сердечко = 0.000011 <b>BTC</b>.
+     Вознаграждения выплачиваются биткоинами на Ваш криптокошелек.
+    Удачи!
+    </p>`
+}

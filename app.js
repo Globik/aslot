@@ -13,7 +13,7 @@ const access = util.promisify(fs.access);
 const mkdir = util.promisify(fs.mkdir);
 const { koaBody } = require('koa-body');
 const axios = require("axios").default;
-
+const { handleMediasoup, ev } = require("./libs/mediasoup_help.js");
 const passport = require('koa-passport');
 const WebSocket = require('ws');
 const Router = require('koa-router');
@@ -143,20 +143,42 @@ const interval = setInterval(function ping() {
     ws.isAlive = false;
     ws.ping(noop);
   });
-}, 1000 * 600);
+}, 1000 * 60);
 
 function heartbeat() {
   this.isAlive = true;
 }
+
+let obid = function () {
+  let tst = ((new Date().getTime() / 1000) | 0).toString(16);
+  return (
+    tst +
+    "xxxxxxxxxxxxxxxx"
+      .replace(/[x]/g, function () {
+        return ((Math.random() * 16) | 0).toString(16);
+      })
+      .toLowerCase()
+  );
+};
+
   wss.on("connection", async function ws_connect(ws, req) {
 	  console.log("websocket connected");
 	const ip = req.socket.remoteAddress;
 	setGuest(ip);
 	 ws.isAlive = true;
+	 ws.id=obid();
   ws.on("pong", heartbeat);
    broadcast_all({ type: "howmuch", value: wss.clients.size });
-	ws.on('message', async function onMessage(msg){
-		console.log(msg);
+   let msg;
+	ws.on('message', async function onMessage(msgi){
+		console.log(msgi);
+		try{
+     msg = JSON.parse(msgi)
+}catch(e){return;}
+if(msg.request == "mediasoup"){
+	handleMediasoup({ ws, msg, WebSocket, wss, pool }).mediasoup_t();
+	return;
+}
 	});
 	ws.on('close', async function onClose(){
 		 broadcast_all({ type: "howmuch", value: wss.clients.size });

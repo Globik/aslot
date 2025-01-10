@@ -1,5 +1,5 @@
 # aslot
-Slot machine game powred based on ChatGPT by OpenAI. Koajs, nodejs
+Streaming service powred based on ChatGPT by OpenAI. Koajs, nodejs
 
 ## Demo
 
