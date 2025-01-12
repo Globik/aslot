@@ -1,777 +1,257 @@
-const tg_api = '7129138329:AAGl9GvZlsK3RsL9Vb3PQGoXOdeoc97lpJ4';
-const grid = '-1002095475544';//-1002247446123
-const { Blob } =require('node:buffer')
-const fs = require('fs');
-const os = require('os')
-const {Duplex} = require('stream');
-const crypto = require('crypto');
-const Room = require('./Room')
-const Peer = require('./Peer')
-
-var BID = undefined;
-
-const axios = require('axios').default;
-const EventEmitter = require('node:events');
-const eventEmitter = new EventEmitter();
-let onLine = new Map();
-const numWorkers = Object.keys(os.cpus()).length;
-
-let workers = []
-let nextMediasoupWorkerIdx = 0 
-let roomList = new Map()
- function on_producer_transport_close(){
-		console.log("***************************************")
-		console.log("producer transport closed")
-		console.log("***********************************")
-     if (videoProducer) {
-        videoProducer.close();
-        videoProducer = null;
-      }
-      if (audioProducer) {
-        audioProducer.close();
-        audioProducer = null;
-      }
-      
-      producerTransport.observer.removeListener('close', on_producer_transport_close)
-      console.log('producerTransport listeners ', producerTransport.observer.listeners('close'))
-      producerTransport = null;
-      console.log('videoproducer: ', videoProducer)
-      console.log('audioproducer: ', audioProducer)
-       
-    }
-   function on_video_transport_closed(){
-	   console.log('**************************************')
-	   console.log('video transport closed')
-	   if (videoProducer) {
-        videoProducer.close();
-        videoProducer = null;
-      }
-	   }
-	   function on_audio_transport_closed(){
-	   console.log('**************************************')
-	   console.log('audio transport closed')
-	   if (audioProducer) {
-        audioProducer.close();
-        audioProducer = null;
-      }
-	   }
-   function on_videoproducer_close(n) {
-	   console.log("***************************************")
-        console.log('videoProducer closed ---', n);
-        console.log("***************************************")
-      }
-      
-      function on_audioproducer_close(n) {
-		  console.log("***************************************")
-        console.log('audioProducer closed ---', n);
-        console.log("***************************************")
-      }
-      
-     eventEmitter.on('data', function(d){console.log("some emitter data ", d)});
-      
-const handleMediasoup =  function(/*ws, data, WebSocket, sock, pool*/ obj){
-	let socket={};
-	socket.id = obj.ws.id;
-	function wsend(ws, ob){
+const handleMediasoup =  function(ws, msg, WebSocket, wss, pool){
+	//ws, msg, WebSocket, wss, pool 
+	console.log('*** MSG ***', msg);
+	function wsend(ws, obj){
 	console.log('hallo wsend')
 	let a;
 	try{
-		a = JSON.stringify(ob);
+		a = JSON.stringify(obj);
 		//console.log('ws.readyState ', ws.readyState);
-		if(ob.type != "producer_published")console.log('a : ', a)
-		if(ws.readyState === obj.WebSocket.OPEN)ws.send(a)
+		//if(obj.type != "producer_published")console.log('a : ', a)
+		if(ws.readyState === WebSocket.OPEN)ws.send(a)
 		}catch(e){console.log(e)}
 	}
-	function broadcast(ob){
-		obj.wss.clients.forEach(function(client){
-			if( client !== obj.ws ) wsend( client, ob );
+	function broadcast(obj){
+		wss.clients.forEach(function(client){
+			if( client !== ws ) wsend( client, obj );
 			})
 		}
-		
-		function broadcast_all(ob){
-		obj.wss.clients.forEach(function(client){
-			wsend(client, ob);
+		function broadcast_room(target, obj){
+			wss.clients.forEach(function(client){
+			if( client.roomname == target ) wsend( client, obj );
 			})
 		}
-	const ws = obj.ws;
-	 function on_consumer_transport_close() {
-      const id = getId(ws);
-      console.log('--- consumerTransport closed. --')
-      let consumer = getVideoConsumer(getId(ws));
-      if (consumer) {
-        consumer.close();
-        removeVideoConsumer(id);
-      }
-      consumer = getAudioConsumer(getId(ws));
-      if (consumer) {
-        consumer.close();
-        removeAudioConsumer(id);
-      }
-      removeConsumerTransport(id);
+		function broadcast_all(obj){
+		wss.clients.forEach(function(client){
+			wsend(client, obj);
+			})
+		}
+	
+//io.on('connection', function (socket) {
+  //console.log('client connected. socket id=' + getId(socket) + '  , total clients=' + getClientCount());
+
+  /*socket.on('disconnect', function () {
+    const roomName = getRoomname();
+
+    // close user connection
+    console.log('client disconnected. socket id=' + getId(socket) + '  , total clients=' + getClientCount());
+    cleanUpPeer(roomName, socket);
+
+    // --- socket.io room ---
+    socket.leave(roomName);
+  });*/
+ const mediasoup_t = async function(){
+
+  if(msg.type == 'getRouterRtpCapabilities') {
+    const router = defaultRoom.router;
+
+    if (router) {
+      //console.log('getRouterRtpCapabilities: ', router.rtpCapabilities);
+    //  sendResponse(router.rtpCapabilities, callback);
+       wsend(ws, {type: msg.type, routerrtpCapabilities: router.rtpCapabilities });
     }
-      
-	
-	
-	const mediasoup_t = async function(){
-	
-	let data = obj.msg;
-	console.log("DATA : ", data);
-	if(data.vid == "publish"){
-//console.log("DATA : ", data);
-    if (roomList.has(data.room_id)) {
-     // callback('already exists')
-      wsend(ws, {type: "error", info: "Трансляция идет! Повторите ппопытку позднее."})
+    else {
+     // sendReject({ text: 'ERROR- router NOT READY' }, callback);
+     wsend(ws,{type:'error', info:'ERROR- router NOT READY'});
+    }
+  }else if(msg.type == 'prepare_room'){
+    const roomId = msg.roomId;
+    const existRoom = Room.getRoom(roomId);
+    if (existRoom) {
+      console.log('--- use exist room. roomId=' + roomId);
     } else {
-      console.log('Created room', { room_id:/* data.room_id*/obj.ws.id })
-      const mediaCodecs = mediasoupOptions.router.mediaCodecs;
-      let room_id = obj.ws.id
-      let worker = await getMediasoupWorker()
-      let router = await worker.createRouter({ mediaCodecs });
-      
-      
-
- router.on('workerclose', function(){ console.log('worker closed so router closed') })
- //router.observer.on('close', function(){console.log('router closed')})
-	  worker.observer.on('close', function(){console.log('worker closed')})
-  console.log('-- mediasoup worker start. --')
-      roomList.set(room_id, new Room(room_id, router, eventEmitter))
-      //callback(room_id)
-      obj.ws.room_id = room_id
-      let c=roomList.get(obj.ws.room_id);
-      console.log('c', c);
-     let d= c.getPeers();
-     console.log('d ', d);
-     let e =d.get(obj.ws.id);
-     console.log('e ', e);
-      wsend(ws, { type:'room_created', room_id: room_id });
-    }
-  //return;
-	}//else
-	 if(data.type == "join"){
-		  console.log('User joined', {
-      room_id: obj.ws.room_id,
-      name: "alik"
-    })
-
-    if (!roomList.has(obj.ws.room_id)) {
-     return wsend(ws, {type: "error", info: "Room does not exist"});
+      console.log('--- create new room. roomId=' + roomId);
+      const room = await setupRoom(roomId);
     }
 
-    roomList.get(obj.ws.room_id).addPeer(new Peer(obj.ws.id, "alik"))
-    
+    // --- socket.io room ---
+   // socket.join(roomId);
+    setRoomname(roomId);
+    wsend(ws, { type: msg.type });
+  }else if(msg.type == 'createProducerTransport'){
+    const roomName = getRoomname();
 
-    wsend(ws, {type: "onjoin", roomer: roomList.get(obj.ws.room_id).toJson()})
-	}else if(data.type == 'getRouterRtpCapabilities'){
-	//	console.log('videoproducer: ', videoProducer)
-	//	console.log('audioProducer: ', audioProducer)
-		// console.log('Get RouterRtpCapabilities', {
-     // name: `${roomList.get(obj.ws.room_id).getPeers().get(obj.ws.id).name}`
-  //  })
-				//console.log('router : ', router);
-				/*
-				if(data.vid == "publish"){
-					if(producerTransport){
-						wsend(ws, {type: "error", info: "Трансляция идет! Повторите ппопытку позднее."})
-						return;
-						}
-			try{
-				await	startWorker();
-			}catch(e){console.log(e);return;}
-			}else if(data.vid == "subscribe"){
-				if(!producerTransport){
-					wsend(ws, { type: "error", info: "Нет видеотрансляции!" });
-					return;
-					}
-				}else{}
-				*/
-			//	roomList.get(ws.room_id).getRtpCapabilities() 
-				//if (router) {
-     // console.log('getRouterRtpCapabilities: ', router.rtpCapabilities);
-      var ew = roomList.get(obj.ws.room_id).getRtpCapabilities();//router.rtpCapabilities;
-     // ws.send(JSON.stringify({dura:'suka'}))
-      wsend(ws, {type: data.type, routerrtpCapabilities: ew});
-    //}
-				}else if(data.type == 'createProducerTransport'){
-    console.log('-- createProducerTransport ---');
-   // producerSocketId = getId(ws);
-   // console.log('producerSocketId: ', producerSocketId)
-   // try{
-   // const { transport, params } = await createTransport();
-   // producerTransport = transport;
-   // producerTransport.on('routerclose', function(){console.log('*** router closed ***')})
-   // producerTransport.observer.on('close', on_producer_transport_close);
-    //console.log('listeners transport close: ', producerTransport.observer.listeners('close'));
-    
-    //transport.on('routerclose', fn())
-   // producerTransport.observer.removeListener('close', on_producer_close)
-    
-   // producerTransport.close();
-    //console.log('-- createProducerTransport params:', params);
-    
-    
-    
-    
-     console.log('Create webrtc transport', {
-      name: `${roomList.get(obj.ws.room_id).getPeers().get(obj.ws.id).name}`
-    })
-
-    try {
-      const { params } = await roomList.get(obj.ws.room_id).createWebRtcTransport(obj.ws.id)
-obj.ws.publish = true;
-    let r = {};
-    r.type = "createProducerTransport";
-    r.params = params
-    wsend(ws, r);
-   
-    } catch (err) {
-      
-      obj.ws.publish = false;
-	wsend(ws, {type: "error", info: er.toString()})
-    }
- }else if(data.type == 'connectProducerTransport'){ 
-	 console.log('connect producer transport',data);
-	let b=data.dtlsParameters;
-	
-	
-	 console.log('Connect transport', { name: `${roomList.get(obj.ws.room_id).getPeers().get(obj.ws.id).name}` })
-
-    if (!roomList.has(obj.ws.room_id)) return
-    await roomList.get(obj.ws.room_id).connectPeerTransport(obj.ws.id, data.transport_id, b)
-wsend(ws, {type: "connectProducerTransport"});
-   // callback('success')
-	
-	
-	/*
-	
-	 try{
-    await producerTransport.connect({ 'dtlsParameters': data.dtlsParameters });
-    wsend(ws, {type: "connectProducerTransport"});
-}catch(e){
-	ws.publish = false;
-	console.log('producer transport connect error ', e.toString());
-	wsend(ws, {type: "error", info: e.toString()})
-	}
-    */
-    }else if(data.type == 'produce'){
-		
-		console.log("**PRODUCE DATA *** ", data);
-		 const { kind, rtpParameters, transportId } = data;
-		
-	
-    if (!roomList.has(obj.ws.room_id)) {
-      return wsend({type:"error", info: 'not is a room' })
-    }
-
-    let producer_id = await roomList.get(obj.ws.room_id).produce(obj.ws.id, transportId, rtpParameters, kind)
-
-    console.log('Produce', {
-      type: `${kind}`,
-      name: `${roomList.get(obj.ws.room_id).getPeers().get(obj.ws.id).name}`,
-      id: `${producer_id}`
-    })
-
-    wsend(ws, {type:"produce",
-      id: producer_id
-    })
-  
-		
-		
-		
-		
-		
-		
-		
-   /*
-    console.log('-- produce --- kind=', kind);
-    if (kind === 'video') {
-		try{
-      videoProducer = await producerTransport.produce({ kind, rtpParameters });
-      wsend(ws,{ type: 'produce', id: videoProducer.id });
-  }catch(er){
-	  ws.publish = false;
-	  wsend(ws, {type: "error", info: er.toString()})
-	  }
-    }
-    else if (kind === 'audio') {
-		try{
-      audioProducer = await producerTransport.produce({ kind, rtpParameters });
-      
-      wsend(ws, {type: 'produce', id: audioProducer.id });
-  }catch(er){
-	  ws.publish = false;
-	  wsend(ws, {type: "error", info: er.toString()})
-	  }
-    }
-    else {
-      console.error('produce ERROR. BAD kind:', kind);
-      ws.publish = false;
-      wsend(ws, {type: "produce"});
-      return;
-    }
-*/
-    // inform clients about new producer
-    console.log('--broadcast newProducer -- kind=', kind);
-    broadcast({type: 'newProducer', kind: kind });
-
-  }else if(data.type == 'createConsumerTransport'){
-    console.log('-- createConsumerTransport ---');
-    /*
-    try{
-    const { transport, params } = await createTransport();
-    addConsumerTrasport(getId(ws), transport);
-    transport.observer.on('close', function(){
-		console.log('consumer transport closed')
-		removeConsumerTransport(getId(ws));
-		});
-    //console.log('-- createTransport params:', params);
-    wsend(ws,{type: data.type, params: params}); 
-  }catch(er){
-	  
-	  wsend(ws, {type: "error", info: er.toString()})
-  }
-	  
-	  */
-	  
-	  
-     console.log('Create consumer transport', {
-      name: `${roomList.get(obj.ws.room_id).getPeers().get(obj.ws.id).name}`
-    })
-
-    try {
-      const { params } = await roomList.get(obj.ws.room_id).createWebRtcTransport(obj.ws.id)
-//obj.ws.publish = true;
-    let r = {};
-    r.type = data.type;//"createProducerTransport";
-    r.params = params
-    wsend(ws, r);
-   
-    } catch (err) {
-      
-    //  obj.ws.publish = false;
-	wsend(ws, {type: "error", info: er.toString()})
-    }
-	  
-	  
-	  
-	  
-	  
-	  
-	  
-	  
-  }else if(data.type == 'connectConsumerTransport'){
-    console.log('-- connectConsumerTransport ---');
-    
-     console.log('connect consumer transport', data);
-	let b=data.dtlsParameters;
-	
-	
-	 console.log('Connect consumer transport', { name: `${roomList.get(obj.ws.room_id).getPeers().get(obj.ws.id).name}` })
-
-    if (!roomList.has(obj.ws.room_id)) return
-    await roomList.get(obj.ws.room_id).connectPeerTransport(obj.ws.id, data.transport_id, b)
-wsend(ws, {type: "connectProducerTransport"});
-    
-    
-    /*
-    
-    let transport = getConsumerTrasnport(getId(ws));
-    if (!transport) {
-      console.error('transport NOT EXIST for id=' + getId(ws));
-      wsend(ws,{type: data.type});
-      return;
-    }
-    await transport.connect({ dtlsParameters: data.dtlsParameters });
-    wsend(ws,{type: data.type});
-    */
-  }else if(data.type == 'consume') {
-  //  const kind = data.kind;
-    console.log('-- consume --kind=, data ', data);
-
- const { kind, rtpParameters, consumerTransportId } = data;
-		
-	
-    if (!roomList.has(obj.ws.room_id)) {
-      return wsend({type:"error", info: 'not is a room' })
-    }
-
-   
- let params = await roomList.get(obj.ws.room_id).consume(obj.ws.id, consumerTransportId, producerId, rtpCapabilities)
-
-    console.log('Consuming', {
-      name: `${roomList.get(socket.room_id) && roomList.get(socket.room_id).getPeers().get(socket.id).name}`,
-      producer_id: `${producerId}`,
-      consumer_id: `${params.id}`
-    })
-    wsend(ws, {type:"consume",
-    //  id: producer_id,
-      params: params
-    })
-  
-		
-
-
-
-
-
-
-
-/*
-
-
-
-
-    if (kind === 'video') {
+    console.log('-- createProducerTransport ---room=%s', roomName);
+    const { transport, params } = await createTransport(roomName);
+    addProducerTrasport(roomName, getId(ws), transport);
+    transport.observer.on('close', () => {
+      const id = getId(ws);
+      const videoProducer = getProducer(roomName, id, 'video');
       if (videoProducer) {
-        let transport = getConsumerTrasnport(getId(ws));
-        if (!transport) {
-          console.error('transport NOT EXIST for id=' + getId(ws));
-          return;
-        }
-        const { consumer, params } = await createConsumer(transport, videoProducer, data.rtpCapabilities); // producer must exist before consume
-        //subscribeConsumer = consumer;
-        const id = getId(ws);
-        addVideoConsumer(id, consumer);
-        consumer.observer.on('close', () => {
-          console.log('consumer closed video---');
-           removeVideoConsumer(id);
-        })
-        consumer.on('producerclose', () => {
-          console.log('consumer -- on.producerclose');
-          consumer.close();
-          removeVideoConsumer(id);
-
-          // -- notify to client ---
-          wsend(ws,{type: 'producerClosed', localId: id, remoteId: producerSocketId, kind: 'video' });
-        });
-
-        console.log('-- consumer ready ---');
-        wsend(ws,{type: data.type, params:params});
+        videoProducer.close();
+        removeProducer(roomName, id, 'video');
       }
-      else {
-        console.log('-- consume, but video producer NOT READY');
-        const params = { type:'producerId', producerId: null, id: null, kind: 'video', rtpParameters: {} };
-        wsend(ws, {type: data.type, params: params});
-      }
-    }
-    else if (kind === 'audio') {
+      const audioProducer = getProducer(roomName, id, 'audio');
       if (audioProducer) {
-        let transport = getConsumerTrasnport(getId(ws));
-        if (!transport) {
-          console.error('transport NOT EXIST for id=' + getId(ws));
-          return;
-        }
-        //consumer_transport_id, producer_id, rtpCapabilities
-        const { consumer, params } = await createConsumer(transport, audioProducer, data.rtpCapabilities); // producer must exist before consume
-        //subscribeConsumer = consumer;
-        const id = getId(ws);
-        addAudioConsumer(id, consumer);
-        consumer.observer.on('close', () => {
-          console.log('consumer closed  audio---');
-           removeAudioConsumer(id);
-        })
-        consumer.on('producerclose', () => {
-          console.log('consumer -- on.producerclose');
-          consumer.close();
-          removeAudioConsumer(id);
-
-          // -- notify to client ---
-          wsend(ws, {type: 'producerClosed',  localId: id, remoteId: producerSocketId, kind: 'audio' });
-        });
-
-        console.log('-- consumer ready ---');
-        wsend(ws, {type: data.type, params });
+        audioProducer.close();
+        removeProducer(roomName, id, 'audio');
       }
-      else {
-        console.log('-- consume, but audio producer NOT READY');
-        const params = { producerId: null, id: null, kind: 'audio', rtpParameters: {} };
-        wsend(ws,{type: data.type, params: params});
-      }
+      removeProducerTransport(roomName, id);
+    });
+    //console.log('-- createProducerTransport params:', params);
+   // sendResponse(params, callback);
+   wsend(ws, { type: msg.type, params: params });
+  }else if(msg.type == 'connectProducerTransport'){
+    const roomName = getRoomname();
+    const transport = getProducerTrasnport(roomName, getId(ws));
+    await transport.connect({ dtlsParameters: msg.dtlsParameters });
+   // sendResponse({}, callback);
+   wsend(ws, { type: msg.type });
+  }else if(msg.type == 'produce'){
+    const roomName = getRoomname();
+    const { kind, rtpParameters } = msg;
+    console.log('-- produce --- kind=' + kind);
+    const id = getId(ws);
+    const transport = getProducerTrasnport(roomName, id);
+    if (!transport) {
+      console.error('transport NOT EXIST for id=' + id);
+      return;
+    }
+    const producer = await transport.produce({ kind, rtpParameters });
+    addProducer(roomName, id, producer, kind);
+    producer.observer.on('close', () => {
+      console.log('producer closed --- kind=' + kind);
+    })
+   // sendResponse({ id: producer.id }, callback);
+ wsend(ws,{ type: msg.type, id: producer.id });
+    // inform clients about new producer
+
+    if (roomName) {
+      console.log('--broadcast room=%s newProducer ---', roomName);
+    //  socket.broadcast.to(roomName).emit('newProducer', { socketId: id, producerId: producer.id, kind: producer.kind });
     }
     else {
-      console.error('ERROR: UNKNOWN kind=' + kind);
+      console.log('--broadcast newProducer ---');
+     // socket.broadcast.emit('newProducer', { socketId: id, producerId: producer.id, kind: producer.kind });
     }
-    */
-  }else if(data.type == 'resume') {
-    const kind = data.kind;
-    console.log('-- resume -- kind=' + kind, '\n data ', data);
-    if (kind === 'video') {
-  //    let consumer = getVideoConsumer(getId(ws));
- let consumer =  await roomList.get(obj.ws.room_id).consumers.get(data.consumer_id)
-      if (!consumer) {
-        console.error('consumer NOT EXIST for id=' + getId(ws));
-        wsend(ws, {type: data.type});
-        return;
-      }
-      await consumer.resume();
-      wsend(ws, {type: data.type});
-    }
-    else {
-      console.warn('NO resume for audio');
-    }
-
-						
-		}else if(data.type == 'stop'){
-			cleanUpPeer(ws.pubId);
-			}else if(data.type=='file'){
-				let f = new FormData();
-	console.log('data.file ', data.pile);
-	try{
-	
-	}catch(e){console.log(e);}
-			}else if( data.type == "pic" ){
-				console.log(" **** PIC! ****");
-				try{
-			
-		
-		let b11 = data.img_data.split(',')[1];
-		let kk = 0;
-		let buf = Buffer.from(b11, "base64");
-		try{
-	let bot='887539364';
-console.log('ws.nick ', ws.nick)
-	var f = new FormData();
-	f.append('chat_id', (data.isprem=="y"?grid:bot));
-	f.append('parse_mode', 'html');
-	f.append('caption', '<b>'+ws.nick+'</b>'+' запустил трансляцию. \nПосмотреть на <a href="https://rouletka.ru/about">https://rouletka.ru</a>\nВы можете купить подписку на уведомления о том, когда <b>' + ws.nick + '</b> онлайн');
-	f.append('disable_notification', true);
-	f.append('photo', new Blob([buf]));
-    f.append('reply_markup', `{"inline_keyboard":[
-	[{"text":"Купить за звездочки","callback_data":"usid=${ws.userId}&action=goldi&nick=${ws.nick}" }]
-	]}`);
-	
-	
-
-	await axios.post(`https://api.telegram.org/bot${tg_api}/sendPhoto`,
-	f
-	); 
-	/*
-	let ra = await pool.query('select * from usergold where usid=(?)', [ ws.userId ]);
-	console.log('ra2 ', ra);
-	if(ra.length > 0){
-	const notifyUsers = ra.map(async (val)=>{
-    await axios.post(`https://api.telegram.org/bot${tg_api}/sendPhoto`, {
-		photo: 'https://rouletka.ru/img/gold/' + val.photo,
-		chat_id: val.tgid.toString(),
-		disable_notification:false,
-		parse_mode: "html",
-		caption: (val.lang=='ru'?`<b>${val.nick}</b> online в чат рулетке на <a href="https://rouletka.ru/about">https://rouletka.ru/about</a>`:`
-		<b>${val.nick}</b> is online on <a href="https://rouletka.ru/about">https://rouletka.ru/about</a>`),
-		reply_markup:`{"inline_keyboard":[
-	[{"text":"Unsubscribe","callback_data":"lang=${val.lang}&usid=${val.usid}&action=unsub&nick=${val.nick}&tgid=${val.tgid}"}]]}`
-})
-	}); 
-
-
-await Promise.all(notifyUsers);
-
-	}*/
-}catch(e){
-	console.log(e);
+  }else if(msg.type == 'createConsumerTransport'){
+    const roomName = getRoomname();
+    console.log('-- createConsumerTransport -- id=' + getId(ws));
+    const { transport, params } = await createTransport(roomName);
+    if(!transport){
+		wsend(ws, {type: "error", info: "No transport" });
+		return;
 	}
-
- if(!onLine.has(getId(ws)))onLine.set(getId(ws), { img_data: data.img_data, userId: ws.userId, publishedId: getId(ws), nick: ws.nick, value: 0 })
- eventEmitter.emit('producer_published', { img_data: data.img_data, userId: ws.userId, nick: ws.nick, value: 0, publishedId: ws.id  });
- ws.pubId = ws.id;
-  broadcast({ type: "producer_published", img_data: data.img_data, userId: ws.userId, nick: ws.nick, value: 0, publishedId: ws.id });			
-			}catch(e){
-				console.log('db error: ', e.toString())
-				wsend(ws, { type: "perror", info: e.toString() });
-				}
-				}else if( data.type == "onconsume" ){
-					console.log(" *************** ONCONSUME ***************", data);
-					ws.pubId = data.publishedId;
-					try{
-						oni("Jemand", "have subscribed to WebRTC");
-						//let v = await pool.query("update vroom set v=v+1 returning v");
-					if(onLine.has(data.publishedId)){
-						let a = onLine.get(data.publishedId);
-						a.value = a.value + 1;
-						broadcast_all({ type: data.type, value: a.value });
-						eventEmitter.emit(data.type, { value: a.value });
-					}else{
-						console.log(" ********** NO ONE !!!! *****");
-					}
-						}catch(err){
-						wsend(ws, { type: "perror", info: err.toString() })
-						}
-					}else if(data.type == "unconsume"){
-						unsubscribe(ws.pubId);
-					}else{
-				console.log("Unknown type: ", data.type);
-				}
-	}
-	/*	
-	function getPub(id){
-		for (let el of sock.clients) {
-    if (el.id == id) {
-		console.log("el.target **** ", el.id, ' = ', id);
-		return el.id
-	}}
-	
-	}*/
-		
-		function unsubscribe(pubId){
-		const id = getId(ws);
-  const consumer = getVideoConsumer(id);
-  if (consumer) {
-	  try{
-						
-						}catch(err){
-						console.log(err.toString());
-						}
-    consumer.close();
-    removeVideoConsumer(id);
+    addConsumerTrasport(roomName, getId(ws), transport);
+    transport.observer.on('close', () => {
+		console.warn('*** transport onclose in comsumer **** ');
+      const localId = getId(ws);
+      removeConsumerSetDeep(roomName, localId);
+      removeConsumerTransport(roomName, localId);//??lid
+    });
+    //console.log('-- createTransport params:', params);
+   // sendResponse(params, callback);
+     wsend(ws,{type: msg.type, params: params}); 
+  }else if(msg.type == 'connectConsumerTransport'){
+    const roomName = getRoomname();
+    console.log('-- connectConsumerTransport -- id=' + getId(ws));
+    let transport = getConsumerTrasnport(roomName, getId(ws));
+    if (!transport) {
+      console.error('transport NOT EXIST for id=' + getId(socket));
+      return;
+    }
+    await transport.connect({ dtlsParameters: msg.dtlsParameters });
+   // sendResponse({}, callback);
+   wsend(ws, { type: msg.type });
   }
-const aconsumer = getAudioConsumer(id);
-if(aconsumer){
-	aconsumer.close();
-removeAudioConsumer(id);
-} 
-  const transport = getConsumerTrasnport(id);
-  if (transport) {
-	  console.log("*************************")
-	  console.log("closing consumer transport ", id)
-	  console.log("*******************************");
-	  if(onLine.has(pubId)){
-						let a = onLine.get(pubId);
-						a.value = a.value - 1;
-						ws.pubId = null;
-						broadcast_all({ type: "onconsume", value: a.value });
-						eventEmitter.emit("onconsume", { value: a.value });
-					}
-    transport.close();
-    removeConsumerTransport(id);
-  }
-  
-}
-		
-		
-const  cleanUpPeer = async function(pubId) {
-	console.log("SOCKET CLOSED!!*******************************")
-  const id = getId(ws);
-  const consumer = getVideoConsumer(id);
-  if (consumer) {
-	 
-    consumer.close();
-    removeVideoConsumer(id);
-  }
-const aconsumer = getAudioConsumer(id);
-if(aconsumer){
-	aconsumer.close();
-removeAudioConsumer(id);
-} 
-  const transport = getConsumerTrasnport(id);
-  if (transport) {
-	  console.log("*************************")
-	  console.log("closing consumer transport ", id)
-	  console.log("*******************************");
-	  if(onLine.has(pubId)){
-						let a = onLine.get(pubId);
-						a.value = a.value - 1;
-						ws.pubId = null;
-						broadcast_all({ type: "onconsume", value: a.value });
-						eventEmitter.emit("onconsume", { value: a.value });
-					}
-    transport.close();
-    removeConsumerTransport(id);
-  }
-  
-  
-  
-  
-  
-  
-  if (producerSocketId === id) {
-    console.log('---- cleanup producer ---');
-    oni("Jemand", "have unpublished the WebRTC translation");
-    eventEmitter.emit("producer_unpublished");
-  
-  /*
-  
-    try{
-	
-		 axios.post(`https://api.telegram.org/bot${tg_api}/sendMessage`, {
-    chat_id: grid,
-    text: '<b>'+ws.nick+'</b> закончил трансляцию',
-    parse_mode: 'html',
-    disable_notification: true
+/*
+  socket.on('consume', async (data, callback) => {
+    console.error('-- ERROR: consume NOT SUPPORTED ---');
+    return;
   });
-	}catch(e){
-		console.log(e);
-		}
-		*/ 
-    if(onLine.has(getId(ws))){
-		onLine.delete(getId(ws));
-		
-	}
-    broadcast({ type: "producer_unpublished" })
-    ws.pubId = null;
-    
-    try{
-	//	await pool.query('delete from vroom');
-	
-		}catch(err){
-			console.log(err.toString())
-		wsend({ type: "perror", info: err.toString() });
-		}
-    
-    if (videoProducer) {
-     videoProducer.close();
-     videoProducer = null;
-     
+
+  socket.on('resume', async (data, callback) => {
+    console.error('-- ERROR: resume NOT SUPPORTED ---');
+    return;
+  });*/
+
+ else if(msg.type == 'getCurrentProducers'){
+	 setRoomname(msg.localId);
+    const roomName = getRoomname();
+    const clientId = msg.localId;
+    console.log('-- getCurrentProducers for Id=' + clientId);
+
+    const remoteVideoIds = getRemoteIds(roomName, clientId, 'video');
+    console.log('-- remoteVideoIds:', remoteVideoIds, ' room name ', roomName);
+    const remoteAudioIds = getRemoteIds(roomName, clientId, 'audio');
+    console.log('-- remoteAudioIds:', remoteAudioIds);
+
+    wsend(ws, { type: msg.type, remoteVideoIds: remoteVideoIds, remoteAudioIds: remoteAudioIds });
+  }else if(msg.type == /*'consumeAdd'*/'consume'){
+    const roomName = getRoomname();
+    const localId = getId(ws);
+    const kind = msg.kind;
+    console.log('-- consumeAdd -- localId=%s kind=%s', localId, kind);
+
+    let transport = getConsumerTrasnport(roomName, localId);
+    if (!transport) {
+      console.error('transport NOT EXIST for id=' + localId);
+      return;
     }
-    if (audioProducer) {
-      audioProducer.close();
-     audioProducer = null;
-     }
-
-    if (producerTransport) {
-      producerTransport.close();
-      producerTransport = null;
+    const rtpCapabilities = msg.rtpCapabilities;
+    const remoteId = msg.remoteId;
+    console.log('-- consumeAdd - localId=' + localId + ' remoteId=' + remoteId + ' kind=' + kind);
+    const producer = getProducer(roomName, remoteId, kind);
+    if (!producer) {
+      console.error('producer NOT EXIST for remoteId=%s kind=%s', remoteId, kind);
+      return;
     }
+    const { consumer, params } = await createConsumer(roomName, transport, producer, rtpCapabilities); // producer must exist before consume
+    
+    addConsumer(roomName, localId, remoteId, consumer, kind); // TODO: MUST comination of  local/remote id
+    console.log('addConsumer localId=%s, remoteId=%s, kind=%s', localId, remoteId, kind);
+    consumer.observer.on('close', () => {
+      console.log('consumer closed ---');
+    })
+    consumer.on('producerclose', () => {
+      console.log('consumer -- on.producerclose');
+      consumer.close();
+      removeConsumer(roomName, localId, remoteId, kind);
 
-    producerSocketId = null;
+      // -- notify to client ---
+      wsend(ws, {type: 'producerClosed', localId: localId, remoteId: remoteId, kind: kind });
+    });
 
-    // --- clenaup all consumers ---
-    //console.log('---- cleanup clenaup all consumers ---');
-    removeAllConsumers();
-    if(router){router.close(); router=null;}
-    
-    if(worker){worker.close();worker=null;}
-    
-    
-     /*try{
-	
-	axios.post(`https://api.telegram.org/bot${tg_api}/sendMessage`, {
-    chat_id: grid,
-    text: '<b>'+ws.nick+'</b> закончил трансляцию',
-    parse_mode: 'html',
-    disable_notification: true
-  });
-	}catch(e){
-		console.log(e.name);
-		}*/
-    
-    
-    
-    
-    
-    
-    
+    console.log('-- consumer ready ---');
+   // sendResponse(params, callback);
+   wsend(ws, { type: msg.type, params: params });
+  }else if(msg.type == /*'resumeAdd'*/ 'resume'){
+    const roomName = getRoomname();
+    const localId = getId(ws);
+    const remoteId = msg.remoteId;
+    const kind = msg.kind;
+    console.log('-- resumeAdd localId=%s remoteId=%s kind=%s', localId, remoteId, kind);
+    let consumer = getConsumer(roomName, localId, remoteId, kind);
+    if (!consumer) {
+      console.error('consumer NOT EXIST for remoteId=' + remoteId);
+      return;
+    }
+    await consumer.resume();
+    //sendResponse({}, callback);
+    wsend(ws, { type: msg.type });
+  }else if(msg.type == "unpublish"){
+	   const roomName = getRoomname();
+	    broadcast_room(roomName, { type: "unpublish", roomName: roomName });
+    console.log('client unpublish socket id=' + getId(ws));
+    cleanUpPeer(roomName, ws);
+   
+  }else if(msg.type == "unsubscribe"){
+	  console.log("*** unsubscribe *** ");
+	  const roomName = getRoomname();
+	  cleanUPconsumer(roomName, ws);
+  }else{
+	  console.error("uknown type ", msg.type);
   }
 }
-		
-		return { mediasoup_t, cleanUpPeer  }
-		
-	}
-	
- 
-		
-	module.exports = { handleMediasoup: handleMediasoup, ev: eventEmitter }
-	
-	
-		
-		function sendResponse(response, callback) {
+  // ---- sendback welcome message with on connected ---
+ // const newId = getId(ws);
+ // sendback(socket, { type: 'welcome', id: newId });
+
+//}
+
+
+  // --- send response to client ---
+  function sendResponse(response, callback) {
     //console.log('sendResponse() callback:', callback);
     callback(null, response);
   }
@@ -781,22 +261,322 @@ removeAudioConsumer(id);
     callback(error.toString(), null);
   }
 
-  function sendback(ws, message) {
-    wsend(ws, message);
+  function sendback(socket, message) {
+   // socket.emit('message', message);
+  }
+
+  function setRoomname(room) {
+    ws.roomname = room;
+  }
+
+  function getRoomname() {
+    const room = ws.roomname;
+    return room;
   }
 
 
 function getId(ws) {
   return ws.id;
 }
+function cleanUpPeerDa(){
+	 const roomName = getRoomname();
+    console.log('client disconnected. socket id=' + getId(ws) + '  , total clients=' + wss.clients.size);
+    cleanUpPeer(roomName, ws);
+}
+return { mediasoup_t, cleanUpPeerDa  }
+}
+module.exports = { handleMediasoup: handleMediasoup }
 
+
+function getId(ws) {
+  return ws.id;
+}
+function getClientCount() {
+  // WARN: undocumented method to get clients number
+  //return io.eio.clientsCount;
+}
+
+
+async function setupRoom(name) {
+  const room = new Room(name);
+  const mediaCodecs = mediasoupOptions.router.mediaCodecs;
+  const router = await worker.createRouter({ mediaCodecs });
+  router.roomname = name;
+
+  router.observer.on('close', () => {
+    console.log('-- router closed. room=%s', name);
+  });
+  router.observer.on('newtransport', transport => {
+    console.log('-- router newtransport. room=%s', name);
+  });
+
+  room.router = router;
+  Room.addRoom(room, name);
+  return room;
+}
+
+
+function cleanUpPeer(roomname, socket) {
+  const id = getId(socket);
+  removeConsumerSetDeep(roomname, id);
+
+  const transport = getConsumerTrasnport(roomname, id);
+  if (transport) {
+    transport.close();
+    removeConsumerTransport(roomname, id);
+  }
+
+  const videoProducer = getProducer(roomname, id, 'video');
+  if (videoProducer) {
+    videoProducer.close();
+    removeProducer(roomname, id, 'video');
+  }
+  const audioProducer = getProducer(roomname, id, 'audio');
+  if (audioProducer) {
+    audioProducer.close();
+    removeProducer(roomname, id, 'audio');
+  }
+
+  const producerTransport = getProducerTrasnport(roomname, id);
+  if (producerTransport) {
+    producerTransport.close();
+    removeProducerTransport(roomname, id);
+  }
+}
+function cleanUPconsumer(roomname, socket){
+	const id = getId(socket);
+	const transport = getConsumerTrasnport(roomname, id);
+  if (transport) {
+    transport.close();
+    removeConsumerTransport(roomname, id);
+  }
+}
+// ========= room ===========
+
+class Room {
+  constructor(name) {
+    this.name = name;
+    this.producerTransports = {};
+    this.videoProducers = {};
+    this.audioProducers = {};
+
+    this.consumerTransports = {};
+    this.videoConsumerSets = {};
+    this.audioConsumerSets = {};
+
+    this.router = null;
+  }
+
+  getProducerTrasnport(id) {
+    return this.producerTransports[id];
+  }
+
+  addProducerTrasport(id, transport) {
+    this.producerTransports[id] = transport;
+    console.log('room=%s producerTransports count=%d', this.name, Object.keys(this.producerTransports).length);
+  }
+
+  removeProducerTransport(id) {
+    delete this.producerTransports[id];
+    console.log('room=%s producerTransports count=%d', this.name, Object.keys(this.producerTransports).length);
+  }
+
+  getProducer(id, kind) {
+    if (kind === 'video') {
+      return this.videoProducers[id];
+    }
+    else if (kind === 'audio') {
+      return this.audioProducers[id];
+    }
+    else {
+      console.warn('UNKNOWN producer kind=' + kind);
+    }
+  }
+
+  getRemoteIds(clientId, kind) {
+    let remoteIds = [];
+    if (kind === 'video') {
+      for (const key in this.videoProducers) {
+        if (key !== clientId) {
+          remoteIds.push(key);
+        }
+      }
+    }
+    else if (kind === 'audio') {
+      for (const key in this.audioProducers) {
+        if (key !== clientId) {
+          remoteIds.push(key);
+        }
+      }
+    }
+    return remoteIds;
+  }
+
+  addProducer(id, producer, kind) {
+    if (kind === 'video') {
+      this.videoProducers[id] = producer;
+      console.log('room=%s videoProducers count=%d', this.name, Object.keys(this.videoProducers).length);
+    }
+    else if (kind === 'audio') {
+      this.audioProducers[id] = producer;
+      console.log('room=%s videoProducers count=%d', this.name, Object.keys(this.audioProducers).length);
+    }
+    else {
+      console.warn('UNKNOWN producer kind=' + kind);
+    }
+  }
+
+  removeProducer(id, kind) {
+    if (kind === 'video') {
+      delete this.videoProducers[id];
+      console.log('videoProducers count=' + Object.keys(this.videoProducers).length);
+    }
+    else if (kind === 'audio') {
+      delete this.audioProducers[id];
+      console.log('audioProducers count=' + Object.keys(this.audioProducers).length);
+    }
+    else {
+      console.warn('UNKNOWN producer kind=' + kind);
+    }
+  }
+
+  getConsumerTrasnport(id) {
+    return this.consumerTransports[id];
+  }
+
+  addConsumerTrasport(id, transport) {
+    this.consumerTransports[id] = transport;
+    console.log('room=%s add consumerTransports count=%d', this.name, Object.keys(this.consumerTransports).length);
+  }
+
+  removeConsumerTransport(id) {
+	  console.log('id ', id);
+    delete this.consumerTransports[id];
+    console.log('room=%s remove consumerTransports count=%d', this.name, Object.keys(this.consumerTransports).length);
+  }
+
+  getConsumerSet(localId, kind) {
+    if (kind === 'video') {
+      return this.videoConsumerSets[localId];
+    }
+    else if (kind === 'audio') {
+      return this.audioConsumerSets[localId];
+    }
+    else {
+      console.warn('WARN: getConsumerSet() UNKNWON kind=%s', kind);
+    }
+  }
+
+  addConsumerSet(localId, set, kind) {
+    if (kind === 'video') {
+      this.videoConsumerSets[localId] = set;
+    }
+    else if (kind === 'audio') {
+      this.audioConsumerSets[localId] = set;
+    }
+    else {
+      console.warn('WARN: addConsumerSet() UNKNWON kind=%s', kind);
+    }
+  }
+
+  removeConsumerSetDeep(localId) {
+    const videoSet = this.getConsumerSet(localId, 'video');
+    delete this.videoConsumerSets[localId];
+    if (videoSet) {
+      for (const key in videoSet) {
+        const consumer = videoSet[key];
+        consumer.close();
+        delete videoSet[key];
+      }
+
+      console.log('room=%s removeConsumerSetDeep video consumers count=%d', this.name, Object.keys(videoSet).length);
+    }
+
+    const audioSet = this.getConsumerSet(localId, 'audio');
+    delete this.audioConsumerSets[localId];
+    if (audioSet) {
+      for (const key in audioSet) {
+        const consumer = audioSet[key];
+        consumer.close();
+        delete audioSet[key];
+      }
+
+      console.log('room=%s removeConsumerSetDeep audio consumers count=%d', this.name, Object.keys(audioSet).length);
+    }
+  }
+
+  getConsumer(localId, remoteId, kind) {
+    const set = this.getConsumerSet(localId, kind);
+    if (set) {
+      return set[remoteId];
+    }
+    else {
+      return null;
+    }
+  }
+
+
+  addConsumer(localId, remoteId, consumer, kind) {
+    const set = this.getConsumerSet(localId, kind);
+    if (set) {
+      set[remoteId] = consumer;
+      console.log('room=%s consumers kind=%s count=%d', this.name, kind, Object.keys(set).length);
+    }
+    else {
+      console.log('room=%s new set for kind=%s, localId=%s', this.name, kind, localId);
+      const newSet = {};
+      newSet[remoteId] = consumer;
+      this.addConsumerSet(localId, newSet, kind);
+      console.log('room=%s consumers kind=%s count=%d', this.name, kind, Object.keys(newSet).length);
+    }
+  }
+
+  removeConsumer(localId, remoteId, kind) {
+    const set = this.getConsumerSet(localId, kind);
+    if (set) {
+      delete set[remoteId];
+      console.log('room=%s consumers kind=%s count=%d', this.name, kind, Object.keys(set).length);
+    }
+    else {
+      console.log('NO set for room=%s kind=%s, localId=%s', this.name, kind, localId);
+    }
+  }
+
+  // --- static methtod ---
+  static staticInit() {
+    rooms = {};
+  }
+
+  static addRoom(room, name) {
+    Room.rooms[name] = room;
+    console.log('static addRoom. name=%s', room.name);
+    //console.log('static addRoom. name=%s, rooms:%O', room.name, room);
+  }
+
+  static getRoom(name) {
+    return Room.rooms[name];
+  }
+
+  static removeRoom(name) {
+    delete Room.rooms[name];
+  }
+}
+
+// -- static member --
+Room.rooms = {};
+
+// --- default room ---
+let defaultRoom = null;
+
+
+// ========= mediasoup ===========
 const mediasoup = require("mediasoup");
 const mediasoupOptions = {
   // Worker settings
   worker: {
     rtcMinPort: 10000,
-    rtcMaxPort: 20100,
-    logLevel: 'error',
+    rtcMaxPort: 10100,
+    logLevel: 'warn',
     logTags: [
       'info',
       'ice',
@@ -830,142 +610,41 @@ const mediasoupOptions = {
             'x-google-start-bitrate': 1000
           }
         },
-         {
-			kind:'video',
-			mimeType:'video/Vp9',
-			clockRate:90000,
-			parameters:{
-				'profile-id':2,
-				'x-google-start-bitrate':1000
-			}
-		},
-		{
-			kind:'video',
-			mimeType:'video/h264',
-			clockRate: 90000,
-			parameters:{
-				'packetization-mode':1,
-				'profile-level-id':'4d0032',
-				'level-asymmetry-allowed': 1,
-				'x-google-start-bitrate':1000
-			}
-		},
-		{
-			kind:'video',
-			mimeType:'video/h264',
-			clockRate:90000,
-			parameters:
-			{
-				'packetization-mode':1,
-				'profile-level-id':'42e01f',
-				'level-asymmetry-allowed':1,
-				'x-google-start-bitrate':1000
-			}
-		}
       ]
   },
-  // WebRtcTransport settings 45.12.18.172
+  // WebRtcTransport settings
   webRtcTransport: {
-   /*    listenIps: [
-      { ip: (process.env.DEVELOPMENT == "yes" ? '127.0.0.1' : "45.12.18.172") , announcedIp: null }
-    ]*/
-    listenInfos:[
-    {
-		protocol:"udp",
-		ip:(process.env.DEVELOPMENT == "yes" ? '127.0.0.1' : "5.35.88.151"),
-	},{
-		protocol:"tcp",
-		ip:(process.env.DEVELOPMENT == "yes" ? '127.0.0.1' : "5.35.88.151"),
-	}
-	],
-   // enableUdp: true,
-   // enableTcp: true,
-   // preferUdp: true,
-   // maxIncomingBitrate: 1500000,
-   // initialAvailableOutgoingBitrate: 1000000,
+    listenIps: [
+      { ip: '127.0.0.1', announcedIp: null }
+    ],
+    enableUdp: true,
+    enableTcp: true,
+    preferUdp: true,
+    maxIncomingBitrate: 1500000,
+    initialAvailableOutgoingBitrate: 1000000,
   }
 };
 
-//let worker = null;
+let worker = null;
 //let router = null;
-let producerTransport = null;
-let videoProducer = null;
-let audioProducer = null;
-let producerSocketId = null;
+//let producerTransport = null;
+//let producer = null;
 //let consumerTransport = null;
 //let subscribeConsumer = null;
 
-const dkey = "/etc/letsencrypt/live/rouletka.ru/privkey.pem";
-const dcert = "/etc/letsencrypt/live/rouletka.ru/fullchain.pem";
-
-
-
-
-
-createWorkers()
-
-
-async function createWorkers() {
- // let { numWorkers } = numWorkers;// config.mediasoup
-
-  for (let i = 0; i < numWorkers; i++) {
-    let worker = await mediasoup.createWorker({
-      logLevel: 'warn',
-      logTags: [
-        'info',
-        'ice',
-        'dtls',
-        'rtp',
-        'srtp',
-        'rtcp'
-        // 'rtx',
-        // 'bwe',
-        // 'score',
-        // 'simulcast',
-        // 'svc'
-      ],
-   //   rtcMinPort: config.mediasoup.worker.rtcMinPort,
-    //  rtcMaxPort: config.mediasoup.worker.rtcMaxPort
-    })
-
-    worker.on('died', () => {
-      console.error('mediasoup worker died, exiting in 2 seconds... [pid:%d]', worker.pid)
-   //   setTimeout(() => process.exit(1), 2000)
-    })
-    workers.push(worker)
-
-    // log worker resource usage
-    /*setInterval(async () => {
-            const usage = await worker.getResourceUsage();
-
-            console.info('mediasoup Worker resource usage [pid:%d]: %o', worker.pid, usage);
-        }, 120000);*/
-  }
-}
-
 
 async function startWorker() {
-	try{
   const mediaCodecs = mediasoupOptions.router.mediaCodecs;
- 
-  worker = await mediasoup.createWorker(
-/*  {
-  dtlsCertificateFile : dcert,
-  dtlsPrivateKeyFile  : dkey
-}*/
-  );
-  router = await worker.createRouter({ mediaCodecs });
- // worker.fuck();
- router.on('workerclose', function(){ console.log('worker closed so router closed') })
- //router.observer.on('close', function(){console.log('router closed')})
-	  worker.observer.on('close', function(){console.log('worker closed')})
-  console.log('-- mediasoup worker start. --')
-}catch(e){console.log(e);}
+  worker = await mediasoup.createWorker();
+  //router = await worker.createRouter({ mediaCodecs });
+  //producerTransport = await router.createWebRtcTransport(mediasoupOptions.webRtcTransport);
 
-//worker.close();
+  defaultRoom = await setupRoom('_default_room');
+  console.log('-- mediasoup worker start. -- room:', defaultRoom.name);
 }
 
-// startWorker();
+startWorker();
+
 
 //
 // Room {
@@ -976,73 +655,214 @@ async function startWorker() {
 // }
 //
 
+// --- multi-producers --
+//let producerTransports = {};
+//let videoProducers = {};
+//let audioProducers = {};
+
+function getProducerTrasnport(roomname, id) {
+  if (roomname) {
+    console.log('=== getProducerTrasnport use room=%s ===', roomname);
+    const room = Room.getRoom(roomname);
+    return room.getProducerTrasnport(id);
+  }
+  else {
+    console.log('=== getProducerTrasnport use defaultRoom room=%s ===', roomname);
+    return defaultRoom.getProducerTrasnport(id);
+  }
+}
+
+function addProducerTrasport(roomname, id, transport) {
+  if (roomname) {
+    const room = Room.getRoom(roomname);
+    room.addProducerTrasport(id, transport);
+    console.log('=== addProducerTrasport use room=%s ===', roomname);
+  }
+  else {
+    defaultRoom.addProducerTrasport(id, transport);
+    console.log('=== addProducerTrasport use defaultRoom room=%s ===', roomname);
+  }
+}
+
+function removeProducerTransport(roomname, id) {
+  if (roomname) {
+    const room = Room.getRoom(roomname);
+    room.removeProducerTransport(id);
+  }
+  else {
+    defaultRoom.removeProducerTransport(id);
+  }
+}
+
+function getProducer(roomname, id, kind) {
+  if (roomname) {
+    const room = Room.getRoom(roomname);
+    return room.getProducer(id, kind);
+  }
+  else {
+    return defaultRoom.getProducer(id, kind);
+  }
+}
+
+
+function getRemoteIds(roomname, clientId, kind) {
+  if (roomname) {
+    const room = Room.getRoom(roomname);
+    if(!room){
+		console.error("no room");
+		return;
+	}
+    return room.getRemoteIds(clientId, kind);
+  }
+  else {
+    return defaultRoom.getRemoteIds(clientId, kind);
+  }
+}
+
+
+function addProducer(roomname, id, producer, kind) {
+  if (roomname) {
+    const room = Room.getRoom(roomname);
+    room.addProducer(id, producer, kind);
+    console.log('=== addProducer use room=%s ===', roomname);
+  }
+  else {
+    defaultRoom.addProducer(id, producer, kind);
+    console.log('=== addProducer use defaultRoom room=%s ===', roomname);
+  }
+}
+
+function removeProducer(roomname, id, kind) {
+  if (roomname) {
+    const room = Room.getRoom(roomname);
+    room.removeProducer(id, kind);
+  }
+  else {
+    defaultRoom.removeProducer(id, kind);
+  }
+}
+
+
 // --- multi-consumers --
-let transports = {};
-let videoConsumers = {};
-let audioConsumers = {};
+//let consumerTransports = {};
+//let videoConsumers = {};
+//let audioConsumers = {};
 
-function getConsumerTrasnport(id) {
-  return transports[id];
-}
-
-function addConsumerTrasport(id, transport) {
-  transports[id] = transport;
-  console.log('consumerTransports count=' + Object.keys(transports).length);
-}
-
-function removeConsumerTransport(id) {
-  delete transports[id];
-  console.log('consumerTransports count=' + Object.keys(transports).length);
-}
-
-function getVideoConsumer(id) {
-  return videoConsumers[id];
-}
-
-function addVideoConsumer(id, consumer) {
-  videoConsumers[id] = consumer;
-  console.log('videoConsumers count=' + Object.keys(videoConsumers).length);
-}
-
-function removeVideoConsumer(id) {
-  delete videoConsumers[id];
-  console.log('videoConsumers count=' + Object.keys(videoConsumers).length);
-}
-
-function getAudioConsumer(id) {
-  return audioConsumers[id];
-}
-
-function addAudioConsumer(id, consumer) {
-  audioConsumers[id] = consumer;
-  console.log('audioConsumers count=' + Object.keys(audioConsumers).length);
-}
-
-function removeAudioConsumer(id) {
-  delete audioConsumers[id];
-  console.log('audioConsumers count=' + Object.keys(audioConsumers).length);
-}
-
-function removeAllConsumers() {
-  for (const key in videoConsumers) {
-    const consumer = videoConsumers[key];
-    console.log('key=' + key + ',  consumer:', consumer);
-    consumer.close();
-    delete videoConsumers[key];
+function getConsumerTrasnport(roomname, id) {
+  if (roomname) {
+    console.log('=== getConsumerTrasnport use room=%s ===', roomname);
+    const room = Room.getRoom(roomname);
+    return room.getConsumerTrasnport(id);
   }
-  console.log('removeAllConsumers videoConsumers count=' + Object.keys(videoConsumers).length);
-
-  for (const key in audioConsumers) {
-    const consumer = audioConsumers[key];
-    console.log('key=' + key + ',  consumer:', consumer);
-    consumer.close();
-    delete audioConsumers[key];
+  else {
+    console.log('=== getConsumerTrasnport use defaultRoom room=%s ===', roomname);
+    return defaultRoom.getConsumerTrasnport(id);
   }
 }
 
-async function createTransport() {
+function addConsumerTrasport(roomname, id, transport) {
+  if (roomname) {
+    const room = Room.getRoom(roomname);
+    room.addConsumerTrasport(id, transport);
+    console.log('=== addConsumerTrasport use room=%s ===', roomname);
+  }
+  else {
+    defaultRoom.addConsumerTrasport(id, transport);
+    console.log('=== addConsumerTrasport use defaultRoom room=%s ===', roomname);
+  }
+}
+
+function removeConsumerTransport(roomname, id) {
+  if (roomname) {
+    const room = Room.getRoom(roomname);
+    room.removeConsumerTransport(id);
+  }
+  else {
+    defaultRoom.removeConsumerTransport(id);
+  }
+}
+
+// function getConsumerSet(localId, kind) {
+//   if (kind === 'video') {
+//     return videoConsumers[localId];
+//   }
+//   else if (kind === 'audio') {
+//     return audioConsumers[localId];
+//   }
+//   else {
+//     console.warn('WARN: getConsumerSet() UNKNWON kind=%s', kind);
+//   }
+// }
+
+function getConsumer(roomname, localId, remoteId, kind) {
+  if (roomname) {
+    const room = Room.getRoom(roomname);
+    return room.getConsumer(localId, remoteId, kind);
+  }
+  else {
+    return defaultRoom.getConsumer(localId, remoteId, kind);
+  }
+}
+
+function addConsumer(roomname, localId, remoteId, consumer, kind) {
+  if (roomname) {
+    const room = Room.getRoom(roomname);
+    room.addConsumer(localId, remoteId, consumer, kind);
+    console.log('=== addConsumer use room=%s ===', roomname);
+  }
+  else {
+    defaultRoom.addConsumer(localId, remoteId, consumer, kind);
+    console.log('=== addConsumer use defaultRoom room=%s ===', roomname);
+  }
+}
+
+function removeConsumer(roomname, localId, remoteId, kind) {
+  if (roomname) {
+    const room = Room.getRoom(roomname);
+    room.removeConsumer(localId, remoteId, kind);
+  }
+  else {
+    defaultRoom.removeConsumer(localId, remoteId, kind);
+  }
+}
+
+function removeConsumerSetDeep(roomname, localId) {
+  if (roomname) {
+    const room = Room.getRoom(roomname);
+    room.removeConsumerSetDeep(localId);
+  }
+  else {
+    defaultRoom.removeConsumerSetDeep(localId);
+  }
+}
+
+// function addConsumerSet(localId, set, kind) {
+//   if (kind === 'video') {
+//     videoConsumers[localId] = set;
+//   }
+//   else if (kind === 'audio') {
+//     audioConsumers[localId] = set;
+//   }
+//   else {
+//     console.warn('WARN: addConsumerSet() UNKNWON kind=%s', kind);
+//   }
+// }
+
+async function createTransport(roomname) {
+  let router = null;
+  if (roomname) {
+    const room = Room.getRoom(roomname);
+    if(!room){
+		console.error('no room');
+		return {transport:undefined};
+	}
+    router = room.router;
+  }
+  else {
+    router = defaultRoom.router;
+  }
   const transport = await router.createWebRtcTransport(mediasoupOptions.webRtcTransport);
-  console.log('-- create transport id=' + transport.id);
+  console.log('-- create transport room=%s id=%s', roomname, transport.id);
 
   return {
     transport: transport,
@@ -1055,9 +875,17 @@ async function createTransport() {
   };
 }
 
-async function createConsumer(transport, producer, rtpCapabilities) {
-//	consumer_transport_id, producer_id, rtpCapabilities
-  let consumer = null;
+async function createConsumer(roomname, transport, producer, rtpCapabilities) {
+  let router = null;
+  if (roomname) {
+    const room = Room.getRoom(roomname);
+    router = room.router;
+  }
+  else {
+    router = defaultRoom.router;
+  }
+
+
   if (!router.canConsume(
     {
       producerId: producer.id,
@@ -1068,6 +896,7 @@ async function createConsumer(transport, producer, rtpCapabilities) {
     return;
   }
 
+  let consumer = null;
   //consumer = await producerTransport.consume({ // NG: try use same trasport as producer (for loopback)
   consumer = await transport.consume({ // OK
     producerId: producer.id,
@@ -1094,20 +923,4 @@ async function createConsumer(transport, producer, rtpCapabilities) {
     }
   };
 }
-
-
-  
-  function getMediasoupWorker() {
-  const worker = workers[nextMediasoupWorkerIdx]
-
-  if (++nextMediasoupWorkerIdx === workers.length) nextMediasoupWorkerIdx = 0
-
-  return worker
-}
-  
-  
-  
-  
-  
-  
 

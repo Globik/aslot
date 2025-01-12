@@ -160,13 +160,24 @@ let obid = function () {
       .toLowerCase()
   );
 };
-
+var ad=new Map();
+let ada = [];
+ad.set(1,{id:1,name:"alik"})
+console.log(...ad)
+for(const value of ad.values()){
+	ada.push(value);
+}
+console.log('ada ',ada)
+var k=1;
   wss.on("connection", async function ws_connect(ws, req) {
 	  console.log("websocket connected");
 	const ip = req.socket.remoteAddress;
 	setGuest(ip);
 	 ws.isAlive = true;
-	 ws.id=obid();
+	 ws.id=k;//obid();
+	 
+	// ws.room_id="alik";
+	 k++;
   ws.on("pong", heartbeat);
    broadcast_all({ type: "howmuch", value: wss.clients.size });
    let msg;
@@ -176,12 +187,13 @@ let obid = function () {
      msg = JSON.parse(msgi)
 }catch(e){return;}
 if(msg.request == "mediasoup"){
-	handleMediasoup({ ws, msg, WebSocket, wss, pool }).mediasoup_t();
+	handleMediasoup( ws, msg, WebSocket, wss, pool ).mediasoup_t();
 	return;
 }
 	});
 	ws.on('close', async function onClose(){
 		 broadcast_all({ type: "howmuch", value: wss.clients.size });
+		 handleMediasoup( ws, msg, WebSocket, wss, pool ).cleanUpPeerDa();
 	});
 	ws.on('error', function(er){console.log(er)});
 })

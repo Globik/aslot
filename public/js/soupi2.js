@@ -69,7 +69,8 @@ function goMedia(data){
 function sendRequest(obj) {
     return new Promise((resolve, reject) => {
         obj.request = "mediasoup";
-        if(!sock) {
+      
+      /* if(!sock) {
 			let s = L()=="ru"?"Повторите попытку позднее":L()=='en'?"Try later":
 			L()=='zh'?'稍后再试':
 			L()=='id'?'coba lagi nanti':'';
@@ -83,7 +84,7 @@ function sendRequest(obj) {
 			reject({ info: s });
 			return;
 		}
-      
+      */
         sock.send(JSON.stringify(obj));
         sock.onmessage = function (e) {
             let a;
@@ -96,7 +97,7 @@ function sendRequest(obj) {
             if (a.type == obj.type) {
                 resolve(a);
             } else if(a.type == "onjoin"){
-				resolve(a.roomer);
+				resolve(a);
 			}else if (a.type == "error") {
                 reject(a.info);
             } else {
@@ -111,8 +112,8 @@ function on_msg(data){
 	 // console.log('data ',data);
 	  if(data.type == "howmuch"){
 		  onlinecount.textContent = data.value;
-	  }else if(data.type == "room_created"){
-		  
+	  }else if(data.type == "unpublish"){
+		  console.warn("Unpublish");
 	  }else{
 		 // console.log("UNknown type ", data.type);
 	  }
@@ -283,14 +284,16 @@ async function publish(el) {
     }
 
     try {
-        const data = await sendRequest({type: 'getRouterRtpCapabilities', vid: "publish"});
-        console.log("data ", data);
-        const somesuka = await sendRequest({type:'join'});
+		const somesuka = await sendRequest({type:'prepare_room', roomId: 1 });
        // console.log('somesuka ', JSON.parse(somesuka.roomer));
         console.log('after somesuka');
+        const data = await sendRequest({type: 'getRouterRtpCapabilities', vid: "publish"});
+        console.log("data ", data);
+        
         await loadDevice(data.routerrtpCapabilities);
         // SENDER = true;
         console.log("after device load");
+        
     } catch (e) {
 		console.error(e);
         note({content:e.info?e.info : e.toString(), type: "error", time: 5});
@@ -530,7 +533,13 @@ async function subscribe(el) {
 	 }*/
     //alert("SUBSCRIBE");
     try {
+		const su = await sendRequest({ type: 'getCurrentProducers' , localId: 1 });
+		console.log("SU ", su);
+		var BUKA = su.remoteVideoIds;
         const data = await sendRequest({type: 'getRouterRtpCapabilities', vid: 'subscribe'});
+        // const somesuka = await sendRequest({type:'join'});
+       // console.log('somesuka ', JSON.parse(somesuka.roomer));
+       // console.log('after somesuka' ,somesuka.roomer);
         await loadDevice(data.routerrtpCapabilities);
     } catch (err) {
 		console.log(err);
@@ -644,18 +653,18 @@ async function subscribe(el) {
         }
     });
 
-    videoConsumer = await consumeAndResume(consumerTransport, 'video');
-    audioConsumer = await consumeAndResume(consumerTransport, 'audio');
+    videoConsumer = await consumeAndResume(consumerTransport, 'video', BUKA);
+    audioConsumer = await consumeAndResume(consumerTransport, 'audio', BUKA);
 
     updateButtons();
 }
 
 
-async function consumeAndResume(transport, kind) {
+async function consumeAndResume(transport, kind, buka) {
     let consumer;
     try {
-        consumer = await consume(consumerTransport, kind);
-        
+        consumer = await consume(consumerTransport, kind, buka);
+        console.log("consumer: ", consumer);
     } catch (err) {
 	
 		console.error("err: ", err);
@@ -669,7 +678,7 @@ async function consumeAndResume(transport, kind) {
         if (kind === 'video') {
             console.log('-- resume kind=' + kind);
             try {
-                await sendRequest({type: 'resume', kind: kind})
+                await sendRequest({type: 'resume', kind: kind, remoteId:buka[0]})
 
                 console.log('resume OK');
                
@@ -705,17 +714,17 @@ async function loadDevice(routerRtpCapabilities) {
     }
 }
 
-async function consume(transport, trackKind) {
+async function consume(transport, trackKind, buka) {
     console.log('--start of consume --kind=' + trackKind);
     const {rtpCapabilities} = device;
     var data;
     try {
-        data = await sendRequest({type: 'consume', rtpCapabilities: rtpCapabilities, kind: trackKind})
+        data = await sendRequest({type: 'consume', rtpCapabilities: rtpCapabilities, kind: trackKind, remoteId: buka[0]})
     } catch (err) {
 		console.error(err);
         note({contrent: 'Consume ERROR: ' + err.toString(), type: "error", time: 5});
     }
-    ;
+    
 //console.error(data)
 
     const producerId = data.params.producerId;
@@ -740,7 +749,7 @@ async function consume(transport, trackKind) {
             return null;
         }
      
-          addRemoteTrack(MYSOCKETID, consumer.track);
+          addRemoteTrack(1, consumer.track);
        
 
         return consumer;
@@ -753,10 +762,8 @@ async function consume(transport, trackKind) {
 
 
 function unpublish() {
-    if (!SENDER) {
-        return;
-    }
-    wsend({ type: "stop", request: "mediasoup"});
+   // alert(1);
+    sock.send(JSON.stringify({ type: "unpublish", request: "mediasoup"}));
     if (loci) {
         pauseVideo(remote);
         stopLocalStream(loci);
@@ -774,38 +781,18 @@ function unpublish() {
         producerTransport.close(); // localStream will stop
         producerTransport = null;
     }
-    updateButtons();
+    
     // updateButtons2();
-    SENDER = false;
-    CONNECTED = false;
+  //  SENDER = false;
+  //  CONNECTED = false;
     if (vV) vV.textContent = 0;
    // disableElement("stopTranslation");
-   playContainer.setAttribute("data-state", "niemand");
-   PSENDER = false;
-   let s = L()=="ru"?"Вы закончили трансляцию.":
-   L()=='en'?"You finished translation!":
-   L()=='zh'?'你翻译完了':
-   L()=='id'?'Anda menyelesaikan terjemahan!':'';
-    note({content: s, type: "info", time: 5});
+  // playContainer.setAttribute("data-state", "niemand");
+  // PSENDER = false;
+ 
+    note({content: "Вы закончили трансляцию.", type: "info", time: 5});
     
-    txtvalue.disabled = true;
-   txtvalue2.disabled = true;
-   txtvalue.setAttribute('data-publish', 'none');
-   txtvalue2.setAttribute('data-publish', 'none');
-    let abbi = document.querySelectorAll('.send');
-               abbi[0].setAttribute('data-publish', 'none');
-               abbi[1].setAttribute('data-publish', 'none');
-     let a = document.querySelector('div#playContainer #kresti');
-               if(a) a.classList.toggle('show');
-               let sa = document.querySelector("#kartinasvg");
-               if(sa) sa.style.display="block";
-    startbtn.disabled = false;
-    nextbtn.disabled = true;
-    chatbox.innerHTML="";
-	  chatbox2.innerHTML="";
-	mobileChat.className = "hide";
-	mobChat = false;
-	textarea2.classList.add('hide');
+
 }
 
 function disconnect2() {
@@ -818,49 +805,21 @@ function disconnect2() {
         audioConsumer.close();
         audioConsumer = null;
     }
-    SENDER = false;
+   
     if (consumerTransport) {
         consumerTransport.close();
         consumerTransport = null;
-        wsend({ type: "unconsume", publishedId: publishedId, request: "mediasoup"});
+        //wsend({ type: "unconsume", publishedId: publishedId, request: "mediasoup"});
     }
-    // updateButtons2();
-gid("playContainer").setAttribute("data-state", "busy");
+     sock.send(JSON.stringify({ type: "unsubscribe", roomname: 1, request: "mediasoup"}));
 
         pauseVideo(remote);
-       // stopLocalStream(remote.srcObject);
-        loci = null;
-        PSENDER = false;
-        startbtn.disabled = false;
-        let s = L()=="ru"?"Вы отписались от трансляции":
-        L()=='en'?"You unsubscribed from translation":
-        L()=='zh'?'您取消订阅翻译':
-        L()=='id'?'Anda berhenti berlangganan terjemahan':'';
-   note({ content: s, type: "info", time: 5 });
-   gid("txtvalue2").setAttribute("data-publish", "none");
-   gid("txtvalue").setAttribute("data-publish", "none");
-   txtvalue.disabled = true;
-   txtvalue2.disabled = true;
-    let abbi = document.querySelectorAll('.send');
-               abbi[0].setAttribute('data-publish', 'none');
-               abbi[1].setAttribute('data-publish', 'none');
-    let a = document.querySelector('div#playContainer #kresti');
-   if(a)a.className = "";
-   let sa = document.querySelector("#kartinasvg");
-               if(sa) sa.style.display="block";
-               if(a) {
-				// if(!a.classList.contains('show'))  a.classList.toggle('show');
-			   }
-			
-			 mobileChat.className="hide";
-				textarea2.className = "hide";
        
-			   while(chatbox2.firstChild){
-				   chatbox2.firstChild.remove();
-			   }
-			     while(chatbox.firstChild){
-				   chatbox.firstChild.remove();
-			   }
+        loci = null;
+      
+   note({ content: "Вы отписались от трансляции", type: "info", time: 5 });
+			
+			
 }
 
 

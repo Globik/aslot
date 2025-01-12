@@ -50,7 +50,8 @@ const main_page = function(n){
      <script src="/pwabuilder-sw-register.js"></script>
     </head><body>
   <video id="remote" playsinline autoplay></video>
-  <button id="Publish" onclick="startMedia(this);">publish</button> | <button id="Subscribe" onclick="subscribe(this);">subscribe</button>
+  <button id="Publish" onclick="startMedia(this);">publish</button> |<button onclick="unpublish();">unpublish</button>| <button id="Subscribe" onclick="subscribe(this);">subscribe</button>
+  | <button onclick="disconnect2();">unsubscribe</button>
     <main id="somemain"><nav class="vhod">
 <div class="ya-share2" data-curtain data-size="m" data-shape="round"  data-services="vkontakte,telegram,odnoklassniki" data-url="https://chatikon.ru" data-image="https://chatikon.ru/img/home.jpg"></div>
     <div><span id="onlinecount">0</span></div><div><a ${n.user?`onclick="logout(this);"`:''} href="${n.user?'#':'#login'}">${n.user?'Выход':'Вход'}</a></div></nav>
