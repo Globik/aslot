@@ -7,9 +7,14 @@ const pub = new Router();
 pub.get('/', async ctx => {
     let db = ctx.db;
     console.log("USER ", ctx.state.user);
-    ctx.body = await ctx.render('main_page', {randomStr: shortid.generate() })
+    ctx.body = await ctx.render('main_page2', {randomStr: shortid.generate() })
 })
 
+pub.get('/subscribe', async ctx => {
+    let db = ctx.db;
+    console.log("USER ", ctx.state.user);
+    ctx.body = await ctx.render('subscribe', {randomStr: shortid.generate() })
+}) 
 
 pub.post('/login', (ctx, next) => {
    if (!ctx.isAuthenticated()) {

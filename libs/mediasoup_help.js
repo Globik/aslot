@@ -1,3 +1,7 @@
+const os = require('os')
+
+const numWorkers =  Object.keys(os.cpus()).length;
+
 const handleMediasoup =  function(ws, msg, WebSocket, wss, pool){
 	//ws, msg, WebSocket, wss, pool 
 	console.log('*** MSG ***', msg);
@@ -295,11 +299,14 @@ function getClientCount() {
   // WARN: undocumented method to get clients number
   //return io.eio.clientsCount;
 }
-
+const workers=[]
 
 async function setupRoom(name) {
   const room = new Room(name);
   const mediaCodecs = mediasoupOptions.router.mediaCodecs;
+  var worker = await getMediasoupWorker();
+  //console.log('worker here ', worker);
+  try{
   const router = await worker.createRouter({ mediaCodecs });
   router.roomname = name;
 
@@ -312,6 +319,7 @@ async function setupRoom(name) {
 
   room.router = router;
   Room.addRoom(room, name);
+  }catch(e){console.error(e)}
   return room;
 }
 
@@ -610,6 +618,38 @@ const mediasoupOptions = {
             'x-google-start-bitrate': 1000
           }
         },
+        {
+			kind:'video',
+			mimeType:'video/Vp9',
+			clockRate:90000,
+			parameters:{
+				'profile-id':2,
+				'x-google-start-bitrate':1000
+			}
+		},
+		{
+			kind:'video',
+			mimeType:'video/h264',
+			clockRate: 90000,
+			parameters:{
+				'packetization-mode':1,
+				'profile-level-id':'4d0032',
+				'level-asymmetry-allowed': 1,
+				'x-google-start-bitrate':1000
+			}
+		},
+		{
+			kind:'video',
+			mimeType:'video/h264',
+			clockRate:90000,
+			parameters:
+			{
+				'packetization-mode':1,
+				'profile-level-id':'42e01f',
+				'level-asymmetry-allowed':1,
+				'x-google-start-bitrate':1000
+			}
+		}
       ]
   },
   // WebRtcTransport settings
@@ -625,7 +665,7 @@ const mediasoupOptions = {
   }
 };
 
-let worker = null;
+//let worker = null;
 //let router = null;
 //let producerTransport = null;
 //let producer = null;
@@ -634,16 +674,43 @@ let worker = null;
 
 
 async function startWorker() {
-  const mediaCodecs = mediasoupOptions.router.mediaCodecs;
-  worker = await mediasoup.createWorker();
+  //const mediaCodecs = mediasoupOptions.router.mediaCodecs;
+  //worker = await mediasoup.createWorker();
   //router = await worker.createRouter({ mediaCodecs });
   //producerTransport = await router.createWebRtcTransport(mediasoupOptions.webRtcTransport);
 
+  
+  
+  
+  for (let i = 0; i < numWorkers; i++) {
+    let worker = await mediasoup.createWorker(/*{
+      logLevel: config.mediasoup.worker.logLevel,
+      logTags: config.mediasoup.worker.logTags,
+      rtcMinPort: config.mediasoup.worker.rtcMinPort,
+      rtcMaxPort: config.mediasoup.worker.rtcMaxPort
+    }*/)
+
+    worker.on('died', () => {
+      console.error('mediasoup worker died, exiting in 2 seconds... [pid:%d]', worker.pid)
+      setTimeout(() => process.exit(1), 2000)
+    })
+   // console.log('workers  daa ', worker);
+    workers.push(worker)
   defaultRoom = await setupRoom('_default_room');
   console.log('-- mediasoup worker start. -- room:', defaultRoom.name);
-}
-
+  
+  
+}}
+var nextMediasoupWorkerIdx = 0;
 startWorker();
+async function getMediasoupWorker() {
+	//console.log('getmediasoupworker', workers);
+  const worker = workers[nextMediasoupWorkerIdx]
+
+  if (++nextMediasoupWorkerIdx === workers.length) nextMediasoupWorkerIdx = 0
+//console.log('*** worker ****', worker)
+  return worker
+}
 
 
 //

@@ -13,7 +13,7 @@ const access = util.promisify(fs.access);
 const mkdir = util.promisify(fs.mkdir);
 const { koaBody } = require('koa-body');
 const axios = require("axios").default;
-const { handleMediasoup, ev } = require("./libs/mediasoup_help.js");
+const { handleMediasoup, ev } = require("./libs/mediasoup_help3.js");
 const passport = require('koa-passport');
 const WebSocket = require('ws');
 const Router = require('koa-router');
@@ -175,7 +175,7 @@ var k=1;
 	setGuest(ip);
 	 ws.isAlive = true;
 	 ws.id=k;//obid();
-	 
+	 wsend(ws, { type: "welcome", yourid: ws.id });
 	// ws.room_id="alik";
 	 k++;
   ws.on("pong", heartbeat);

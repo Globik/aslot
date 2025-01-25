@@ -108,6 +108,7 @@ function sendRequest(obj) {
     });
 
 }
+
 function on_msg(data){
 	 // console.log('data ',data);
 	  if(data.type == "howmuch"){
