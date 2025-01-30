@@ -182,7 +182,7 @@ var k=1;
    broadcast_all({ type: "howmuch", value: wss.clients.size });
    let msg;
 	ws.on('message', async function onMessage(msgi){
-		console.log(msgi);
+		//console.log(msgi);
 		try{
      msg = JSON.parse(msgi)
 }catch(e){return;}

@@ -3,8 +3,7 @@ const main_page2 = function(n){
     
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
     <title>Машина</title>
-    <!-- <meta name="viewport" content="width=device-width,initial-scale=1.0"> -->
-    <meta name="viewport" content="initial-scale=0.60, minimum-scale=0.60, maximum-scale=0.60">
+   <meta name="viewport" content="width=device-width,initial-scale=1.0"> 
     
     <link rel="icon" type="image/png" href="/img3/favicon-96x96.png" sizes="96x96" />
 <link rel="icon" type="image/svg+xml" href="/img3/favicon.svg" />
@@ -29,6 +28,7 @@ const main_page2 = function(n){
 <meta name="description" content="Крути руль и собирай по дороге сердечки"/>
     
     <!-- <link rel="icon" href="/img/w4.png"> -->
+     <link href="/css/slot.css" rel="stylesheet">
     <link href="/css/note.css" rel="stylesheet">
     
     <link href="/css/output.css" rel="stylesheet">

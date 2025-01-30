@@ -69,7 +69,7 @@ main();
 
  const handleMediasoup =  function(ws, msg, WebSocket, wss, pool){
 	//ws, msg, WebSocket, wss, pool 
-	console.log('*** MSG ***', msg);
+	//console.log('*** MSG ***', msg);
 	const socket = ws;
 	function wsend(ws, obj){
 	console.log('hallo wsend ', obj)
@@ -116,7 +116,7 @@ main();
 
     // update our most-recently-seem timestamp -- we're not stale!
     roomState.peers[peerId].lastSeenTs = Date.now();
-console.log("************** active speaker******************* ", roomState.activeSpeaker)
+//console.log("************** active speaker******************* ", roomState.activeSpeaker)
     wsend({type:msg.type,
       peers: roomState.peers,
       activeSpeaker: roomState.activeSpeaker
@@ -259,7 +259,7 @@ socket.peerId = peerId;
     // but we don't ever need to call removeProducer() because the core
     // AudioLevelObserver code automatically removes closed producers
     if (producer.kind === 'audio') {
-    //  audioLevelObserver.addProducer({ producerId: producer.id });
+     // audioLevelObserver.addProducer({ producerId: producer.id });
     }
 
     roomState.producers.push(producer);
@@ -492,19 +492,18 @@ socket.peerId = peerId;
 
 audioLevelObserver.on('volumes', (volumes) => {
     const { producer, volume } = volumes[0];
-    console.log('*****************audio-level volumes event', producer.appData.peerId, volume);
+   // console.log('*****************audio-level volumes event', producer.appData.peerId, volume);
     roomState.activeSpeaker.producerId = producer.id;
     roomState.activeSpeaker.volume = volume;
     roomState.activeSpeaker.peerId = producer.appData.peerId;
     wsend({type:'ok'});})
 
 function wsend(obj){
-	console.log('hallo wsend ', obj)
+	//console.log('hallo wsend ', obj)
 	let a;
 	try{
 		a = JSON.stringify(obj);
-		//if(ws.readyState === WebSocket.OPEN)ws.send(a)
-		socket.send(a);
+		if(ws.readyState === WebSocket.OPEN) socket.send(a);
 		}catch(e){console.log(e)}
 	}
   // periodically clean up peers that disconnected without sending us
@@ -533,8 +532,8 @@ function wsend(obj){
 		//}
 	async function cleanUpPeerDa(){
 			 try {
-    let { peerId } = msg;
-    log('leave', peerId);
+   // let { peerId } = msg;
+   // log('leave', peerId);
 
     await closePeer(socket.peerId);
    // wsend({type:msg.type, left: true });

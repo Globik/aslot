@@ -707,14 +707,14 @@ async function createTransport(direction) {
 async function pollAndUpdate() {
 	//alert(1);
   let { peers, activeSpeaker, error } = await sendRequest({type:'sync'});
-  console.log('polling peers', peers);
-  console.log('polling active speaker ',activeSpeaker);
+ // console.log('polling peers', peers);
+ // console.log('polling active speaker ',activeSpeaker);
   if (error) {
     return ({ error });
   }
 
   // always update bandwidth stats and active speaker display
-  currentActiveSpeaker = activeSpeaker;
+  if(activeSpeaker)currentActiveSpeaker = activeSpeaker;
   updateActiveSpeaker();
   updateCamVideoProducerStatsDisplay();
   updateScreenVideoProducerStatsDisplay();
@@ -725,6 +725,7 @@ async function pollAndUpdate() {
   // seen time and stats, so we can easily do a deep-equals
   // comparison. compare this list with the cached list from last
   // poll.
+  if(peers){
   let thisPeersList = sortPeers(peers),
       lastPeersList = sortPeers(lastPollSyncData);
   if (!deepEqual(thisPeersList, lastPeersList)) {
@@ -743,9 +744,11 @@ async function pollAndUpdate() {
       });
     }
   }
+}
 
   // if a peer has stopped sending media that we are consuming, we
   // need to close the consumer and remove video and audio elements
+  if(peers){
   consumers.forEach((consumer) => {
     let { peerId, mediaTag } = consumer.appData;
     if (!peers[peerId].media[mediaTag]) {
@@ -753,8 +756,8 @@ async function pollAndUpdate() {
       closeConsumer(consumer);
     }
   });
-
-  lastPollSyncData = peers;
+}
+ if(peers) lastPollSyncData = peers;
   return ({}); // return an empty object if there isn't an error
 }
 

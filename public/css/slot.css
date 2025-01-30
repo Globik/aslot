@@ -99,12 +99,13 @@ footer#pdf{
 }
 footer input[type=button],button,input[type=text],input[type=submit],input[type=reset]{
 	color:#371463;
-	font-size:2rem;
+	font-size:1.3rem;
 	font-weight:bold;
 	padding-left:15px;
 	padding-right:15px;
 	mrgin-left:10px;
 	margin-right:10px;
+	margin-top:1rem;
 	border-radius:10px;
 }
 footer input[type=button]:disabled{
@@ -322,7 +323,7 @@ padding:1rem;
 			padding:2rem;
 		}
 /*321 */
-	@media screen and (max-width: calc(452px * 60)) and (orientation: portrait){
+	@media screen and (max-width: 452px) and (orientation: portrait){
 							html{
 								ackground:black;
 							}
@@ -372,11 +373,3 @@ padding:1rem;
 				}
 						}
 
-@media screen and (max-width: calc(334px * 60)) and (orientation: portrait){
-	html{
-		ackground: red;
-	}
-	#stage{
-		width:80%;
-	}
-}
