@@ -351,18 +351,18 @@ async function startScreenshare() {
 // list (if we have multiple cameras)
 async function cycleCamera() {
   if (!(camVideoProducer && camVideoProducer.track)) {
-    console.warn('cannot cycle camera - no current camera track');
+    alert('cannot cycle camera - no current camera track');
     return;
   }
 
-  console.log ('cycle camera');
+  alert('cycle camera');
 
   // find "next" device in device list
   let deviceId = await getCurrentDeviceId(),
       allDevices = await navigator.mediaDevices.enumerateDevices(),
       vidDevices = allDevices.filter((d) => d.kind === 'videoinput');
   if (!vidDevices.length > 1) {
-    console.warn('cannot cycle camera - only one camera');
+    alert('cannot cycle camera - only one camera');
     return;
   }
   let idx = vidDevices.findIndex((d) => d.deviceId === deviceId);
@@ -376,7 +376,7 @@ async function cycleCamera() {
   // just in case browsers want to group audio/video streams together
   // from the same device when possible (though they don't seem to,
   // currently)
-  console.log('getting a video stream from new device', vidDevices[idx].label);
+  alert('getting a video stream from new device '+ vidDevices[idx].label);
   localCam = await navigator.mediaDevices.getUserMedia({
     video: { deviceId: { exact: vidDevices[idx].deviceId } },
     audio: true
@@ -991,7 +991,7 @@ async function showCameraInfo() {
       deviceInfo = devices.find((d) => d.deviceId === deviceId);
   infoEl.innerHTML = `
       ${ deviceInfo.label }
-      <button onclick="Client.cycleCamera()">switch camera</button>
+      <button onclick="cycleCamera()">switch camera</button>
   `;
 }
 
