@@ -357,17 +357,9 @@ async function cycleCamera(el) {
     alert('cannot cycle camera - no current camera track');
     return;
   }
-  /*
-if(localCam){
-	localCam.getTracks().forEach(function(track){
-			track.stop();
-		});
-
-	localCam.srcObject = null;
-
-	}*/
+ 
 	
-  alert('cycle camera');
+ // alert('cycle camera');
 try{
 	camVideoProducer.track.stop();
   // find "next" device in device list
@@ -387,15 +379,15 @@ try{
 
 
 	var dura;
-	//var si = el.getAttribute("data-current");
+
 	if(curd !== videoInput2){
-		alert('back 1  cam '+videoInput2);
-	//el.setAttribute("data-current", videoInput2);
+		//alert('back 1  cam '+videoInput2);
+	
 	curd = videoInput2
 	dura = videoInput2;
 }else{
-	alert('front 2  cam '+videoInput1);
-	//el.setAttribute("data-current", videoInput1);
+	//alert('front 2  cam '+videoInput1);
+	
 	dura = videoInput1;
 	curd = dura;
 }
@@ -415,7 +407,7 @@ try{
   // just in case browsers want to group audio/video streams together
   // from the same device when possible (though they don't seem to,
   // currently)
-  alert('getting a video stream from new device '+ vidDevices[idx].label);
+ // alert('getting a video stream from new device '+ vidDevices[idx].label);
   localCam = await navigator.mediaDevices.getUserMedia(
   constraints
   /*{
