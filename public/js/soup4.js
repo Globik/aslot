@@ -356,7 +356,7 @@ async function cycleCamera(el) {
     alert('cannot cycle camera - no current camera track');
     return;
   }
-  
+  /*
 if(localCam){
 	localCam.getTracks().forEach(function(track){
 			track.stop();
@@ -364,9 +364,11 @@ if(localCam){
 
 	localCam.srcObject = null;
 
-	}
+	}*/
+	
   alert('cycle camera');
 try{
+	camVideoProducer.track.stop();
   // find "next" device in device list
   let deviceId = await getCurrentDeviceId(),
       allDevices = await navigator.mediaDevices.enumerateDevices(),
@@ -420,8 +422,9 @@ try{
   );
 
   // replace the tracks we are sending
+  
   await camVideoProducer.replaceTrack({ track: localCam.getVideoTracks()[0] });
-  await camAudioProducer.replaceTrack({ track: localCam.getAudioTracks()[0] });
+ // await camAudioProducer.replaceTrack({ track: localCam.getAudioTracks()[0] });
 
   // update the user interface
   showCameraInfo();
