@@ -388,11 +388,11 @@ try{
 	var dura;
 	var si = el.getAttribute("data-current");
 	if(si !== videoInput2){
-		alert('si '+si);
+		alert('si 1 '+si+' cam '+videoInput2);
 	el.setAttribute("data-current", videoInput2);
 	dura = videoInput2;
 }else{
-	alert('si '+si);
+	alert('si 2 '+si+' cam '+videoInput1);
 	el.setAttribute("data-current", videoInput1);
 	dura = videoInput1;
 }
