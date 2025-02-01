@@ -361,8 +361,8 @@ if(localCam){
 	localCam.getTracks().forEach(function(track){
 			track.stop();
 		});
-//window.streami = undefined;
-	local.srcObject = null;
+
+	localCam.srcObject = null;
 
 	}
   alert('cycle camera');
