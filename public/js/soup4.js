@@ -4,6 +4,7 @@ import * as mediasoup from 'mediasoup-client';
 import deepEqual from 'deep-equal';
 import debugModule from 'debug';
 */
+var videoInput1, videoInput2;
 const $ = document.querySelector.bind(document);
 const $$ = document.querySelectorAll.bind(document);
 //const log = debugModule('demo-app');
@@ -17,6 +18,7 @@ const $$ = document.querySelectorAll.bind(document);
 //
 //   `Client.camVideoProducer.paused`
 //
+var kK = 0;
 const myPeerId = uuidv4();
 let device,
            joined,
@@ -349,14 +351,22 @@ async function startScreenshare() {
 
 // switch to sending video from the "next" camera device in our device
 // list (if we have multiple cameras)
-async function cycleCamera() {
+async function cycleCamera(el) {
   if (!(camVideoProducer && camVideoProducer.track)) {
     alert('cannot cycle camera - no current camera track');
     return;
   }
+  /*
+if(window.streami){
+	window.streami.getTracks().forEach(function(track){
+			track.stop();
+		});
+window.streami = undefined;
+	local.srcObject = null;
 
+	}*/
   alert('cycle camera');
-
+try{
   // find "next" device in device list
   let deviceId = await getCurrentDeviceId(),
       allDevices = await navigator.mediaDevices.enumerateDevices(),
@@ -372,15 +382,40 @@ async function cycleCamera() {
     idx += 1;
   }
 
+
+	var dura;
+	var si = el.getAttribute("data-current");
+	if(si !== videoInput2){
+	el.setAttribute("data-current", videoInput2);
+	dura = videoInput2;
+}else{
+	el.setAttribute("data-current", videoInput1);
+	dura = videoInput1;
+}
+
+		let constraints = {
+			audio:{
+      echoCancellation: {exact: true}
+    }, 
+    video:{deviceId: dura ? {exact: dura} : undefined}
+    };
+
+
+
+
+
   // get a new video stream. might as well get a new audio stream too,
   // just in case browsers want to group audio/video streams together
   // from the same device when possible (though they don't seem to,
   // currently)
   alert('getting a video stream from new device '+ vidDevices[idx].label);
-  localCam = await navigator.mediaDevices.getUserMedia({
+  localCam = await navigator.mediaDevices.getUserMedia(
+  constraints
+  /*{
     video: { deviceId: { exact: vidDevices[idx].deviceId } },
     audio: true
-  });
+  }*/
+  );
 
   // replace the tracks we are sending
   await camVideoProducer.replaceTrack({ track: localCam.getVideoTracks()[0] });
@@ -388,6 +423,9 @@ async function cycleCamera() {
 
   // update the user interface
   showCameraInfo();
+}catch(err){
+	alert(err);
+}
 }
 
  async function stopStreams() {
@@ -991,7 +1029,7 @@ async function showCameraInfo() {
       deviceInfo = devices.find((d) => d.deviceId === deviceId);
   infoEl.innerHTML = `
       ${ deviceInfo.label }
-      <button onclick="cycleCamera()">switch camera</button>
+      <button data-current="" onclick="cycleCamera(this);">switch camera</button>
   `;
 }
 
@@ -1012,6 +1050,36 @@ async function getCurrentDeviceId() {
       deviceInfo = devices.find((d) => d.label.startsWith(track.label));
   return deviceInfo.deviceId;
 }
+
+function gotDevices(deviceInfos){
+	let a = navigator.mediaDevices.getSupportedConstraints();
+	
+	for(var i=0; i !== deviceInfos.length; ++i){
+		
+		const deviceInfo = deviceInfos[i];
+		if(deviceInfo.kind === 'videoinput'){
+			if(kK == 0){
+				videoInput1 = deviceInfo.deviceId;
+			
+	
+			}else if(kK == 1){
+				
+				videoInput2 = deviceInfo.deviceId;
+			}
+			
+			kK++;
+		}
+	}
+}
+function getDevice(){
+if(!navigator.mediaDevices || !navigator.mediaDevices.enumerateDevices){
+note({ content: "Your browser navigator.mediaDevices not supported", type: "warn", time: 5 });
+}else{
+navigator.mediaDevices.enumerateDevices().then(gotDevices).catch(function(err){console.error(err)});
+}
+}
+
+getDevice();
 
 function updateActiveSpeaker() {
   $$('.track-subscribe').forEach((el) => {
