@@ -48,7 +48,9 @@ const main_page2 = function(n){
     <script async src="https://yastatic.net/share2/share.js"></script>
      <script src="/pwabuilder-sw-register.js"></script>
     </head><body>
-   
+   <section id="localcamContaiiner"><header>Local cam</header>
+   <video id="localVideo" muted ></video>
+   </section>
 <div id="local-control">
   <div id="join-control">
     <button id="join-button" onclick="joinRoom()">

@@ -117,13 +117,13 @@ main();
     // update our most-recently-seem timestamp -- we're not stale!
     roomState.peers[peerId].lastSeenTs = Date.now();
 //console.log("************** active speaker******************* ", roomState.activeSpeaker)
-    wsend({type:msg.type,
+    wsend(ws,{type:msg.type,
       peers: roomState.peers,
       activeSpeaker: roomState.activeSpeaker
     });
   } catch (e) {
     console.error(e.message);
-    wsend({type:msg.type, error: e.message });
+    wsend(ws, {type:msg.type, error: e.message });
   }
 	}else if(msg.type=='join-as-new-peer'){
 		
@@ -139,10 +139,10 @@ socket.peerId = peerId;
       media: {}, consumerLayers: {}, stats: {}
     };
 
-    wsend({type:msg.type, routerRtpCapabilities: router.rtpCapabilities });
+    wsend(ws, {type:msg.type, routerRtpCapabilities: router.rtpCapabilities });
   } catch (e) {
     console.error('error in /signaling/join-as-new-peer', e);
-    wsend({type:msg.type, error: e });
+    wsend(ws, {type:msg.type, error: e });
   }
 }else if(msg.type == 'leave'){
 	 try {
@@ -150,10 +150,10 @@ socket.peerId = peerId;
     log('leave', peerId);
 
     await closePeer(peerId);
-    wsend({type:msg.type, left: true });
+    wsend(ws, {type:msg.type, left: true });
   } catch (e) {
     console.error('error in /signaling/leave', e);
-    wsend({type:msg.type, error: e });
+    wsend(ws, {type:msg.type, error: e });
   }
 }else if(msg.type=='create-transport'){
 	try {
@@ -164,12 +164,12 @@ socket.peerId = peerId;
     roomState.transports[transport.id] = transport;
 
     let { id, iceParameters, iceCandidates, dtlsParameters } = transport;
-    wsend({type:msg.type,
+    wsend(ws, {type:msg.type,
       transportOptions: { id, iceParameters, iceCandidates, dtlsParameters }
     });
   } catch (e) {
     console.error('error in /signaling/create-transport', e);
-    wsend({type:msg.type, error: e });
+    wsend(ws, {type:msg.type, error: e });
   }
 }else if(msg.type=='connect-transport'){
 	try {
@@ -178,17 +178,17 @@ socket.peerId = peerId;
 
     if (!transport) {
       err(`connect-transport: server-side transport ${transportId} not found`);
-      wsend({type:msg.type, error: `server-side transport ${transportId} not found` });
+      wsend(ws, {type:msg.type, error: `server-side transport ${transportId} not found` });
       return;
     }
 
     log('connect-transport', peerId, transport.appData);
 
     await transport.connect({ dtlsParameters });
-    wsend({type:msg.type, connected: true });
+    wsend(ws, {type:msg.type, connected: true });
   } catch (e) {
     console.error('error in /signaling/connect-transport', e);
-    wsend({type:msg.type, error: e });
+    wsend(ws, {type:msg.type, error: e });
   }
 }else if(msg.type=='close-transport'){
   try {
@@ -197,20 +197,20 @@ socket.peerId = peerId;
 
     if (!transport) {
       err(`close-transport: server-side transport ${transportId} not found`);
-      wsend({type:msg.type, error: `server-side transport ${transportId} not found` });
+      wsend(ws, {type:msg.type, error: `server-side transport ${transportId} not found` });
       return;
     }
 
     log('close-transport', peerId, transport.appData);
 
     await closeTransport(transport);
-    wsend({type:msg.type, closed: true });
+    wsend(ws, {type:msg.type, closed: true });
   } catch (e) {
     console.error('error in /signaling/close-transport', e);
-    wsend({type:msg.type, error: e.message });
+    wsend(ws, {type:msg.type, error: e.message });
   }
 	
-}else if(msg.type=='close-producer'){
+}else if(msg.type == 'close-producer'){
 	
   try {
     let { peerId, producerId } = msg,
@@ -218,19 +218,19 @@ socket.peerId = peerId;
 
     if (!producer) {
       err(`close-producer: server-side producer ${producerId} not found`);
-      wsend({type:msg.type, error: `server-side producer ${producerId} not found` });
+      wsend(ws, {type:msg.type, error: `server-side producer ${producerId} not found` });
       return;
     }
 
     log('close-producer', peerId, producer.appData);
 
     await closeProducer(producer);
-    wsend({type:msg.type, closed: true });
+    wsend(ws, {type:msg.type, closed: true });
   } catch (e) {
     console.error(e);
-    wsend({type:msg.type, error: e.message });
+    wsend(ws, {type:msg.type, error: e.message });
   }
-}else if(msg.type=='send-track'){
+}else if(msg.type == 'send-track'){
   try {
     let { peerId, transportId, kind, rtpParameters,
           paused=false, appData } = msg,
@@ -238,7 +238,7 @@ socket.peerId = peerId;
 
     if (!transport) {
       err(`send-track: server-side transport ${transportId} not found`);
-      wsend({type:msg.type, error: `server-side transport ${transportId} not found`});
+      wsend(ws, {type:msg.type, error: `server-side transport ${transportId} not found`});
       return;
     }
 
@@ -267,11 +267,11 @@ socket.peerId = peerId;
       paused,
       encodings: rtpParameters.encodings
     };
-
-    wsend({type:msg.type, id: producer.id });
+    wsend(ws, { type: msg.type, id: producer.id });
+    broadcast({ type: "Newproducer", id: producer.id });
   } catch (e) {
 	  console.log(e);
-	  wsend({type:msg.type, error: e });
+	  wsend(ws, {type:msg.type, error: e });
   }
 }else if(msg.type=='recv-track'){
 	
@@ -287,7 +287,7 @@ socket.peerId = peerId;
       let msg = 'server-side producer for ' +
                   `${mediaPeerId}:${mediaTag} not found`;
       err('recv-track: ' + msg);
-      wsend({type:msg.type, error: msg });
+      wsend(ws, {type:msg.type, error: msg });
       return;
     }
 
@@ -295,7 +295,7 @@ socket.peerId = peerId;
                              rtpCapabilities })) {
       let msg = `client cannot consume ${mediaPeerId}:${mediaTag}`;
       err(`recv-track: ${peerId} ${msg}`);
-      wsend({type:msg.type, error: msg });
+      wsend(ws, {type:msg.type, error: msg });
       return;
     }
 
@@ -306,7 +306,7 @@ socket.peerId = peerId;
     if (!transport) {
       let msg = `server-side recv transport for ${peerId} not found`;
       err('recv-track: ' + msg);
-      wsend({type:msg.type, error: msg });
+      wsend(ws, {type:msg.type, error: msg });
       return;
     }
 
@@ -348,7 +348,7 @@ socket.peerId = peerId;
       }
     });
 
-    wsend({
+    wsend(ws, {
       producerId: producer.id,
       id: consumer.id,
       kind: consumer.kind,
@@ -358,7 +358,7 @@ socket.peerId = peerId;
     });
   } catch (e) {
     console.error('error in /signaling/recv-track', e);
-    wsend ({type:msg.type, error: e });
+    wsend (ws, {type:msg.type, error: e });
   }
 	
 	
@@ -369,7 +369,7 @@ socket.peerId = peerId;
 
     if (!consumer) {
       err(`pause-consumer: server-side consumer ${consumerId} not found`);
-      wsend({type:msg.type, error: `server-side producer ${consumerId} not found` });
+      wsend(ws, {type:msg.type, error: `server-side producer ${consumerId} not found` });
       return;
     }
 
@@ -377,10 +377,10 @@ socket.peerId = peerId;
 
     await consumer.pause();
 
-    wsend({type:msg.type, paused: true});
+    wsend(ws, {type:msg.type, paused: true});
   } catch (e) {
     console.error('error in /signaling/pause-consumer', e);
-    wsend({type:msg.type, error: e });
+    wsend(ws, {type:msg.type, error: e });
   }
 }else if(msg.type=='resume-consumer'){
 	 try {
@@ -389,7 +389,7 @@ socket.peerId = peerId;
 
     if (!consumer) {
       err(`pause-consumer: server-side consumer ${consumerId} not found`);
-      wsend({type:msg.type, error: `server-side consumer ${consumerId} not found` });
+      wsend(ws, {type:msg.type, error: `server-side consumer ${consumerId} not found` });
       return;
     }
 
@@ -397,10 +397,10 @@ socket.peerId = peerId;
 
     await consumer.resume();
 
-    wsend({type:msg.type, resumed: true });
+    wsend(ws, {type:msg.type, resumed: true });
   } catch (e) {
     console.error('error in /signaling/resume-consumer', e);
-    wsend({type:msg.type, error: e });
+    wsend(ws, {type:msg.type, error: e });
   }
 }else if(msg.type=='close-consumer'){
 	try {
@@ -409,16 +409,16 @@ socket.peerId = peerId;
 
     if (!consumer) {
       err(`close-consumer: server-side consumer ${consumerId} not found`);
-      wsend({type:msg.type, error: `server-side consumer ${consumerId} not found` });
+      wsend(ws, {type:msg.type, error: `server-side consumer ${consumerId} not found` });
       return;
     }
 
     await closeConsumer(consumer);
 
-    wsend({type:msg.type, closed: true });
+    wsend(ws, {type:msg.type, closed: true });
   } catch (e) {
     console.error('error in /signaling/close-consumer', e);
-    wsend({type:msg.type, error: e });
+    wsend(ws, {type:msg.type, error: e });
   }
 }else if(msg.type=='consumer-set-layers'){
 	
@@ -428,7 +428,7 @@ socket.peerId = peerId;
 
     if (!consumer) {
       err(`consumer-set-layers: server-side consumer ${consumerId} not found`);
-      wsend({type:msg.type, error: `server-side consumer ${consumerId} not found` });
+      wsend(ws, {type:msg.type, error: `server-side consumer ${consumerId} not found` });
       return;
     }
 
@@ -436,7 +436,7 @@ socket.peerId = peerId;
 
     await consumer.setPreferredLayers({ spatialLayer });
 
-    wsend({type:msg.type, layersSet: true });
+    wsend(ws, {type:msg.type, layersSet: true });
   } catch (e) {
     console.error('error in /signaling/consumer-set-layers', e);
     wsend({type:msg.type, error: e });
@@ -448,7 +448,7 @@ socket.peerId = peerId;
 
     if (!producer) {
       err(`pause-producer: server-side producer ${producerId} not found`);
-      wsend({type:msg.type, error: `server-side producer ${producerId} not found` });
+      wsend(ws, {type:msg.type, error: `server-side producer ${producerId} not found` });
       return;
     }
 
@@ -458,10 +458,10 @@ socket.peerId = peerId;
 
     roomState.peers[peerId].media[producer.appData.mediaTag].paused = true;
 
-    wsend({type:msg.type, paused: true });
+    wsend(ws, {type:msg.type, paused: true });
   } catch (e) {
     console.error('error in /signaling/pause-producer', e);
-    wsend({type:msg.type, error: e });
+    wsend(ws, {type:msg.type, error: e });
   }
 	}else if(msg.type=='resume-producer'){
 		 try {
@@ -470,7 +470,7 @@ socket.peerId = peerId;
 
     if (!producer) {
       err(`resume-producer: server-side producer ${producerId} not found`);
-      wsend({type:msg.type, error: `server-side producer ${producerId} not found` });
+      wsend(ws, {type:msg.type, error: `server-side producer ${producerId} not found` });
       return;
     }
 
@@ -480,10 +480,10 @@ socket.peerId = peerId;
 
     roomState.peers[peerId].media[producer.appData.mediaTag].paused = false;
 
-    wsend({type:msg.type, resumed: true });
+    wsend(ws, {type:msg.type, resumed: true });
   } catch (e) {
     console.error('error in /signaling/resume-producer', e);
-    wsend({type:msg.type, error: e });
+    wsend(ws, {type:msg.type, error: e });
   }
 	}else{}
 }
@@ -496,8 +496,8 @@ audioLevelObserver.on('volumes', (volumes) => {
     roomState.activeSpeaker.producerId = producer.id;
     roomState.activeSpeaker.volume = volume;
     roomState.activeSpeaker.peerId = producer.appData.peerId;
-    wsend({type:'ok'});})
-
+    wsend(ws,{type:'ok'});})
+/*
 function wsend(obj){
 	//console.log('hallo wsend ', obj)
 	let a;
@@ -505,7 +505,7 @@ function wsend(obj){
 		a = JSON.stringify(obj);
 		if(ws.readyState === WebSocket.OPEN) socket.send(a);
 		}catch(e){console.log(e)}
-	}
+	}*/
   // periodically clean up peers that disconnected without sending us
   // a final "beacon"
   /*

@@ -11,7 +11,7 @@ const $$ = document.querySelectorAll.bind(document);
 //const warn = debugModule('demo-app:WARN');
 //const err = debugModule('demo-app:ERROR');
 
-
+const localVideo = gid('localVideo');
 //
 // export all the references we use internally to manage call state,
 // to make it easy to tinker from the js console. for example:
@@ -87,7 +87,7 @@ if (window.location.protocol === "https:") {
   sock.onclose=function(){
 	console.log('websocket closed');
   }
-   sock.onmessage = function (e) {
+   sock.addEventListener('message',function (e) {
 	      let a;
             try {
                 a = JSON.parse(e.data);
@@ -99,10 +99,21 @@ if (window.location.protocol === "https:") {
             }
             //res(a);
            on_msg(a);
-   }
+   },false)
 
 }
 getSocket();
+function on_msg(a){
+	console.log('msg type ', a.type);
+	if(a.type == 'ok'){
+		alert('a  '+ a);
+		pollAndUpdate();
+	}else if(a.type == "Newproducer"){
+		pollAndUpdate();
+	}else{console.log("unknown type ", a.type);}
+	//alert(a);
+	
+}
  function sendRequest(obj) {
     return new Promise((resolve, reject) => {
         obj.request = "mediasoup";
@@ -137,6 +148,7 @@ getSocket();
                 a = JSON.parse(e.data);
             } catch (er) {
                 reject(er);
+                
             }
            // if(a.type=='recv-track'){
 			//	alert(JSON.stringify(a));
@@ -149,7 +161,7 @@ getSocket();
 				resolve(a);
 			}else if(a.type == "send-track"){
 					//alert('send track');
-					pollAndUpdate();
+					//pollAndUpdate();
 					resolve(a);
 				//await pollAndUpdate()
 			//resolve(a);
@@ -163,22 +175,16 @@ getSocket();
 				resolve(a);
 			} else if(a.type =='simple'){
 				resolve(a);
-			}else{console.log(a.type);}
+			}else{console.log(a.type);
+				//resolve(a);
+				}
 			}
         
 
     });
 
 }
-function on_msg(a){
-	
-	if(a.type == 'ok'){
-		alert('a  '+ a);
-		pollAndUpdate();
-	}
-	//alert(a);
-	
-}
+
 
 
 
@@ -344,6 +350,9 @@ async function startScreenshare() {
       video: true,
       audio: true
     });
+    localVideo.srcObject = localCam;
+    localVideo.volume = 0;
+     localVideo.play();
   } catch (e) {
     console.error('start camera error', e);
   }
@@ -458,8 +467,13 @@ try{
   camAudioProducer = null;
   screenVideoProducer = null;
   screenAudioProducer = null;
+  stopLocalStream(localCam);
   localCam = null;
   localScreen = null;
+        pauseVideo(localVideo);
+        
+    
+  //  el.setAttribute('disabled', 1);
 
   // update relevant ui elements
   $('#send-camera').style.display = 'initial';
@@ -469,6 +483,18 @@ try{
   showCameraInfo();
 }
 
+function pauseVideo(element) {
+    element.pause();
+    element.srcObject = null;
+}
+function stopLocalStream(stream) {
+    let tracks = stream.getTracks();
+    if (!tracks) {
+        console.warn('NO tracks');
+        return;
+    }
+	tracks.forEach(track => track.stop());
+}
 async function leaveRoom() {
   if (!joined) {
     return;
@@ -729,7 +755,9 @@ async function createTransport(direction) {
     // for this simple sample code, assume that transports being
     // closed is an error (we never close these transports except when
     // we leave the room)
-    if (state === 'closed' || state === 'failed' || state === 'disconnected') {
+    if(state == "connected"){
+		note({ content: "You're on air!", type: "info", time: 5 });
+	}else if (state === 'closed' || state === 'failed' || state === 'disconnected') {
       console.log('transport closed ... leaving the room and resetting');
       leaveRoom();
     }
@@ -909,6 +937,7 @@ async function updatePeersDisplay(peersInfo = lastPollSyncData,
 }
 
 function makeTrackControlEl(peerName, mediaTag, mediaInfo) {
+	//if(peerName == 'my') return;
   let div = document.createElement('div'),
       peerId = (peerName === 'my' ? myPeerId : peerName),
       consumer = findConsumerForTrack(peerId, mediaTag);
