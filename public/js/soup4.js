@@ -351,6 +351,7 @@ async function startScreenshare() {
 
 // switch to sending video from the "next" camera device in our device
 // list (if we have multiple cameras)
+var curd = undefined;
 async function cycleCamera(el) {
   if (!(camVideoProducer && camVideoProducer.track)) {
     alert('cannot cycle camera - no current camera track');
@@ -386,15 +387,17 @@ try{
 
 
 	var dura;
-	var si = el.getAttribute("data-current");
-	if(si !== videoInput2){
-		alert('si 1 '+si+' cam '+videoInput2);
-	el.setAttribute("data-current", videoInput2);
+	//var si = el.getAttribute("data-current");
+	if(curd !== videoInput2){
+		alert('back 1  cam '+videoInput2);
+	//el.setAttribute("data-current", videoInput2);
+	curd = videoInput2
 	dura = videoInput2;
 }else{
-	alert('si 2 '+si+' cam '+videoInput1);
-	el.setAttribute("data-current", videoInput1);
+	alert('front 2  cam '+videoInput1);
+	//el.setAttribute("data-current", videoInput1);
 	dura = videoInput1;
+	curd = dura;
 }
 
 		let constraints = {
@@ -1065,7 +1068,7 @@ function gotDevices(deviceInfos){
 		if(deviceInfo.kind === 'videoinput'){
 			if(kK == 0){
 				videoInput1 = deviceInfo.deviceId;
-			
+			curd = videoInput1;
 	
 			}else if(kK == 1){
 				
