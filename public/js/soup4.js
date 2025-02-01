@@ -356,15 +356,15 @@ async function cycleCamera(el) {
     alert('cannot cycle camera - no current camera track');
     return;
   }
-  /*
-if(window.streami){
-	window.streami.getTracks().forEach(function(track){
+  
+if(localCam){
+	localCam.getTracks().forEach(function(track){
 			track.stop();
 		});
-window.streami = undefined;
+//window.streami = undefined;
 	local.srcObject = null;
 
-	}*/
+	}
   alert('cycle camera');
 try{
   // find "next" device in device list
@@ -386,9 +386,11 @@ try{
 	var dura;
 	var si = el.getAttribute("data-current");
 	if(si !== videoInput2){
+		alert('si '+si);
 	el.setAttribute("data-current", videoInput2);
 	dura = videoInput2;
 }else{
+	alert('si '+si);
 	el.setAttribute("data-current", videoInput1);
 	dura = videoInput1;
 }
