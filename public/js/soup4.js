@@ -427,6 +427,8 @@ try{
 
   // replace the tracks we are sending
   localVideo.srcObject = localCam;
+  localVideo.volume = 0;
+  localVideo.play();
   await camVideoProducer.replaceTrack({ track: localCam.getVideoTracks()[0] });
  // await camAudioProducer.replaceTrack({ track: localCam.getAudioTracks()[0] });
 
