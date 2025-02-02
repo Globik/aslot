@@ -426,7 +426,7 @@ try{
   );
 
   // replace the tracks we are sending
-  
+  localVideo.srcObject = localCam;
   await camVideoProducer.replaceTrack({ track: localCam.getVideoTracks()[0] });
  // await camAudioProducer.replaceTrack({ track: localCam.getAudioTracks()[0] });
 
@@ -937,7 +937,7 @@ async function updatePeersDisplay(peersInfo = lastPollSyncData,
 }
 
 function makeTrackControlEl(peerName, mediaTag, mediaInfo) {
-	//if(peerName == 'my') return;
+	
   let div = document.createElement('div'),
       peerId = (peerName === 'my' ? myPeerId : peerName),
       consumer = findConsumerForTrack(peerId, mediaTag);
