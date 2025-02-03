@@ -1,3 +1,48 @@
+**Comments Policy**
+
+Welcome to our community! We encourage open and respectful discussions on our platform. To ensure a positive and constructive environment for all users, we have established the following guidelines for commenting. By participating in discussions, you agree to adhere to these rules:
+
+### 1. **Be Respectful**
+   - Treat all users with respect and courtesy. Personal attacks, harassment, hate speech, or any form of discrimination based on race, gender, religion, nationality, sexual orientation, or other characteristics will not be tolerated.
+   - Avoid using offensive language, including profanity, slurs, or derogatory remarks.
+
+### 2. **Stay On Topic**
+   - Keep your comments relevant to the topic of the post or discussion. Off-topic comments may be removed to maintain the focus of the conversation.
+   - Avoid spamming, including excessive posting of links, promotional content, or repetitive messages.
+
+### 3. **No Trolling or Flame Wars**
+   - Do not post inflammatory or provocative comments intended to disrupt the conversation or provoke others. Constructive criticism is welcome, but trolling or baiting other users is not allowed.
+
+### 4. **Respect Privacy**
+   - Do not share personal information about yourself or others, including phone numbers, email addresses, or physical addresses. Respect the privacy of all users.
+
+### 5. **No Illegal Content**
+   - Do not post or promote illegal activities, including but not limited to piracy, fraud, or violence. Any content that violates the law will be removed and reported to the appropriate authorities.
+
+### 6. **Cite Sources**
+   - If you reference external sources, provide proper attribution. Misinformation or unsubstantiated claims may be removed.
+
+### 7. **Moderation**
+   - We reserve the right to moderate comments at our discretion. Comments that violate this policy may be edited, removed, or result in the suspension of your account.
+   - If you believe a comment has been removed in error, please contact us for clarification.
+
+### 8. **Report Violations**
+   - If you encounter a comment that violates this policy, please use the reporting tools provided by Disqus to bring it to our attention. Do not engage with the offending user.
+
+### 9. **Be Constructive**
+   - We value thoughtful and constructive contributions. Share your opinions, but do so in a way that fosters meaningful dialogue and adds value to the discussion.
+
+### 10. **Disclaimer**
+   - The opinions expressed in the comments section belong solely to the individual authors and do not necessarily reflect the views of the website or its administrators.
+
+By following these guidelines, we can create a welcoming and engaging community for everyone. Thank you for your cooperation!
+
+**Last Updated:** [Insert Date]  
+**Contact Us:** [Insert Contact Information]  
+
+---
+
+This policy is designed to comply with Disqus's requirements and ensure a positive experience for all users. Make sure to customize the placeholders (e.g., date, contact information) as needed.
 **Политика комментариев**
 
 Добро пожаловать в наше сообщество! Мы приветствуем открытые и уважительные обсуждения на нашей платформе. Чтобы обеспечить позитивную и конструктивную атмосферу для всех пользователей, мы установили следующие правила комментирования. Участвуя в обсуждениях, вы соглашаетесь соблюдать эти правила:
