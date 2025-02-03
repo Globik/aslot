@@ -107,8 +107,10 @@ function on_msg(a){
 	console.log('msg type ', a.type);
 	if(a.type == 'ok'){
 		alert('a  '+ a);
-		pollAndUpdate();
+		//pollAndUpdate(a);
 	}else if(a.type == "Newproducer"){
+		pollAndUpdate();
+	}else if(a.type == 'oksync'){
 		pollAndUpdate();
 	}else{console.log("unknown type ", a.type);}
 	//alert(a);
@@ -118,27 +120,8 @@ function on_msg(a){
     return new Promise((resolve, reject) => {
         obj.request = "mediasoup";
         obj.peerId = myPeerId; 
-      if(obj.beacon){
-	//	  if (beacon) {
-     // navigator.sendBeacon('/signaling/' + obj.type, {});
-     // return null;
-   // }
-	  }
-      /* if(!sock) {
-			let s = L()=="ru"?"Повторите попытку позднее":L()=='en'?"Try later":
-			L()=='zh'?'稍后再试':
-			L()=='id'?'coba lagi nanti':'';
-			reject({ info: s });
-			return;
-		}
-		if(sock.readyState === 0) {
-			let s = L()=="ru"?"Повторите попытку позднее":L()=='en'?"Try later":
-			L()=='zh'?'稍后再试':
-			L()=='id'?'coba lagi nanti':'';
-			reject({ info: s });
-			return;
-		}
-      */
+     
+     
         sock.send(JSON.stringify(obj));
         sock.onmessage = async function (e) {
 			
@@ -156,7 +139,7 @@ function on_msg(a){
 			//	console.log('*** recv-track ***', a);
 			//}else 
 			console.log('B ', a);
-			if(a.type=="ok"){
+		/*	if(a.type=="ok"){
 				pollAndUpdate();
 				resolve(a);
 			}else if(a.type == "send-track"){
@@ -165,18 +148,21 @@ function on_msg(a){
 					resolve(a);
 				//await pollAndUpdate()
 			//resolve(a);
-			}else if (a.type == obj.type) {
+			}else */
+			if (a.type == obj.type) {
 				console.log("d ", a.type," = ", obj.type);
                 resolve(a);
             }else if (a.type == "error") {
                 reject(a.info);
-            }else if(a.type =="simulcast"){
-			//	alert(a.type);
+            }else if(a.type == "simulcast"){
+			console.log(e.data);
 				resolve(a);
-			} else if(a.type =='simple'){
+			}else if(a.type =='simple'){
 				resolve(a);
-			}else{console.log(a.type);
-				//resolve(a);
+			}
+			else{
+				console.log(a.type);
+				
 				}
 			}
         
@@ -778,6 +764,7 @@ async function pollAndUpdate() {
  // console.log('polling peers', peers);
  // console.log('polling active speaker ',activeSpeaker);
   if (error) {
+	  console.error(error);
     return ({ error });
   }
 

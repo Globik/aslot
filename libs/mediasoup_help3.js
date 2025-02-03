@@ -40,7 +40,9 @@ async function startMediasoup() {
   // audioLevelObserver for signaling active speaker
   //
   const audioLevelObserver = await router.createAudioLevelObserver({
-		interval: 800
+		interval: 5000,
+		maxEntries: 1,
+		threshold: -100
 	});
 	/*
   audioLevelObserver.on('volumes', (volumes) => {
@@ -56,7 +58,9 @@ async function startMediasoup() {
     roomState.activeSpeaker.volume = null;
     roomState.activeSpeaker.peerId = null;
   });
-
+	audioLevelObserver.on('routerclose', function(){
+		audioLevelObserver.close();// or is closed already automatically?
+	});
   return { worker, router, audioLevelObserver };
 }
 console.log('starting mediasoup');
@@ -115,7 +119,7 @@ main();
     }
 
     // update our most-recently-seem timestamp -- we're not stale!
-    roomState.peers[peerId].lastSeenTs = Date.now();
+   roomState.peers[peerId].lastSeenTs = Date.now();
 //console.log("************** active speaker******************* ", roomState.activeSpeaker)
     wsend(ws,{type:msg.type,
       peers: roomState.peers,
@@ -125,10 +129,11 @@ main();
     console.error(e.message);
     wsend(ws, {type:msg.type, error: e.message });
   }
-	}else if(msg.type=='join-as-new-peer'){
+	}else if(msg.type == 'join-as-new-peer'){
 		
 
   try {
+	  
     let { peerId } = msg,
         now = Date.now();
     log('join-as-new-peer', peerId);
@@ -259,21 +264,44 @@ socket.peerId = peerId;
     // but we don't ever need to call removeProducer() because the core
     // AudioLevelObserver code automatically removes closed producers
     if (producer.kind === 'audio') {
-     // audioLevelObserver.addProducer({ producerId: producer.id });
+   // audioLevelObserver.addProducer({ producerId: producer.id });
     }
-
+   /*
+ audioLevelObserver.on('volumes', (volumes) => {
+    const { producer, volume } = volumes[0];
+    //console.log('*****************audio-level volumes event', producer.appData.peerId, volume);
+    roomState.activeSpeaker.producerId = producer.id;
+    roomState.activeSpeaker.volume = volume;
+    roomState.activeSpeaker.peerId = producer.appData.peerId;
+    broadcast({ type: 'oksync', peers: roomState.peers, activeSpeaker: roomState.activeSpeaker });
+  });
+  */
     roomState.producers.push(producer);
-    roomState.peers[peerId].media[appData.mediaTag] = {
-      paused,
-      encodings: rtpParameters.encodings
-    };
+    roomState.peers[peerId].media[appData.mediaTag]={
+		paused, 
+		encodings: rtpParameters.encodings
+	}
+  
+
+    // make sure this peer is connected. if we've disconnected the
+    // peer because of a network outage we want the peer to know that
+    // happened, when/if it returns
+   
+    // update our most-recently-seem timestamp -- we're not stale!
+    
+//console.log("************** active speaker******************* ", roomState.activeSpeaker)
+  
+    
+    
+    
+    
     wsend(ws, { type: msg.type, id: producer.id });
     broadcast({ type: "Newproducer", id: producer.id });
   } catch (e) {
 	  console.log(e);
 	  wsend(ws, {type:msg.type, error: e });
   }
-}else if(msg.type=='recv-track'){
+}else if(msg.type == 'recv-track'){ // can change to consumer.type == 'simulcast' to reply
 	
   try {
     let { peerId, mediaPeerId, mediaTag, rtpCapabilities } = msg;
@@ -353,7 +381,7 @@ socket.peerId = peerId;
       id: consumer.id,
       kind: consumer.kind,
       rtpParameters: consumer.rtpParameters,
-      type: consumer.type,
+      type: consumer.type, // simulcast
       producerPaused: consumer.producerPaused
     });
   } catch (e) {
@@ -489,7 +517,7 @@ socket.peerId = peerId;
 }
 
 
-
+/*
 audioLevelObserver.on('volumes', (volumes) => {
     const { producer, volume } = volumes[0];
    // console.log('*****************audio-level volumes event', producer.appData.peerId, volume);
@@ -497,6 +525,7 @@ audioLevelObserver.on('volumes', (volumes) => {
     roomState.activeSpeaker.volume = volume;
     roomState.activeSpeaker.peerId = producer.appData.peerId;
     wsend(ws,{type:'ok'});})
+    */ 
 /*
 function wsend(obj){
 	//console.log('hallo wsend ', obj)
