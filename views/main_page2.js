@@ -34,7 +34,11 @@ const main_page2 = function(n){
     <link href="/css/output.css" rel="stylesheet">
     <link href="/css/login3.css" rel="stylesheet"> 
     <style>
-   
+   video{
+   width:100px;
+   height:100px;
+   border: 1px solid green;
+}
     </style>
    
     <script src="/js/globalik.js"></script>
@@ -52,19 +56,20 @@ const main_page2 = function(n){
    <video id="localVideo" muted ></video>
    </section>
 <div id="local-control">
+<!--
   <div id="join-control">
     <button id="join-button" onclick="joinRoom()">
       join room
     </button>
     <span class="arrow"> &#x21E2; </span>
-  </div>
+  </div> -->
 
   <div id="camera-control">
     <button id="send-camera" onclick="sendCameraStreams()">
-      send camera streams
+      Войти в чат
     </button>
-    <button id="stop-streams" onclick="stopStreams()">
-      stop streams
+    <button id="stop-streams" style="display:none;" onclick="stopStreams()">
+      Выйти из чата
     </button>
     <span id="camera-info"></span>
     <button id="share-screen" onclick="startScreenshare()">
@@ -93,11 +98,11 @@ const main_page2 = function(n){
       </div>
     </div>
   </div>
-
+<!--
   <button id="leave-room" onclick="leaveRoom()">
     leave room
   </button>
-
+-->
 </div>
 
 <div id="available-tracks">

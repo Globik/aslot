@@ -108,20 +108,22 @@ main();
   // start mediasoup
   
 
-	if(msg.type=='sync'){
+	if(msg.type == 'sync'){
 		 let { peerId } = msg;
+		 console.log('type sync peerId ', peerId);
   try {
     // make sure this peer is connected. if we've disconnected the
     // peer because of a network outage we want the peer to know that
     // happened, when/if it returns
     if (!roomState.peers[peerId]) {
-      throw new Error('not connected');
+      throw new Error('type sync not connected');
     }
 
     // update our most-recently-seem timestamp -- we're not stale!
    roomState.peers[peerId].lastSeenTs = Date.now();
 //console.log("************** active speaker******************* ", roomState.activeSpeaker)
-    wsend(ws,{type:msg.type,
+    wsend(ws,{ 
+	  type:msg.type,
       peers: roomState.peers,
       activeSpeaker: roomState.activeSpeaker
     });
@@ -134,7 +136,8 @@ main();
 
   try {
 	  
-    let { peerId } = msg,
+    let { peerId } = msg;
+    console.log('join-as-new-peer peerId ', peerId);
         now = Date.now();
     log('join-as-new-peer', peerId);
 socket.peerId = peerId;
@@ -143,8 +146,8 @@ socket.peerId = peerId;
       lastSeenTs: now,
       media: {}, consumerLayers: {}, stats: {}
     };
-
-    wsend(ws, {type:msg.type, routerRtpCapabilities: router.rtpCapabilities });
+warn(msg.type, ' roomState.peers[peerId] ', roomState.peers[peerId])
+    wsend(ws, { type: msg.type, routerRtpCapabilities: router.rtpCapabilities });
   } catch (e) {
     console.error('error in /signaling/join-as-new-peer', e);
     wsend(ws, {type:msg.type, error: e });
@@ -301,11 +304,11 @@ socket.peerId = peerId;
 	  console.log(e);
 	  wsend(ws, {type:msg.type, error: e });
   }
-}else if(msg.type == 'recv-track'){ // can change to consumer.type == 'simulcast' to reply
+}else if(msg.type == 'recv-track'){ // can change to consumer.type == 'simulcast' or 'simple' video/audio to reply
 	
   try {
     let { peerId, mediaPeerId, mediaTag, rtpCapabilities } = msg;
-
+console.log('msg ', msg)
     let producer = roomState.producers.find(
       (p) => p.appData.mediaTag === mediaTag &&
              p.appData.peerId === mediaPeerId
@@ -381,7 +384,7 @@ socket.peerId = peerId;
       id: consumer.id,
       kind: consumer.kind,
       rtpParameters: consumer.rtpParameters,
-      type: consumer.type, // simulcast
+      type: consumer.type, // simulcast for video and simple for audio
       producerPaused: consumer.producerPaused
     });
   } catch (e) {
@@ -410,14 +413,14 @@ socket.peerId = peerId;
     console.error('error in /signaling/pause-consumer', e);
     wsend(ws, {type:msg.type, error: e });
   }
-}else if(msg.type=='resume-consumer'){
+}else if(msg.type == 'resume-consumer'){
 	 try {
     let { peerId, consumerId } = msg,
         consumer = roomState.consumers.find((c) => c.id === consumerId);
 
     if (!consumer) {
-      err(`pause-consumer: server-side consumer ${consumerId} not found`);
-      wsend(ws, {type:msg.type, error: `server-side consumer ${consumerId} not found` });
+      err(`resume-consumer: server-side consumer ${consumerId} not found`);
+      wsend(ws, { type: msg.type, error: `server-side consumer ${consumerId} not found` });
       return;
     }
 

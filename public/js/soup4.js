@@ -79,7 +79,7 @@ if (window.location.protocol === "https:") {
   sock.onopen = function () {
 	 console.log("websocket opened");
 	// alert('open');
-
+joinRoom()
   };
   sock.onerror = function (e) {
 	  console.error(e);
@@ -180,7 +180,7 @@ async function joinRoom() {
   }
 
   console.log('join room');
-  $('#join-control').style.display = 'none';
+  //$('#join-control').style.display = 'none';
 
   try {
     // signal that we're a new peer and initialize our
@@ -190,7 +190,7 @@ async function joinRoom() {
       await device.load({ routerRtpCapabilities });
     }
     joined = true;
-    $('#leave-room').style.display = 'initial';
+   // $('#leave-room').style.display = 'initial';
   } catch (e) {
     console.error(e);
     return;
@@ -468,6 +468,7 @@ try{
   $('#share-screen').style.display = 'initial';
   $('#local-screen-pause-ctrl').style.display = 'none';
   $('#local-screen-audio-pause-ctrl').style.display = 'none';
+  leaveRoom();
   showCameraInfo();
 }
 
@@ -489,10 +490,8 @@ async function leaveRoom() {
   }
 
   console.log('leave room');
-  $('#leave-room').style.display = 'none';
+  //$('#leave-room').style.display = 'none';
 
-  // stop polling
-  clearInterval(pollingInterval);
 
   // close everything on the server-side (transports, producers, consumers)
   let { error } = await sendRequest({type:'leave'});
@@ -522,7 +521,7 @@ async function leaveRoom() {
   joined = false;
 
   // hacktastically restore ui to initial state
-  $('#join-control').style.display = 'initial';
+//  $('#join-control').style.display = 'initial';
   $('#send-camera').style.display = 'initial';
   $('#stop-streams').style.display = 'none';
   $('#remote-video').innerHTML = '';
@@ -550,10 +549,21 @@ async function subscribeToTrack(peerId, mediaTag) {
     console.error('already have consumer for track', peerId, mediaTag)
     return;
   };
-
+  //alert('mediatag ' + mediaTag);
+ //videoConsumer = 
+ if(mediaTag == 'cam-video'){
+  consumer = await consumeAndResume(recvTransport, mediaTag, peerId);
+}else{
+  //  audioConsumer = 
+  consumer = await consumeAndResume(recvTransport, mediaTag, peerId);
+}
   // ask the server to create a server-side consumer object and send
   // us back the info we need to create a client-side consumer
-  let consumerParameters = await sendRequest({type:'recv-track', 
+  
+  
+  //bconsumer = await bconsume(recvTransport, mediaTag);
+  /*
+  let consumerParameters = await sendRequest({type:'recv-track', // consume
     mediaTag,
     mediaPeerId: peerId,
     rtpCapabilities: device.rtpCapabilities
@@ -564,23 +574,128 @@ async function subscribeToTrack(peerId, mediaTag) {
     appData: { peerId, mediaTag }
   });
   console.log('created new consumer', consumer.id);
-
+*/
   // the server-side consumer will be started in paused state. wait
   // until we're connected, then send a resume request to the server
   // to get our first keyframe and start displaying video
-  while (recvTransport.connectionState !== 'connected') {
-    console.log('  transport connstate', recvTransport.connectionState );
-    await sleep(100);
-  }
+ // while (recvTransport.connectionState !== 'connected') {
+   // console.log('  transport connstate', recvTransport.connectionState );
+  //  await sleep(100);
+  //}
   // okay, we're ready. let's ask the peer to send us media
-  await resumeConsumer(consumer);
+ // await resumeConsumer(consumer);
 
   // keep track of all our consumers
   consumers.push(consumer);
 
   // ui
-  await addVideoAudio(consumer);
+  //await addVideoAudio(consumer);
   updatePeersDisplay();
+}
+
+
+async function resumeConsumer(consumer) {
+  if (consumer) {
+    console.log('resume consumer', consumer.appData.peerId, consumer.appData.mediaTag);
+    try {
+      await sendRequest({type:'resume-consumer',  consumerId: consumer.id });
+      await consumer.resume();
+    } catch (e) {
+      console.error(e);
+    }
+  }
+}
+async function consumeAndResume(recvTransport, kind, peerId) {
+    let consumer;
+    try {
+        consumer = await bconsume(recvTransport, kind, peerId);
+        
+    } catch (err) {
+	
+		console.error("err: ", err);
+        note({content: err.toString(), type: "error", time: 10 });
+    }
+    if (consumer) {
+		
+        console.log('-- track exist, consumer ready. kind=' + kind);
+        console.log('----- consumer: ', consumer);
+      
+        if (kind === 'cam-video' || 'cam-audio') {
+            console.log('-- resume kind=' + kind + ' --consumer.id = ' + consumer.id);
+            try {
+                await sendRequest({type: 'resume-consumer' /*kind: kind*/, consumerId: consumer.id })
+
+                console.log('resume OK');
+               
+                return consumer;
+            } catch (err) {
+				console.error(err);
+                note({content: err.toString(), type: "error", time: 10 });
+                return consumer;
+            }
+        } else {
+            console.log('-- do not resume kind=' + kind);
+            return consumer;
+        }
+    } else {
+        console.log('-- no consumer yet. kind=' + kind);
+        return null;
+    }
+}
+async function bconsume(transport, trackKind, peerId) {
+    console.log('--start of consume --kind=' + trackKind);
+    const {rtpCapabilities} = device;
+    var data;
+    
+    let consumerParameters;
+    try {
+		// mediaTag,
+   // mediaPeerId: peerId,
+   // rtpCapabilities: device.rtpCapabilities
+      //  data
+      consumerParameters   = await sendRequest({type: 'recv-track' /*'consume'*/, rtpCapabilities, mediaTag: trackKind, mediaPeerId: peerId })
+    } catch (err) {
+		console.error(err);
+        note({contrent: 'Consume ERROR: ' + err.toString(), type: "error", time: 5});
+    }
+    ;
+//console.error(data)
+console.log('consumerParameters ', JSON.stringify(consumerParameters))
+
+   const producerId = consumerParameters.producerId;
+  //  const id = data.params.id;
+  //  const kind = data.params.kind;
+  //  const rtpParameters = data.params.rtpParameters;
+mediaTag = trackKind;
+    if (producerId) {
+        let codecOptions = {};
+        let consumer;
+        try {
+            consumer = await transport.consume({
+                //id,
+              //  producerId,
+              //  kind,
+              //  rtpParameters,
+               // codecOptions,
+               ...consumerParameters,
+    appData: { peerId, mediaTag }
+            });
+        } catch (err) {
+			console.error(err);
+            note({content: err.toString(), type: "error", time: 5});
+            return null;
+        }
+     
+        //  addRemoteTrack(MYSOCKETID, consumer.track);
+      await addVideoAudio(consumer);
+		//updatePeersDisplay();
+
+        return consumer;
+    } else {
+        note({content: 'Remote producer NOT READY', type: "info", time: 5});
+
+        return null;
+    }
 }
 
 async function unsubscribeFromTrack(peerId, mediaTag) {
@@ -610,7 +725,7 @@ async function pauseConsumer(consumer) {
     }
   }
 }
-
+/*
 async function resumeConsumer(consumer) {
   if (consumer) {
     console.log('resume consumer', consumer.appData.peerId, consumer.appData.mediaTag);
@@ -622,7 +737,7 @@ async function resumeConsumer(consumer) {
     }
   }
 }
-
+*/
 async function pauseProducer(producer) {
   if (producer) {
     console.log('pause producer', producer.appData.mediaTag);
@@ -744,7 +859,7 @@ async function createTransport(direction) {
     // closed is an error (we never close these transports except when
     // we leave the room)
     if(state == "connected"){
-		note({ content: "You're on air!", type: "info", time: 5 });
+		note({ content: (direction=='send'?"Вы в эфире!":"Вы подписались!"), type: "info", time: 5 });
 	}else if (state === 'closed' || state === 'failed' || state === 'disconnected') {
       console.log('transport closed ... leaving the room and resetting');
       leaveRoom();
@@ -934,14 +1049,15 @@ function makeTrackControlEl(peerName, mediaTag, mediaInfo) {
 
   let sub = document.createElement('button');
   if (!consumer) {
-    sub.innerHTML += 'subscribe'
-    sub.onclick = () => subscribeToTrack(peerId, mediaTag);
+    sub.innerHTML += 'подписаться на спикера в качестве зрителя или слушателя'
+    sub.onclick = () => 
+    subscribeToTrack(peerId, mediaTag);
     div.appendChild(sub);
 
   } else {
-    sub.innerHTML += 'unsubscribe'
-    sub.onclick = () => unsubscribeFromTrack(peerId, mediaTag);
-    div.appendChild(sub);
+    sub.innerHTML += 'отписаться от спикера видео или аудио'
+   sub.onclick = () => unsubscribeFromTrack(peerId, mediaTag);
+   div.appendChild(sub);
   }
 
   let trackDescription = document.createElement('span');
@@ -1260,26 +1376,6 @@ function screenshareEncodings() {
 // our "signaling" function -- just an http fetch
 //
 
-async function sig(endpoint, data, beacon) {
-  try {
-    let headers = { 'Content-Type': 'application/json' },
-        body = JSON.stringify({ ...data, peerId: myPeerId });
-
-    if (beacon) {
-      navigator.sendBeacon('/signaling/' + endpoint, body);
-      return null;
-    }
-
-    let response = await fetch(
-      '/signaling/' + endpoint, { method: 'POST', body, headers }
-    );
-    return await response.json();
-  } catch (e) {
-    console.error(e);
-    return { error: e };
-  }
-}
-
 //
 // simple uuid helper function
 //
@@ -1306,9 +1402,9 @@ function uuidv4() {
 // promisified sleep
 //
 
-async function sleep(ms) {
-  return new Promise((r) => setTimeout(() => r(), ms));
-}
+//async function sleep(ms) {
+  //return new Promise((r) => setTimeout(() => r(), ms));
+//}
 function deepEqual(x, y) {
   if (x === y) {
     return true;
