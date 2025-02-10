@@ -33,10 +33,26 @@ async function startMediasoup() {
     console.error('mediasoup worker died (this should never happen)');
     process.exit(1);
   });
-
+worker.observer.on('newrouter', function(r){
+	  console.error('******************************************************ron new outer ');
+	  r.observer.on('close', function(){console.log('router closed')});
+	  r.observer.on('newtransport', function(t){
+		  console.log('******************************************************* new transport ***********************');
+		  t.observer.on('newproducer', function(p, a){
+			  console.log('***************************  new producer! ******************** ', p.id, p.producerId, p.appData, a);
+		  });
+	  });
+  });
+  worker.observer.on('close', function(){
+	  console.log('worker closed');
+  });
+ 
   const mediaCodecs = config.router.mediaCodecs;
   const router = await worker.createRouter({ mediaCodecs });
-
+router.on('workerclose', function(){
+	console.log('worker close so closing router');
+	router.close();
+})
   // audioLevelObserver for signaling active speaker
   //
   const audioLevelObserver = await router.createAudioLevelObserver({
@@ -64,8 +80,24 @@ async function startMediasoup() {
   return { worker, router, audioLevelObserver };
 }
 console.log('starting mediasoup');
+
+
+process.on('exit', function(c){
+	 console.log("** EXIT ***");
+ });
+ process.on('SIGINT', function() {
+    console.log("Caught interrupt signal");
+worker.close()
+   // if (i_should_exit)
+        process.exit();
+});
+
+
+
+
 async function main(){
   ({ worker, router, audioLevelObserver } = await startMediasoup());
+  
 }
 main();
   // start https server, falling back to http if https fails
@@ -139,7 +171,7 @@ main();
     let { peerId } = msg;
     console.log('join-as-new-peer peerId ', peerId);
         now = Date.now();
-    log('join-as-new-peer', peerId);
+    //log('join-as-new-peer', peerId);
 socket.peerId = peerId;
     roomState.peers[peerId] = {
       joinTs: now,
@@ -150,7 +182,7 @@ warn(msg.type, ' roomState.peers[peerId] ', roomState.peers[peerId])
     wsend(ws, { type: msg.type, routerRtpCapabilities: router.rtpCapabilities });
   } catch (e) {
     console.error('error in /signaling/join-as-new-peer', e);
-    wsend(ws, {type:msg.type, error: e });
+    wsend(ws, { type: msg.type, error: e });
   }
 }else if(msg.type == 'leave'){
 	 try {
@@ -158,12 +190,12 @@ warn(msg.type, ' roomState.peers[peerId] ', roomState.peers[peerId])
     log('leave', peerId);
 
     await closePeer(peerId);
-    wsend(ws, {type:msg.type, left: true });
+    wsend(ws, { type: msg.type, left: true });
   } catch (e) {
     console.error('error in /signaling/leave', e);
     wsend(ws, {type:msg.type, error: e });
   }
-}else if(msg.type=='create-transport'){
+}else if(msg.type == 'create-transport'){
 	try {
     let { peerId, direction } = msg;
     log('create-transport', peerId, direction);
@@ -179,26 +211,26 @@ warn(msg.type, ' roomState.peers[peerId] ', roomState.peers[peerId])
     console.error('error in /signaling/create-transport', e);
     wsend(ws, {type:msg.type, error: e });
   }
-}else if(msg.type=='connect-transport'){
+}else if(msg.type == 'connect-transport'){
 	try {
     let { peerId, transportId, dtlsParameters } = msg,
         transport = roomState.transports[transportId];
 
     if (!transport) {
       err(`connect-transport: server-side transport ${transportId} not found`);
-      wsend(ws, {type:msg.type, error: `server-side transport ${transportId} not found` });
+      wsend(ws, { type: msg.type, error: `server-side transport ${transportId} not found` });
       return;
     }
 
     log('connect-transport', peerId, transport.appData);
 
     await transport.connect({ dtlsParameters });
-    wsend(ws, {type:msg.type, connected: true });
+    wsend(ws, { type: msg.type, connected: true });
   } catch (e) {
     console.error('error in /signaling/connect-transport', e);
     wsend(ws, {type:msg.type, error: e });
   }
-}else if(msg.type=='close-transport'){
+}else if(msg.type == 'close-transport'){
   try {
     let { peerId, transportId } = msg,
         transport = roomState.transports[transportId];
@@ -212,10 +244,10 @@ warn(msg.type, ' roomState.peers[peerId] ', roomState.peers[peerId])
     log('close-transport', peerId, transport.appData);
 
     await closeTransport(transport);
-    wsend(ws, {type:msg.type, closed: true });
+    wsend(ws, { type: msg.type, closed: true });
   } catch (e) {
     console.error('error in /signaling/close-transport', e);
-    wsend(ws, {type:msg.type, error: e.message });
+    wsend(ws, { type: msg.type, error: e.message });
   }
 	
 }else if(msg.type == 'close-producer'){
@@ -226,14 +258,14 @@ warn(msg.type, ' roomState.peers[peerId] ', roomState.peers[peerId])
 
     if (!producer) {
       err(`close-producer: server-side producer ${producerId} not found`);
-      wsend(ws, {type:msg.type, error: `server-side producer ${producerId} not found` });
+      wsend(ws, { type: msg.type, error: `server-side producer ${producerId} not found` });
       return;
     }
 
     log('close-producer', peerId, producer.appData);
 
     await closeProducer(producer);
-    wsend(ws, {type:msg.type, closed: true });
+    wsend(ws, { type:msg.type, closed: true });
   } catch (e) {
     console.error(e);
     wsend(ws, {type:msg.type, error: e.message });
@@ -243,7 +275,7 @@ warn(msg.type, ' roomState.peers[peerId] ', roomState.peers[peerId])
     let { peerId, transportId, kind, rtpParameters,
           paused=false, appData } = msg,
         transport = roomState.transports[transportId];
-
+        
     if (!transport) {
       err(`send-track: server-side transport ${transportId} not found`);
       wsend(ws, {type:msg.type, error: `server-side transport ${transportId} not found`});
@@ -299,26 +331,36 @@ warn(msg.type, ' roomState.peers[peerId] ', roomState.peers[peerId])
     
     
     wsend(ws, { type: msg.type, id: producer.id });
-    broadcast({ type: "Newproducer", id: producer.id });
+   //  broadcast({ type: "Newproducer", id: producer.id , peerId: peerId, mediaTag: kind });
   } catch (e) {
 	  console.log(e);
 	  wsend(ws, {type:msg.type, error: e });
   }
+}else if(msg.type == 'Newproducer'){
+	 broadcast({ type: "Newproducer", id: msg.id , peerId: msg.peerId, mediaTag: msg.mediaTag });
 }else if(msg.type == 'recv-track'){ // can change to consumer.type == 'simulcast' or 'simple' video/audio to reply
 	
   try {
     let { peerId, mediaPeerId, mediaTag, rtpCapabilities } = msg;
 console.log('msg ', msg)
     let producer = roomState.producers.find(
-      (p) => p.appData.mediaTag === mediaTag &&
-             p.appData.peerId === mediaPeerId
-    );
-
+      (p) => {
+		  
+		  let lu = (p.appData.mediaTag === mediaTag && p.appData.peerId === mediaPeerId)
+		  console.error('p.appData.mediaTag '+p.appData.mediaTag);
+		  console.error('p.appData.peerId '+p.appData.peerId)
+		  console.error('lu '+lu); 
+		  return lu;
+		  });
+    console.error(msg.type);
+console.log('peerId: ', peerId);
+console.log('mediaPeerId :', mediaPeerId)
+console.log('roomState.producers: ', JSON.stringify(roomState.producers))
     if (!producer) {
-      let msg = 'server-side producer for ' +
+      let msgi = 'server-side producer for ' +
                   `${mediaPeerId}:${mediaTag} not found`;
-      err('recv-track: ' + msg);
-      wsend(ws, {type:msg.type, error: msg });
+      err('recv-track: ' + msgi);
+      wsend(ws, {type: "error", error: msgi});
       return;
     }
 
@@ -326,7 +368,7 @@ console.log('msg ', msg)
                              rtpCapabilities })) {
       let msg = `client cannot consume ${mediaPeerId}:${mediaTag}`;
       err(`recv-track: ${peerId} ${msg}`);
-      wsend(ws, {type:msg.type, error: msg });
+      wsend(ws, { type: 'error', error: msg });
       return;
     }
 
@@ -337,7 +379,7 @@ console.log('msg ', msg)
     if (!transport) {
       let msg = `server-side recv transport for ${peerId} not found`;
       err('recv-track: ' + msg);
-      wsend(ws, {type:msg.type, error: msg });
+      wsend(ws, { type: "error", error: msg });
       return;
     }
 
@@ -389,7 +431,7 @@ console.log('msg ', msg)
     });
   } catch (e) {
     console.error('error in /signaling/recv-track', e);
-    wsend (ws, {type:msg.type, error: e });
+    wsend (ws, { type: "error", error: e });
   }
 	
 	
@@ -415,7 +457,7 @@ console.log('msg ', msg)
   }
 }else if(msg.type == 'resume-consumer'){
 	 try {
-    let { peerId, consumerId } = msg,
+    let { peerId, consumerId, kind } = msg,
         consumer = roomState.consumers.find((c) => c.id === consumerId);
 
     if (!consumer) {
@@ -424,29 +466,30 @@ console.log('msg ', msg)
       return;
     }
 
-    log('resume-consumer', consumer.appData);
+    log('resume-consumer', consumer.appData, ' kind ', kind);
 
-    await consumer.resume();
+ // if(kind == 'cam-audio') 
+  await consumer.resume();
 
     wsend(ws, {type:msg.type, resumed: true });
   } catch (e) {
     console.error('error in /signaling/resume-consumer', e);
     wsend(ws, {type:msg.type, error: e });
   }
-}else if(msg.type=='close-consumer'){
+}else if(msg.type == 'close-consumer'){
 	try {
   let { peerId, consumerId } = msg,
       consumer = roomState.consumers.find((c) => c.id === consumerId);
 
     if (!consumer) {
       err(`close-consumer: server-side consumer ${consumerId} not found`);
-      wsend(ws, {type:msg.type, error: `server-side consumer ${consumerId} not found` });
+      wsend(ws, { type: msg.type, error: `server-side consumer ${consumerId} not found` });
       return;
     }
 
     await closeConsumer(consumer);
 
-    wsend(ws, {type:msg.type, closed: true });
+    wsend(ws, { type: msg.type, closed: true });
   } catch (e) {
     console.error('error in /signaling/close-consumer', e);
     wsend(ws, {type:msg.type, error: e });
@@ -667,7 +710,12 @@ async function createWebRtcTransport({ peerId, direction }) {
     initialAvailableOutgoingBitrate: 1000000,
     appData: { peerId, clientDirection: direction }
   });
-
+transport.observer.on('newProducer', function(l,e){
+	console.error("**** ON NEW PRODUCER!!!!! ****** ", l, e);
+})
+transport.observer.on('newconsumer', function(l,e){
+	console.error("**** ON NEW PRODUCER!!!!! ****** ", l, e);
+})
   return transport;
 }
 
