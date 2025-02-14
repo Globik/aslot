@@ -11,6 +11,8 @@ const err = console.error;
 //
 // and one "room" ...
 //
+var TOTAL_SPEAKERS = 0;
+
 const roomState = {
   // external
   peers: {},
@@ -20,7 +22,7 @@ const roomState = {
   producers: [],
   consumers: []
 }
-
+// roomState.peers[peerId].media[appData.mediaTag]
 async function startMediasoup() {
   let worker = await mediasoup.createWorker({
     logLevel: config.worker.logLevel,
@@ -40,6 +42,18 @@ worker.observer.on('newrouter', function(r){
 		  console.log('******************************************************* new transport ***********************');
 		  t.observer.on('newproducer', function(p, a){
 			  console.log('***************************  new producer! ******************** ', p.id, p.producerId, p.appData, a);
+				p.observer.on('close', function(){
+					console.log('**** producer closed ***** ', p.id);
+				});
+		  });
+		  t.observer.on('newconsumer', function(c){
+			  console.log('*** new consumer *****');
+			  c.observer.on('close', function(){
+				  console.log('*** consumer closed **** ', c.id);
+			  });
+		  });
+		  t.observer.on('close', function(){
+			  console.log('*** transport closed **** ', t.id);
 		  });
 	  });
   });
@@ -153,18 +167,18 @@ main();
 
     // update our most-recently-seem timestamp -- we're not stale!
    roomState.peers[peerId].lastSeenTs = Date.now();
-//console.log("************** active speaker******************* ", roomState.activeSpeaker)
-    wsend(ws,{ 
+//console.error("************** active sper******************* ", roomState.activeSpeaker)
+    wsend(ws, { 
 	  type:msg.type,
       peers: roomState.peers,
       activeSpeaker: roomState.activeSpeaker
     });
   } catch (e) {
     console.error(e.message);
-    wsend(ws, {type:msg.type, error: e.message });
+    wsend(ws, { type: msg.type, error: e.message });
   }
 	}else if(msg.type == 'join-as-new-peer'){
-		
+		broadcast_all({ type: 'total_speakers', count: TOTAL_SPEAKERS });
 
   try {
 	  
@@ -178,22 +192,40 @@ socket.peerId = peerId;
       lastSeenTs: now,
       media: {}, consumerLayers: {}, stats: {}
     };
-warn(msg.type, ' roomState.peers[peerId] ', roomState.peers[peerId])
-    wsend(ws, { type: msg.type, routerRtpCapabilities: router.rtpCapabilities });
+//console.error(msg.type, ' roomState.producers ', roomState.producers)
+let suka = [];
+
+for (let [key, value] of Object.entries(roomState.producers)){
+	console.log('key value.media ',key, ' ', value.appData);
+	suka.push({ peerid: value.appData.peerId, media: value.appData.mediaTag });
+}
+    wsend(ws, { type: msg.type, routerRtpCapabilities: router.rtpCapabilities, state: suka });
   } catch (e) {
     console.error('error in /signaling/join-as-new-peer', e);
     wsend(ws, { type: msg.type, error: e });
   }
+}else if(msg.type == 'add-statistic'){
+	if(msg.subtype == 'streamer'){
+		TOTAL_SPEAKERS += 1;
+		broadcast_all({ type: 'total_speakers', count: TOTAL_SPEAKERS });
+	}
+}else if(msg.type == 'minus-statistic'){
+	if(msg.subtype == 'streamer'){
+		TOTAL_SPEAKERS -=1;
+		broadcast_all({ type: 'total_speakers', count: TOTAL_SPEAKERS });
+	}
+	
 }else if(msg.type == 'leave'){
 	 try {
     let { peerId } = msg;
     log('leave', peerId);
 
     await closePeer(peerId);
+    ws.publish = false;
     wsend(ws, { type: msg.type, left: true });
   } catch (e) {
     console.error('error in /signaling/leave', e);
-    wsend(ws, {type:msg.type, error: e });
+    wsend(ws, { type: msg.type, error: e });
   }
 }else if(msg.type == 'create-transport'){
 	try {
@@ -204,7 +236,7 @@ warn(msg.type, ' roomState.peers[peerId] ', roomState.peers[peerId])
     roomState.transports[transport.id] = transport;
 
     let { id, iceParameters, iceCandidates, dtlsParameters } = transport;
-    wsend(ws, {type:msg.type,
+    wsend(ws, { type: msg.type,
       transportOptions: { id, iceParameters, iceCandidates, dtlsParameters }
     });
   } catch (e) {
@@ -228,7 +260,7 @@ warn(msg.type, ' roomState.peers[peerId] ', roomState.peers[peerId])
     wsend(ws, { type: msg.type, connected: true });
   } catch (e) {
     console.error('error in /signaling/connect-transport', e);
-    wsend(ws, {type:msg.type, error: e });
+    wsend(ws, { type: msg.type, error: e });
   }
 }else if(msg.type == 'close-transport'){
   try {
@@ -237,7 +269,7 @@ warn(msg.type, ' roomState.peers[peerId] ', roomState.peers[peerId])
 
     if (!transport) {
       err(`close-transport: server-side transport ${transportId} not found`);
-      wsend(ws, {type:msg.type, error: `server-side transport ${transportId} not found` });
+      wsend(ws, { type: msg.type, error: `server-side transport ${transportId} not found` });
       return;
     }
 
@@ -265,10 +297,10 @@ warn(msg.type, ' roomState.peers[peerId] ', roomState.peers[peerId])
     log('close-producer', peerId, producer.appData);
 
     await closeProducer(producer);
-    wsend(ws, { type:msg.type, closed: true });
+    wsend(ws, { type: msg.type, closed: true });
   } catch (e) {
     console.error(e);
-    wsend(ws, {type:msg.type, error: e.message });
+    wsend(ws, { type: msg.type, error: e.message });
   }
 }else if(msg.type == 'send-track'){
   try {
@@ -278,7 +310,7 @@ warn(msg.type, ' roomState.peers[peerId] ', roomState.peers[peerId])
         
     if (!transport) {
       err(`send-track: server-side transport ${transportId} not found`);
-      wsend(ws, {type:msg.type, error: `server-side transport ${transportId} not found`});
+      wsend(ws, { type:  msg.type, error: `server-side transport ${transportId} not found`});
       return;
     }
 
@@ -328,16 +360,18 @@ warn(msg.type, ' roomState.peers[peerId] ', roomState.peers[peerId])
   
     
     
-    
+    ws.producer = true;
     
     wsend(ws, { type: msg.type, id: producer.id });
-   //  broadcast({ type: "Newproducer", id: producer.id , peerId: peerId, mediaTag: kind });
+   
   } catch (e) {
 	  console.log(e);
-	  wsend(ws, {type:msg.type, error: e });
+	  wsend(ws, { type: msg.type, error: e });
   }
 }else if(msg.type == 'Newproducer'){
 	 broadcast({ type: "Newproducer", id: msg.id , peerId: msg.peerId, mediaTag: msg.mediaTag });
+}else if(msg.type == 'bye'){
+	broadcast({ type: msg.type, peerId: msg.peerId });
 }else if(msg.type == 'recv-track'){ // can change to consumer.type == 'simulcast' or 'simple' video/audio to reply
 	
   try {
@@ -360,7 +394,7 @@ console.log('roomState.producers: ', JSON.stringify(roomState.producers))
       let msgi = 'server-side producer for ' +
                   `${mediaPeerId}:${mediaTag} not found`;
       err('recv-track: ' + msgi);
-      wsend(ws, {type: "error", error: msgi});
+      wsend(ws, { type: "error", error: msgi });
       return;
     }
 
@@ -435,7 +469,7 @@ console.log('roomState.producers: ', JSON.stringify(roomState.producers))
   }
 	
 	
-}else if(msg.type=='pause-consumer'){
+}else if(msg.type == 'pause-consumer'){
 	 try {
     let { peerId, consumerId } = msg,
         consumer = roomState.consumers.find((c) => c.id === consumerId);
@@ -450,10 +484,10 @@ console.log('roomState.producers: ', JSON.stringify(roomState.producers))
 
     await consumer.pause();
 
-    wsend(ws, {type:msg.type, paused: true});
+    wsend(ws, { type: msg.type, paused: true});
   } catch (e) {
     console.error('error in /signaling/pause-consumer', e);
-    wsend(ws, {type:msg.type, error: e });
+    wsend(ws, { type: msg.type, error: e });
   }
 }else if(msg.type == 'resume-consumer'){
 	 try {
@@ -471,10 +505,10 @@ console.log('roomState.producers: ', JSON.stringify(roomState.producers))
  // if(kind == 'cam-audio') 
   await consumer.resume();
 
-    wsend(ws, {type:msg.type, resumed: true });
+    wsend(ws, { type: msg.type, resumed: true });
   } catch (e) {
     console.error('error in /signaling/resume-consumer', e);
-    wsend(ws, {type:msg.type, error: e });
+    wsend(ws, { type: msg.type, error: e });
   }
 }else if(msg.type == 'close-consumer'){
 	try {
@@ -494,7 +528,7 @@ console.log('roomState.producers: ', JSON.stringify(roomState.producers))
     console.error('error in /signaling/close-consumer', e);
     wsend(ws, {type:msg.type, error: e });
   }
-}else if(msg.type=='consumer-set-layers'){
+}else if(msg.type == 'consumer-set-layers'){
 	
   try {
     let { peerId, consumerId, spatialLayer } = msg,
@@ -510,12 +544,12 @@ console.log('roomState.producers: ', JSON.stringify(roomState.producers))
 
     await consumer.setPreferredLayers({ spatialLayer });
 
-    wsend(ws, {type:msg.type, layersSet: true });
+    wsend(ws, { type: msg.type, layersSet: true });
   } catch (e) {
     console.error('error in /signaling/consumer-set-layers', e);
-    wsend({type:msg.type, error: e });
+    wsend({ type: msg.type, error: e });
   }
-}else if(msg.type=='pause-producer'){
+}else if(msg.type == 'pause-producer'){
 	try {
     let { peerId, producerId } = msg,
         producer = roomState.producers.find((p) => p.id === producerId);
@@ -532,19 +566,19 @@ console.log('roomState.producers: ', JSON.stringify(roomState.producers))
 
     roomState.peers[peerId].media[producer.appData.mediaTag].paused = true;
 
-    wsend(ws, {type:msg.type, paused: true });
+    wsend(ws, { type: msg.type, paused: true });
   } catch (e) {
     console.error('error in /signaling/pause-producer', e);
-    wsend(ws, {type:msg.type, error: e });
+    wsend(ws, { type: msg.type, error: e });
   }
-	}else if(msg.type=='resume-producer'){
+	}else if(msg.type == 'resume-producer'){
 		 try {
     let { peerId, producerId } = msg,
         producer = roomState.producers.find((p) => p.id === producerId);
 
     if (!producer) {
       err(`resume-producer: server-side producer ${producerId} not found`);
-      wsend(ws, {type:msg.type, error: `server-side producer ${producerId} not found` });
+      wsend(ws, { type: msg.type, error: `server-side producer ${producerId} not found` });
       return;
     }
 
@@ -554,10 +588,10 @@ console.log('roomState.producers: ', JSON.stringify(roomState.producers))
 
     roomState.peers[peerId].media[producer.appData.mediaTag].paused = false;
 
-    wsend(ws, {type:msg.type, resumed: true });
+    wsend(ws, { type: msg.type, resumed: true });
   } catch (e) {
     console.error('error in /signaling/resume-producer', e);
-    wsend(ws, {type:msg.type, error: e });
+    wsend(ws, { type: msg.type, error: e });
   }
 	}else{}
 }
@@ -612,6 +646,11 @@ function wsend(obj){
 
     await closePeer(socket.peerId);
    // wsend({type:msg.type, left: true });
+   broadcast({ type: 'bye', peerId: msg.peerId });
+   if(socket.producer){
+	   TOTAL_SPEAKERS-=1;
+   }
+   broadcast_all({ type: 'total_speakers', count: TOTAL_SPEAKERS });
   } catch (e) {
     console.error('error in /signaling/leave', e);
   //  wsend({type:msg.type, error: e });
@@ -623,6 +662,7 @@ function wsend(obj){
 	module.exports = { handleMediasoup: handleMediasoup }
 	
 function closePeer(peerId) {
+	//2
   log('closing peer', peerId);
   for (let [id, transport] of Object.entries(roomState.transports)) {
     if (transport.appData.peerId === peerId) {
@@ -633,6 +673,7 @@ function closePeer(peerId) {
 }
 
 async function closeTransport(transport) {
+	//1
   try {
     log('closing transport', transport.id, transport.appData);
 
@@ -710,12 +751,7 @@ async function createWebRtcTransport({ peerId, direction }) {
     initialAvailableOutgoingBitrate: 1000000,
     appData: { peerId, clientDirection: direction }
   });
-transport.observer.on('newProducer', function(l,e){
-	console.error("**** ON NEW PRODUCER!!!!! ****** ", l, e);
-})
-transport.observer.on('newconsumer', function(l,e){
-	console.error("**** ON NEW PRODUCER!!!!! ****** ", l, e);
-})
+
   return transport;
 }
 

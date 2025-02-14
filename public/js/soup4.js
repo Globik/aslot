@@ -36,23 +36,26 @@ let device,
 		t.observer.on('newproducer', function(p){
 			//alert('new producer '+p.appData.mediaTag+' '+p.appData.peerId+' '+p.id);
 			
+			p.observer.on('close', function(){
+				console.log('*** producer closed *** ', p.id);
+			});
 			
-			
-			setTimeout(function(){
+			//setTimeout(function(){
 
-			if(camVideoProducer){
+			//if(camVideoProducer){
 					//alert('my peerId: '+ myPeerId+' mediTag '+camVideoProducer.appData.mediaTag+' producerId: '+camVideoProducer.id);
 					wsend({ 
 						type: 'Newproducer', 
 						request: 'mediasoup',
-						 mediaTag: camVideoProducer.appData.mediaTag, 
+						 mediaTag: p.appData.mediaTag, 
 						 peerId: myPeerId ,
-						 id: camVideoProducer.id
+						 id: p.id
 						 });
-			}else{
-				alert('cavideoProducer '+camVideoProducer);
-			}
-	},100);
+			//}else{
+				//alert('cavideoProducer '+camVideoProducer);
+			//}
+	//},100);
+	/*
 		setTimeout(function(){
 			if(camAudioProducer){
 			//	alert('my peerId: '+ myPeerId+' mediTag '+camAudioProducer.appData.mediaTag+' producerId: '+camAudioProducer.id);
@@ -67,7 +70,7 @@ let device,
 				alert('camAudioProducer '+camAudioProducer);
 			}
 	},101);
-			
+		*/	
 		
 			
 			
@@ -75,6 +78,16 @@ let device,
 			
 			
 		});
+		t.observer.on('close', function(){
+			console.log('***** transport closed ***** ', t.id);
+		});
+		t.observer.on('newconsumer', function(c){
+			console.log('new consumer ', c.id);
+			c.observer.on('close', function(){
+				console.log('**** consumer closed **** ', c.id, ' ', c.appData.mediaTag);
+			});
+		});
+		
 	});
   } catch (e) {
     if (e.name === 'UnsupportedError') {
@@ -122,6 +135,7 @@ joinRoom()
   sock.onclose=function(){
 	console.log('websocket closed');
 	isSocketOpened  = false;
+	stopStreams();
   }
    sock.addEventListener('message',function (e) {
 	      let a;
@@ -146,18 +160,25 @@ async function on_msg(a){
 		//pollAndUpdate(a);
 	}else if(a.type == "Newproducer"){
 	//pollAndUpdate();
-	if(a.mediaTag=='video'){
-		//setTimeout(async ()=>{	
+	if(a.mediaTag == 'cam-video'){
+		setTimeout(async ()=>{	
 			//await 
 			subscribeToTrack(a.peerId, a.mediaTag) 
-		//	},1000)
+			},1000)
 		}
-	else{
-		//setTimeout(async ()=>{
+	else if(a.mediaTag == 'cam-audio'){
+		setTimeout(async ()=>{
 			//await 
 			subscribeToTrack(a.peerId, a.mediaTag)
-			//}, 100) 
+			}, 2000) 
 	 }
+	}else if(a.type == 'bye'){
+		unsubscribeFromTrack(a.peerId, 'cam-video')
+		setTimeout(function(){
+			unsubscribeFromTrack(a.peerId, 'cam-audio')
+		},100);
+	}else if(a.type == 'total_speakers'){
+		totalSpeakers.textContent = a.count;
 	}else if(a.type == 'oksync'){
 		pollAndUpdate();
 	}else{console.log("unknown type ", a.type);}
@@ -166,6 +187,9 @@ async function on_msg(a){
 }
  function sendRequest(obj) {
     return new Promise((resolve, reject) => {
+		if(!isSocketOpened){
+			return resolve({ error: 'socket closed' });
+		}
         obj.request = "mediasoup";
         obj.peerId = myPeerId; 
      
@@ -194,10 +218,12 @@ async function on_msg(a){
 				resolve(a);
 			}else if(a.type =='simple'){
 				resolve(a);
+			}else if(a.type=='bye'){
+			//	resolve(a);
 			}
 			else{
 				console.log(a.type);
-				
+				//resolve();
 				}
 			}
         
@@ -220,10 +246,23 @@ async function joinRoom() {
   try {
     // signal that we're a new peer and initialize our
     // mediasoup-client device, if this is our first time connecting
-    let { routerRtpCapabilities } = await sendRequest({type:'join-as-new-peer'});
+    let { routerRtpCapabilities, state } = await sendRequest({type:'join-as-new-peer'});
     if (!device.loaded) {
       await device.load({ routerRtpCapabilities });
-    }
+  }
+      console.log('state ', state);
+      if(state.length > 0){
+		  
+		  let i = 10;
+		  state.map( function(el){
+			 	
+				setTimeout(function(){
+					subscribeToTrack(el.peerid, el.media)
+				}, i);
+				i+=1000;
+			})
+		}
+    
     joined = true;
    // $('#leave-room').style.display = 'initial';
   } catch (e) {
@@ -261,6 +300,12 @@ async function sendCameraStreams() {
     encodings: camEncodings(),
     appData: { mediaTag: 'cam-video' }
   });
+  camVideoProducer.on('transportclose', function(){
+	  console.log('camvideoproducer on transport close');
+  });
+  camVideoProducer.on('trackended', function(){
+	  console.log('videoproducer track ended paused ', camVideoProducer.paused);
+  });
   /*
   	if(camVideoProducer){
 					//alert('my peerId: '+ myPeerId+' mediTag '+camVideoProducer.appData.mediaTag+' producerId: '+camVideoProducer.id);
@@ -288,6 +333,12 @@ async function sendCameraStreams() {
   camAudioProducer = await sendTransport.produce({
     track: localCam.getAudioTracks()[0],
     appData: { mediaTag: 'cam-audio' }
+  });
+  camAudioProducer.on('transportclose', function(){
+	  console.log('camaudioproducer on transport close');
+  });
+  camAudioProducer.on('trackended', function(){
+	  console.log('audioproducer track ended paused ', camAudioProducer.paused);
   });
   if (getMicPausedState()) {
     try {
@@ -329,13 +380,14 @@ setTimeout(function(){
 			}
 		},2);
 	*/
+	wsend({ type: 'add-statistic', subtype: 'streamer', peerId: myPeerId , request: 'mediasoup' });
   $('#stop-streams').style.display = 'initial';
-  showCameraInfo();
+//  showCameraInfo();
 }
 
 async function startScreenshare() {
   console.log('start screen share');
-  $('#share-screen').style.display = 'none';
+ // $('#share-screen').style.display = 'none';
 
   // make sure we've joined the room and that we have a sending
   // transport
@@ -392,7 +444,7 @@ async function startScreenshare() {
     }
     $('#local-screen-pause-ctrl').style.display = 'none';
     $('#local-screen-audio-pause-ctrl').style.display = 'none';
-    $('#share-screen').style.display = 'initial';
+  //  $('#share-screen').style.display = 'initial';
   }
 
   $('#local-screen-pause-ctrl').style.display = 'block';
@@ -463,10 +515,10 @@ try{
 }
 
 		let constraints = {
-			audio:{
-      echoCancellation: {exact: true}
+			audio: {
+      echoCancellation: { exact: true }
     }, 
-    video:{deviceId: dura ? {exact: dura} : undefined}
+    video: { deviceId: dura ? { exact: dura } : undefined}
     };
 
 
@@ -494,7 +546,7 @@ try{
  // await camAudioProducer.replaceTrack({ track: localCam.getAudioTracks()[0] });
 
   // update the user interface
-  showCameraInfo();
+//  showCameraInfo();
 }catch(err){
 	alert(err);
 }
@@ -520,6 +572,10 @@ try{
   // the camVideoProducer and camAudioProducer are closed,
   // mediasoup-client stops the local cam tracks, so we don't need to
   // do anything except set all our local variables to null.
+  camVideoProducer.close();
+  camAudioProducer.close();
+ if(screenVideoProducer) screenVideoProducer.close();
+  if(screenAudioProducer)screenAudioProducer.close();
   try {
     await sendTransport.close();
   } catch (e) {
@@ -535,16 +591,16 @@ try{
   localScreen = null;
         pauseVideo(localVideo);
         
-    
+    wsend({ type: 'minus-statistic', subtype: 'streamer', peerId: myPeerId , request: 'mediasoup' });
   //  el.setAttribute('disabled', 1);
 
   // update relevant ui elements
   $('#send-camera').style.display = 'initial';
-  $('#share-screen').style.display = 'initial';
-  $('#local-screen-pause-ctrl').style.display = 'none';
-  $('#local-screen-audio-pause-ctrl').style.display = 'none';
+ // $('#share-screen').style.display = 'initial';
+ // $('#local-screen-pause-ctrl').style.display = 'none';
+//  $('#local-screen-audio-pause-ctrl').style.display = 'none';
   leaveRoom();
-  showCameraInfo();
+ // showCameraInfo();
 }
 
 function pauseVideo(element) {
@@ -583,6 +639,7 @@ async function leaveRoom() {
   } catch (e) {
     console.error(e);
   }
+  wsend({ type: 'bye', peerId: myPeerId , request: 'mediasoup' });
   recvTransport = null;
   sendTransport = null;
   camVideoProducer = null;
@@ -592,6 +649,11 @@ async function leaveRoom() {
   localCam = null;
   localScreen = null;
   lastPollSyncData = {};
+  consumers.forEach( function(el){
+	  unsubscribeFromTrack(el.appData.peerId, el.appData.mediaTag) 
+	  // removeVideoAudio(el);
+	  // el.close();
+  });
   consumers = [];
   joined = false;
 
@@ -600,10 +662,10 @@ async function leaveRoom() {
   $('#send-camera').style.display = 'initial';
   $('#stop-streams').style.display = 'none';
   $('#remote-video').innerHTML = '';
-  $('#share-screen').style.display = 'initial';
-  $('#local-screen-pause-ctrl').style.display = 'none';
-  $('#local-screen-audio-pause-ctrl').style.display = 'none';
-  showCameraInfo();
+//  $('#share-screen').style.display = 'initial';
+ // $('#local-screen-pause-ctrl').style.display = 'none';
+ // $('#local-screen-audio-pause-ctrl').style.display = 'none';
+ // showCameraInfo();
   updateCamVideoProducerStatsDisplay();
   updateScreenVideoProducerStatsDisplay();
   updatePeersDisplay();
@@ -626,18 +688,35 @@ try{
 
   // if we do already have a consumer, we shouldn't have called this
   // method
- // let consumer = findConsumerForTrack(peerId, mediaTag);
- // if (consumer) {
+ let consumer = findConsumerForTrack(peerId, mediaTag);
+  if (consumer) {
     console.error('already have consumer for track', peerId, mediaTag)
-   // return;
- // };
+    return;
+ };
   
   //alert('mediatag ' + mediaTag);
  //videoConsumer = 
 if(mediaTag == 'cam-video'){
-  videoConsumer =  await consumeAndResume(recvTransport, mediaTag, peerId);
+ let  consumer =  await consumeAndResume(recvTransport, mediaTag, peerId);
+ consumers.push(consumer);
+	consumer.on('trackended', function(){
+		alert('videoconsumer on track ended pused '+ videoConsumer.paused);
+	//	unsubscribeFromTrack(peerId, mediaTag)
+	});
+	consumer.on('transportclose', function(){
+		console.log('transport closed so videoconsumer must close');
+	})
 }else{
-  audioConsumer = await consumeAndResume(recvTransport, mediaTag, peerId);
+ let consumer = await consumeAndResume(recvTransport, mediaTag, peerId);
+ consumers.push(consumer);
+consumer.on('trackended', function(){
+	alert('audio consumer on track ended pause '+audioConsumer.paused); 
+	// unsubscribeFromTrack(peerId, mediaTag)
+ }
+ );
+ consumer.on('transportclose', function(){
+		console.log('transport closed so audioconsumer must close');
+	})
 }
   // ask the server to create a server-side consumer object and send
   // us back the info we need to create a client-side consumer
@@ -679,17 +758,6 @@ alert(e);
 }
 
 
-async function resumeConsumer(consumer) {
-  if (consumer) {
-    console.log('resume consumer', consumer.appData.peerId, consumer.appData.mediaTag);
-    try {
-      await sendRequest({type:'resume-consumer',  consumerId: consumer.id });
-      await consumer.resume();
-    } catch (e) {
-      console.error(e);
-    }
-  }
-}
 async function consumeAndResume(recvTransport, kind, peerId) {
     let consumer;
     try {
@@ -775,7 +843,7 @@ mediaTag = trackKind;
         //  addRemoteTrack(MYSOCKETID, consumer.track);
       await addVideoAudio(consumer);
 		//updatePeersDisplay();
-
+       
         return consumer;
     } else {
         note({content: 'Remote producer NOT READY', type: "info", time: 5});
@@ -797,7 +865,7 @@ async function unsubscribeFromTrack(peerId, mediaTag) {
     console.error(e);
   }
   // force update of ui
-  updatePeersDisplay();
+ // updatePeersDisplay();
 }
 
 async function pauseConsumer(consumer) {
@@ -852,11 +920,12 @@ async function closeConsumer(consumer) {
   if (!consumer) {
     return;
   }
-  console.log('closing consumer', consumer.appData.peerId, consumer.appData.mediaTag);
+  console.log('closing consumer', consumer.appData.peerId, consumer.appData.mediaTag, consumer.id);
   try {
     // tell the server we're closing this consumer. (the server-side
     // consumer may have been closed already, but that's okay.)
-    await sendRequest({type:'close-consumer',  consumerId: consumer.id });
+  //  let {error} = await sendRequest({ type:'close-consumer',  consumerId: consumer.id });
+    //if(error)console.warn(error);
     await consumer.close();
 
     consumers = consumers.filter((c) => c !== consumer);
@@ -1069,19 +1138,19 @@ function findConsumerForTrack(peerId, mediaTag) {
 //
 
 function getCamPausedState() {
-  return !$('#local-cam-checkbox').checked;
+ // return !$('#local-cam-checkbox').checked;
 }
 
 function getMicPausedState() {
-  return !$('#local-mic-checkbox').checked;
+ // return !$('#local-mic-checkbox').checked;
 }
 
 function getScreenPausedState() {
-  return !$('#local-screen-checkbox').checked;
+ // return !$('#local-screen-checkbox').checked;
 }
 
 function getScreenAudioPausedState() {
-  return !$('#local-screen-audio-checkbox').checked;
+ // return !$('#local-screen-audio-checkbox').checked;
 }
 
  async function changeCamPaused() {
@@ -1269,6 +1338,7 @@ function addVideoAudio(consumer) {
 function removeVideoAudio(consumer) {
   document.querySelectorAll(consumer.kind).forEach((v) => {
     if (v.consumer === consumer) {
+		console.log("yes " + consumer.kind);
       v.parentNode.removeChild(v);
     }
   });
@@ -1349,6 +1419,7 @@ function updateActiveSpeaker() {
 }
 
 function updateCamVideoProducerStatsDisplay() {
+	return;
   let tracksEl = $('#camera-producer-stats');
   tracksEl.innerHTML = '';
   if (!camVideoProducer || camVideoProducer.paused) {
@@ -1367,6 +1438,7 @@ function updateCamVideoProducerStatsDisplay() {
 }
 
 function updateScreenVideoProducerStatsDisplay() {
+	return;
   let tracksEl = $('#screen-producer-stats');
   tracksEl.innerHTML = '';
   if (!screenVideoProducer || screenVideoProducer.paused) {

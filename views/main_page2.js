@@ -52,9 +52,17 @@ const main_page2 = function(n){
     <script async src="https://yastatic.net/share2/share.js"></script>
      <script src="/pwabuilder-sw-register.js"></script>
     </head><body>
-   <section id="localcamContaiiner"><header>Local cam</header>
+    <b>total speakers: </b><span id="totalSpeakers">0</span>
+    <div><button id="send-camera" onclick="sendCameraStreams()">
+      Войти в чат
+    </button>
+    <button id="stop-streams" style="display:none;" onclick="stopStreams()">
+      Выйти из чата
+    </button></div>
+   <section id="localcamContaiiner">
    <video id="localVideo" muted ></video>
    </section>
+   <div id="remote-audio"></div>
 <div id="local-control">
 <!--
   <div id="join-control">
@@ -65,18 +73,13 @@ const main_page2 = function(n){
   </div> -->
 
   <div id="camera-control">
-    <button id="send-camera" onclick="sendCameraStreams()">
-      Войти в чат
-    </button>
-    <button id="stop-streams" style="display:none;" onclick="stopStreams()">
-      Выйти из чата
-    </button>
+    
     <span id="camera-info"></span>
-    <button id="share-screen" onclick="startScreenshare()">
+  <!--  <button id="share-screen" onclick="startScreenshare()">
       share screen
-    </button>
+    </button> -->
     <div id="outgoing-cam-streams-ctrl">
-      <div><input id="local-cam-checkbox" type="checkbox" checked
+     <!-- <div><input id="local-cam-checkbox" type="checkbox" checked
                   onchange="changeCamPaused()"></input>
            <label id="local-cam-label">camera</label>
         <span id="camera-producer-stats" class="track-ctrl"></span>
@@ -95,7 +98,7 @@ const main_page2 = function(n){
                   onchange="changeScreenAudioPaused()"></input>
            <label id="local-screen-audio-label">screen audio</label>
            <span id="screen-audio-producer-stats" class="track-ctrl"></span>
-      </div>
+      </div> -->
     </div>
   </div>
 <!--
@@ -111,8 +114,7 @@ const main_page2 = function(n){
 <div id="remote-video">
 </div>
 
-<div id="remote-audio">
-</div>
+
 
   <script src="/js/soup4.js"></script>
     </body></html>`;
