@@ -4,7 +4,7 @@ const $ = document.querySelector.bind(document);
 const $$ = document.querySelectorAll.bind(document);
 
 
-const localVideo = gid('localVideo');
+//const localVideo = gid('localVideo');
 
 var kK = 0;
 const myPeerId = uuidv4();
@@ -127,6 +127,7 @@ if (window.location.protocol === "https:") {
 	 console.log("websocket opened");
 	// alert('open');
 	isSocketOpened  = true;
+	 $('#send-camera').disabled = false;
 joinRoom()
   };
   sock.onerror = function (e) {
@@ -159,19 +160,32 @@ async function on_msg(a){
 		alert('a  '+ a);
 		//pollAndUpdate(a);
 	}else if(a.type == "Newproducer"){
-	//pollAndUpdate();
-	if(a.mediaTag == 'cam-video'){
+	//	let b, m;
+	//	let suka = [];
+		//suka.push({ peerid: a.peerId, media: a.mediaTag });
+		
+		if(a.mediaTag == 'cam-video'){
+	
 		setTimeout(async ()=>{	
 			//await 
-			subscribeToTrack(a.peerId, a.mediaTag) 
+			b = subscribeToTrack(a.peerId, a.mediaTag) 
 			},1000)
 		}
 	else if(a.mediaTag == 'cam-audio'){
 		setTimeout(async ()=>{
 			//await 
-			subscribeToTrack(a.peerId, a.mediaTag)
+			m = subscribeToTrack(a.peerId, a.mediaTag)
 			}, 2000) 
 	 }
+	// let ci = await b;
+	// let ki = await m;
+	/*
+	let i = 1000;
+	 for(let item of suka){
+		 setTimeout(async function(){  await subscribeToTrack(item.peerid, item.media) }, i)
+		 i+=1000;
+	 }
+	*/
 	}else if(a.type == 'bye'){
 		unsubscribeFromTrack(a.peerId, 'cam-video')
 		setTimeout(function(){
@@ -253,14 +267,21 @@ async function joinRoom() {
       console.log('state ', state);
       if(state.length > 0){
 		  
+		// let suka = []
 		  let i = 10;
-		  state.map( function(el){
+		  /*
+		  state.map( async function(el){
 			 	
-				setTimeout(function(){
-					subscribeToTrack(el.peerid, el.media)
+				setTimeout(async function(){
+				await subscribeToTrack(el.peerid, el.media)
 				}, i);
 				i+=1000;
-			})
+			})*/
+			for(let item of state){
+			//	console.log(item, ' ', state);
+			await subscribeToTrack(item.peerid, item.media)
+			}
+		//	await Promise.all(suka);
 		}
     
     joined = true;
@@ -272,10 +293,10 @@ async function joinRoom() {
 
 }
 
-async function sendCameraStreams() {
+async function sendCameraStreams(el) {
   console.log('send camera streams');
-  $('#send-camera').style.display = 'none';
-
+ // $('#send-camera').style.display = 'none';
+ $('#send-camera').disabled = true;
   // make sure we've joined the room and started our camera. these
   // functions don't do anything if they've already been called this
   // session
@@ -381,8 +402,9 @@ setTimeout(function(){
 		},2);
 	*/
 	wsend({ type: 'add-statistic', subtype: 'streamer', peerId: myPeerId , request: 'mediasoup' });
-  $('#stop-streams').style.display = 'initial';
+ // $('#stop-streams').style.display = 'initial';
 //  showCameraInfo();
+$('#send-camera').disabled = false;
 }
 
 async function startScreenshare() {
@@ -454,21 +476,42 @@ async function startScreenshare() {
 }
 
  async function startCamera() {
-  if (localCam) {
+ // alert(1);
+  console.log('start camera');
+  let ku = $('#send-camera').getAttribute("data-state");
+ //alert(ku);
+   if(ku == "start"){
+  try {
+	//  alert(ku);
+	 
+		   if (localCam) {
     return;
   }
-  console.log('start camera');
-  try {
     localCam = await navigator.mediaDevices.getUserMedia({
       video: true,
       audio: true
     });
-    localVideo.srcObject = localCam;
-    localVideo.volume = 0;
-     localVideo.play();
+   // localVideo.srcObject = localCam;
+   // localVideo.volume = 0;
+    // localVideo.play();
+     let vi = document.createElement('video');
+  // replace the tracks we are sending
+   var li = document.getElementById('remote-video');
+  
+  vi.srcObject = localCam;
+  vi.id = 'localVideo';
+  vi.volume = 0;
+  li.appendChild(vi);
+  vi.play();
+  $('#send-camera').setAttribute("data-state", "end");
+  
+
   } catch (e) {
     console.error('start camera error', e);
   }
+}else{
+	stopStreams();
+}
 }
 
 // switch to sending video from the "next" camera device in our device
@@ -537,11 +580,15 @@ try{
     audio: true
   }*/
   );
-
+let vi = document.createElement('video');
   // replace the tracks we are sending
-  localVideo.srcObject = localCam;
-  localVideo.volume = 0;
-  localVideo.play();
+   var li = document.getElementById('remote-video');
+  
+  vi.srcObject = localCam;
+  li.appendChild(vi);
+  vi.volume = 0;
+  vi.play();
+ 
   await camVideoProducer.replaceTrack({ track: localCam.getVideoTracks()[0] });
  // await camAudioProducer.replaceTrack({ track: localCam.getAudioTracks()[0] });
 
@@ -561,7 +608,7 @@ try{
   }
 
   console.log('stop sending media streams');
-  $('#stop-streams').style.display = 'none';
+  //$('#stop-streams').style.display = 'none';
 
   let { error } = await sendRequest({ type: 'close-transport',
                             transportId: sendTransport.id });
@@ -572,14 +619,15 @@ try{
   // the camVideoProducer and camAudioProducer are closed,
   // mediasoup-client stops the local cam tracks, so we don't need to
   // do anything except set all our local variables to null.
-  camVideoProducer.close();
+	camVideoProducer.close();
   camAudioProducer.close();
  if(screenVideoProducer) screenVideoProducer.close();
   if(screenAudioProducer)screenAudioProducer.close();
   try {
+	//  alert(sendTransport.closed);
     await sendTransport.close();
   } catch (e) {
-    console.error(e);
+    console.warn(e);
   }
   sendTransport = null;
   camVideoProducer = null;
@@ -589,8 +637,11 @@ try{
   stopLocalStream(localCam);
   localCam = null;
   localScreen = null;
-        pauseVideo(localVideo);
-        
+  let localVideo = document.getElementById('localVideo');
+     if(localVideo){
+		 pauseVideo(localVideo);
+		 localVideo.remove();
+        }
     wsend({ type: 'minus-statistic', subtype: 'streamer', peerId: myPeerId , request: 'mediasoup' });
   //  el.setAttribute('disabled', 1);
 
@@ -660,7 +711,7 @@ async function leaveRoom() {
   // hacktastically restore ui to initial state
 //  $('#join-control').style.display = 'initial';
   $('#send-camera').style.display = 'initial';
-  $('#stop-streams').style.display = 'none';
+ // $('#stop-streams').style.display = 'none';
   $('#remote-video').innerHTML = '';
 //  $('#share-screen').style.display = 'initial';
  // $('#local-screen-pause-ctrl').style.display = 'none';
@@ -669,6 +720,8 @@ async function leaveRoom() {
   updateCamVideoProducerStatsDisplay();
   updateScreenVideoProducerStatsDisplay();
   updatePeersDisplay();
+   $('#send-camera').textContent = "Войти в чат";
+   $('#send-camera').setAttribute("data-state", "start");
 }
 
 async function subscribeToTrack(peerId, mediaTag) {
@@ -680,6 +733,7 @@ if(mediaTag == 'video'){
 }else{
 	
 }
+return new Promise(async function(resolve,reject){
 try{
   // create a receive transport if we don't already have one
   if (!recvTransport) {
@@ -718,6 +772,7 @@ consumer.on('trackended', function(){
 		console.log('transport closed so audioconsumer must close');
 	})
 }
+resolve('ok')
   // ask the server to create a server-side consumer object and send
   // us back the info we need to create a client-side consumer
   
@@ -749,12 +804,14 @@ consumer.on('trackended', function(){
   // keep track of all our consumers
  // consumers.push(consumer);
 }catch(e){
+	resolve(e);
 	console.error(e);
 alert(e);
 }
  // ui
   //await addVideoAudio(consumer);
  // updatePeersDisplay();
+})
 }
 
 
@@ -1046,10 +1103,13 @@ async function createTransport(direction) {
 				alert('camAudioProducer '+camAudioProducer);
 			}
 		},1000); */
+		$('#send-camera').textContent = "Выйти из чата";
 		}else{
 		//	alert('no send');
 		}
 	//	alert('connected');
+	 $('#send-camera').disbabled = false;
+	  
 		note({ content: (direction=='send'?"Вы в эфире!":"Вы подписались!"), type: "info", time: 5 });
 	}else if (state === 'closed' || state === 'failed' || state === 'disconnected') {
       console.log('transport closed ... leaving the room and resetting');

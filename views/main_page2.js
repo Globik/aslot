@@ -34,10 +34,15 @@ const main_page2 = function(n){
     <link href="/css/output.css" rel="stylesheet">
     <link href="/css/login3.css" rel="stylesheet"> 
     <style>
+    #remote-video{
+    display:flex;
+	justify-content: start;
+	}	
    video{
-   width:100px;
-   height:100px;
+   width:225px;
+   height:200px;
    border: 1px solid green;
+   object-fit:cover;
 }
     </style>
    
@@ -53,15 +58,16 @@ const main_page2 = function(n){
      <script src="/pwabuilder-sw-register.js"></script>
     </head><body>
     <b>total speakers: </b><span id="totalSpeakers">0</span>
-    <div><button id="send-camera" onclick="sendCameraStreams()">
+    <div><button id="send-camera" disabled="true" data-state="start" onclick="sendCameraStreams(this)">
       Войти в чат
     </button>
-    <button id="stop-streams" style="display:none;" onclick="stopStreams()">
+   <!-- <button id="stop-streams" style="display:none;" onclick="stopStreams()">
       Выйти из чата
-    </button></div>
-   <section id="localcamContaiiner">
+    </button></div> -->
+  <!-- <section id="localcamContaiiner">
    <video id="localVideo" muted ></video>
-   </section>
+   </section> -->
+   <div id="remote-video"></div>
    <div id="remote-audio"></div>
 <div id="local-control">
 <!--
@@ -111,8 +117,7 @@ const main_page2 = function(n){
 <div id="available-tracks">
 </div>
 
-<div id="remote-video">
-</div>
+
 
 
 
