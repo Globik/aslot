@@ -197,7 +197,10 @@ if(msg.request == "mediasoup"){
 	});
 	ws.on('error', function(er){console.log(er)});
 })
-  
+  ev.on('total_speakers',(data)=>{
+	  data.type = 'total_speakers';
+	  broadcast_all(data);
+  });
   function wsend(ws, obj) {
   let a;
   try {

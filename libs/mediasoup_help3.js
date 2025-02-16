@@ -1,5 +1,7 @@
 const os = require('os')
 const mediasoup = require('mediasoup')
+const EventEmitter = require('node:events');
+const eventEmitter = new EventEmitter();
 const numWorkers =  Object.keys(os.cpus()).length;
 const config = require('./config.js')
 // one mediasoup worker and router
@@ -207,12 +209,14 @@ for (let [key, value] of Object.entries(roomState.producers)){
 }else if(msg.type == 'add-statistic'){
 	if(msg.subtype == 'streamer'){
 		TOTAL_SPEAKERS += 1;
-		broadcast_all({ type: 'total_speakers', count: TOTAL_SPEAKERS });
+		//broadcast_all({ type: 'total_speakers', count: TOTAL_SPEAKERS });
+		eventEmitter.emit('total_speakers', { count: TOTAL_SPEAKERS });
 	}
 }else if(msg.type == 'minus-statistic'){
 	if(msg.subtype == 'streamer'){
 		TOTAL_SPEAKERS -=1;
-		broadcast_all({ type: 'total_speakers', count: TOTAL_SPEAKERS });
+		//broadcast_all({ type: 'total_speakers', count: TOTAL_SPEAKERS });
+		eventEmitter.emit('total_speakers', { count: TOTAL_SPEAKERS });
 	}
 	
 }else if(msg.type == 'leave'){
@@ -661,7 +665,7 @@ function wsend(obj){
   }
 		return { mediasoup_t, cleanUpPeerDa  }
 	}
-	module.exports = { handleMediasoup: handleMediasoup }
+	module.exports = { handleMediasoup: handleMediasoup, ev: eventEmitter }
 	
 function closePeer(peerId) {
 	//2

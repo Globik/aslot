@@ -159,36 +159,24 @@ if (window.location.protocol === "https:") {
 getSocket();
 async function on_msg(a){
 	console.log('msg type ', a.type);
-	if(a.type == 'ok'){
-		alert('a  '+ a);
-		//pollAndUpdate(a);
+	if(a.type == 'howmuch'){
+		$('#onlineCount').textContent = a.value;
 	}else if(a.type == "Newproducer"){
-	//	let b, m;
-	//	let suka = [];
-		//suka.push({ peerid: a.peerId, media: a.mediaTag });
-		
+		if(!joined){
+			console.log('else not joined return');
+			return;
+		}
 		if(a.mediaTag == 'cam-video'){
 	
 		setTimeout(async ()=>{	
-			//await 
-			b = subscribeToTrack(a.peerId, a.mediaTag) 
+			subscribeToTrack(a.peerId, a.mediaTag) 
 			},1000)
 		}
 	else if(a.mediaTag == 'cam-audio'){
 		setTimeout(async ()=>{
-			//await 
-			m = subscribeToTrack(a.peerId, a.mediaTag)
+			subscribeToTrack(a.peerId, a.mediaTag)
 			}, 2000) 
 	 }
-	// let ci = await b;
-	// let ki = await m;
-	/*
-	let i = 1000;
-	 for(let item of suka){
-		 setTimeout(async function(){  await subscribeToTrack(item.peerid, item.media) }, i)
-		 i+=1000;
-	 }
-	*/
 	}else if(a.type == 'bye'){
 		unsubscribeFromTrack(a.peerId, 'cam-video')
 		setTimeout(function(){
@@ -1416,13 +1404,15 @@ function addVideoAudio(consumer) {
  // $(`#remote-${consumer.kind}`).appendChild(el);
  let newstream = new MediaStream(/*[ consumer.track.clone() ]*/);
  newstream.addTrack(consumer.track);
-// if(consumer.kind == 'video'){
+  el.srcObject = newstream;
+ if(consumer.kind == 'video'){
 	  $(`#remote-${consumer.kind}`).appendChild(el);
 	 // el.play();
 	   el.volume = 1.0;
-	   el.srcObject = newstream;
+	  
+   }
   el.consumer = consumer;
- // }
+  
  if(el.srcObject){
 //	 alert('schon hats srcObject '+ consumer.kind);
 //	 el.srcObject.addTrack(consumer.kind);
