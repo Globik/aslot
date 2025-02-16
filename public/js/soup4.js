@@ -489,11 +489,10 @@ async function startScreenshare() {
 }
 
  async function startCamera() {
- // alert(1);
+ 
   console.log('start camera');
  
   try {
-	//  alert(ku);
 	 
 		   if (localCam) {
     return;
@@ -1420,7 +1419,11 @@ function addVideoAudio(consumer) {
   el.srcObject = newstream;
   el.consumer = consumer;
   //el.volume = 1.0;
-  if(consumer.kind == 'video')$(`#remote-${consumer.kind}`).appendChild(el);
+  if(consumer.kind == 'video'){
+	  $(`#remote-${consumer.kind}`).appendChild(el);
+	  el.play();
+	   el.volume = 1.0;
+  }
 //}else{
 	//el.srcObject.addTrack(consumer.track);
 //}
