@@ -129,7 +129,8 @@ if (window.location.protocol === "https:") {
 	// alert('open');
 	isSocketOpened  = true;
 	 $('#send-camera').disabled = false;
-joinRoom()
+	 $('#join-button').disabled = false;
+//joinRoom()
   };
   sock.onerror = function (e) {
 	  console.error(e);
@@ -255,7 +256,7 @@ async function joinRoom() {
   if (joined) {
     return;
   }
-
+$('#join-button').disabled = true;
   console.log('join room');
   //$('#join-control').style.display = 'none';
 
@@ -281,9 +282,9 @@ async function joinRoom() {
 			})*/
 			for(let item of state){
 			//	console.log(item, ' ', state);
-			setTimeout(async function(){
+			//setTimeout(async function(){
 			await subscribeToTrack(item.peerid, item.media)
-		}, i)
+		//}, i)
 		i+=1000;
 			}
 		//	await Promise.all(suka);
@@ -293,6 +294,9 @@ async function joinRoom() {
    // $('#leave-room').style.display = 'initial';
   } catch (e) {
     console.error(e);
+    note({ content: e, type: "error", time: 5 });
+    $('#join-button').disabled = false;
+    joined = false;
     return;
   }
 
@@ -1385,6 +1389,7 @@ function makeTrackControlEl(peerName, mediaTag, mediaInfo) {
 
 function addVideoAudio(consumer) {
   if (!(consumer && consumer.track)) {
+	  alert('no track');
     return;
   }
  // let el = document.createElement(consumer.kind);
@@ -1411,19 +1416,22 @@ function addVideoAudio(consumer) {
  // $(`#remote-${consumer.kind}`).appendChild(el);
  let newstream = new MediaStream(/*[ consumer.track.clone() ]*/);
  newstream.addTrack(consumer.track);
- if(el.srcObject){
-	 console.warn('schon hats srcObject ', consumer.kind);
-	 el.srcObject.addTrack(consumer.kind);
-	 return;
- }
-  el.srcObject = newstream;
-  el.consumer = consumer;
-  //el.volume = 1.0;
-  if(consumer.kind == 'video'){
+// if(consumer.kind == 'video'){
 	  $(`#remote-${consumer.kind}`).appendChild(el);
 	 // el.play();
 	   el.volume = 1.0;
-  }
+	   el.srcObject = newstream;
+  el.consumer = consumer;
+ // }
+ if(el.srcObject){
+//	 alert('schon hats srcObject '+ consumer.kind);
+//	 el.srcObject.addTrack(consumer.kind);
+//	 return;
+ }
+ // el.srcObject = newstream;
+ // el.consumer = consumer;
+  //el.volume = 1.0;
+  
 //}else{
 	//el.srcObject.addTrack(consumer.track);
 //}

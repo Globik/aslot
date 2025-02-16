@@ -62,6 +62,9 @@ const main_page2 = function(n){
     <div><button id="send-camera" disabled="true" data-state="start" onclick="sendCameraStreams(this)">
       Войти в чат
     </button>
+     <button id="join-button" onclick="joinRoom()" disabled="true" data-state="start">
+      подписаться
+    </button>
    <!-- <button id="stop-streams" style="display:none;" onclick="stopStreams()">
       Выйти из чата
     </button></div> -->
