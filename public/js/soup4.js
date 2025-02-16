@@ -1421,7 +1421,7 @@ function addVideoAudio(consumer) {
   //el.volume = 1.0;
   if(consumer.kind == 'video'){
 	  $(`#remote-${consumer.kind}`).appendChild(el);
-	  el.play();
+	 // el.play();
 	   el.volume = 1.0;
   }
 //}else{
