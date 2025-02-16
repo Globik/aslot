@@ -296,6 +296,10 @@ async function joinRoom() {
 }
 
 async function sendCameraStreams(el) {
+	$('#send-camera').disabled = true;
+	 let ku = $('#send-camera').getAttribute("data-state");
+ //alert(ku);
+   if(ku == "start"){
   console.log('send camera streams');
  // $('#send-camera').style.display = 'none';
  $('#send-camera').disabled = true;
@@ -406,7 +410,11 @@ setTimeout(function(){
 	wsend({ type: 'add-statistic', subtype: 'streamer', peerId: myPeerId , request: 'mediasoup' });
  // $('#stop-streams').style.display = 'initial';
 //  showCameraInfo();
+$('#send-camera').setAttribute("data-state", "end");
 $('#send-camera').disabled = false;
+}else{
+	stopStreams();
+}
 }
 
 async function startScreenshare() {
@@ -480,9 +488,7 @@ async function startScreenshare() {
  async function startCamera() {
  // alert(1);
   console.log('start camera');
-  let ku = $('#send-camera').getAttribute("data-state");
- //alert(ku);
-   if(ku == "start"){
+ 
   try {
 	//  alert(ku);
 	 
@@ -505,15 +511,13 @@ async function startScreenshare() {
   vi.volume = 0;
   li.appendChild(vi);
   vi.play();
-  $('#send-camera').setAttribute("data-state", "end");
+  
   
 
   } catch (e) {
     console.error('start camera error', e);
   }
-}else{
-	stopStreams();
-}
+
 }
 
 // switch to sending video from the "next" camera device in our device
