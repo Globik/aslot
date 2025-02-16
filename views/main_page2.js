@@ -37,9 +37,10 @@ const main_page2 = function(n){
     #remote-video{
     display:flex;
 	justify-content: start;
+	flex-wrap: wrap;
 	}	
    video{
-   width:225px;
+   width:210px;
    height:200px;
    border: 1px solid green;
    object-fit:cover;
@@ -57,7 +58,7 @@ const main_page2 = function(n){
     <script async src="https://yastatic.net/share2/share.js"></script>
      <script src="/pwabuilder-sw-register.js"></script>
     </head><body>
-    <b>total speakers: </b><span id="totalSpeakers">0</span>
+    <b>Спикеров: </b><span id="totalSpeakers">0</span> | <span id="clientId"></span>
     <div><button id="send-camera" disabled="true" data-state="start" onclick="sendCameraStreams(this)">
       Войти в чат
     </button>

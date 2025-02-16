@@ -8,6 +8,7 @@ const $$ = document.querySelectorAll.bind(document);
 
 var kK = 0;
 const myPeerId = uuidv4();
+gid('clientId').textContent = myPeerId;
 var isSocketOpened = false;
 let device,
            joined,
@@ -137,6 +138,7 @@ joinRoom()
 	console.log('websocket closed');
 	isSocketOpened  = false;
 	stopStreams();
+	 joined = false;
   }
    sock.addEventListener('message',function (e) {
 	      let a;
@@ -625,7 +627,8 @@ let vi = document.createElement('video');
   if(screenAudioProducer)screenAudioProducer.close();
   try {
 	//  alert(sendTransport.closed);
-    await sendTransport.close();
+    //await 
+    sendTransport.close()
   } catch (e) {
     console.warn(e);
   }
@@ -646,7 +649,7 @@ let vi = document.createElement('video');
   //  el.setAttribute('disabled', 1);
 
   // update relevant ui elements
-  $('#send-camera').style.display = 'initial';
+ // $('#send-camera').style.display = 'initial';
  // $('#share-screen').style.display = 'initial';
  // $('#local-screen-pause-ctrl').style.display = 'none';
 //  $('#local-screen-audio-pause-ctrl').style.display = 'none';
@@ -706,11 +709,11 @@ async function leaveRoom() {
 	  // el.close();
   });
   consumers = [];
-  joined = false;
+ // joined = false;
 
   // hacktastically restore ui to initial state
 //  $('#join-control').style.display = 'initial';
-  $('#send-camera').style.display = 'initial';
+ // $('#send-camera').style.display = 'initial';
  // $('#stop-streams').style.display = 'none';
   $('#remote-video').innerHTML = '';
 //  $('#share-screen').style.display = 'initial';
@@ -722,6 +725,7 @@ async function leaveRoom() {
   updatePeersDisplay();
    $('#send-camera').textContent = "Войти в чат";
    $('#send-camera').setAttribute("data-state", "start");
+   $('#send-camera').disabled = false;
 }
 
 async function subscribeToTrack(peerId, mediaTag) {
@@ -752,6 +756,7 @@ try{
  //videoConsumer = 
 if(mediaTag == 'cam-video'){
  let  consumer =  await consumeAndResume(recvTransport, mediaTag, peerId);
+ if(consumer){
  consumers.push(consumer);
 	consumer.on('trackended', function(){
 		alert('videoconsumer on track ended pused '+ videoConsumer.paused);
@@ -760,8 +765,10 @@ if(mediaTag == 'cam-video'){
 	consumer.on('transportclose', function(){
 		console.log('transport closed so videoconsumer must close');
 	})
+}
 }else{
  let consumer = await consumeAndResume(recvTransport, mediaTag, peerId);
+ if(consumer){
  consumers.push(consumer);
 consumer.on('trackended', function(){
 	alert('audio consumer on track ended pause '+audioConsumer.paused); 
@@ -771,6 +778,7 @@ consumer.on('trackended', function(){
  consumer.on('transportclose', function(){
 		console.log('transport closed so audioconsumer must close');
 	})
+}
 }
 resolve('ok')
   // ask the server to create a server-side consumer object and send
@@ -867,9 +875,9 @@ async function bconsume(transport, trackKind, peerId) {
       consumerParameters   = await sendRequest({type: 'recv-track' /*'consume'*/, rtpCapabilities, mediaTag: trackKind, mediaPeerId: peerId })
     } catch (err) {
 		console.error(err);
-        note({contrent: 'Consume ERROR: ' + err.toString(), type: "error", time: 5});
+        note({contrent: 'Consume ERROR: ' + err, type: "error", time: 5});
     }
-    ;
+    
 //console.error(data)
 console.log('consumerParameters ', JSON.stringify(consumerParameters))
 
@@ -1372,27 +1380,50 @@ function addVideoAudio(consumer) {
   if (!(consumer && consumer.track)) {
     return;
   }
-  let el = document.createElement(consumer.kind);
+ // let el = document.createElement(consumer.kind);
   // set some attributes on our audio and video elements to make
   // mobile Safari happy. note that for audio to play you need to be
   // capturing from the mic/camera
-  if (consumer.kind === 'video') {
-    el.setAttribute('playsinline', true);
-  } else {
+/*   if (video.srcObject) {
+		
+        video.srcObject.addTrack(track);
+        return;
+    }
+*/
+ // if (consumer.kind === 'video') {
+	  let el = document.createElement(consumer.kind);
     el.setAttribute('playsinline', true);
     el.setAttribute('autoplay', true);
-  }
-  $(`#remote-${consumer.kind}`).appendChild(el);
-  el.srcObject = new MediaStream([ consumer.track.clone() ]);
+    el.setAttribute('muted', true);
+  //}
+  /* else {
+    el.setAttribute('playsinline', true);
+    el.setAttribute('autoplay', true);
+    el.setAttribute('muted', true);
+  }*/
+ // $(`#remote-${consumer.kind}`).appendChild(el);
+ let newstream = new MediaStream(/*[ consumer.track.clone() ]*/);
+ newstream.addTrack(consumer.track);
+ if(el.srcObject){
+	 console.warn('schon hats srcObject ', consumer.kind);
+	 el.srcObject.addTrack(consumer.kind);
+	 return;
+ }
+  el.srcObject = newstream;
   el.consumer = consumer;
+  //el.volume = 1.0;
+  if(consumer.kind == 'video')$(`#remote-${consumer.kind}`).appendChild(el);
+//}else{
+	//el.srcObject.addTrack(consumer.track);
+//}
   // let's "yield" and return before playing, rather than awaiting on
   // play() succeeding. play() will not succeed on a producer-paused
   // track until the producer unpauses.
-  el.play()
+ /* el.play()
     .then(()=>{})
     .catch((e) => {
       console.error(e);
-    });
+    });*/
 }
 
 function removeVideoAudio(consumer) {

@@ -440,12 +440,13 @@ console.log('roomState.producers: ', JSON.stringify(roomState.producers))
     // and create a data structure to track the client-relevant state
     // of this consumer
     roomState.consumers.push(consumer);
-    roomState.peers[peerId].consumerLayers[consumer.id] = {
-      currentLayer: null,
-      clientSelectedLayer: null
-    };
+    //roomState.peers[peerId].consumerLayers[consumer.id] = {
+    //  currentLayer: null,
+    //  clientSelectedLayer: null
+   // };
 
     // update above data structure when layer changes.
+    /*
     consumer.on('layerschange', (layers) => {
       log(`consumer layerschange ${mediaPeerId}->${peerId}`, mediaTag, layers);
       if (roomState.peers[peerId] &&
@@ -454,7 +455,7 @@ console.log('roomState.producers: ', JSON.stringify(roomState.producers))
           .currentLayer = layers && layers.spatialLayer;
       }
     });
-
+*/
     wsend(ws, {
       producerId: producer.id,
       id: consumer.id,
@@ -529,7 +530,7 @@ console.log('roomState.producers: ', JSON.stringify(roomState.producers))
     wsend(ws, {type:msg.type, error: e });
   }
 }else if(msg.type == 'consumer-set-layers'){
-	
+	/*
   try {
     let { peerId, consumerId, spatialLayer } = msg,
         consumer = roomState.consumers.find((c) => c.id === consumerId);
@@ -548,7 +549,8 @@ console.log('roomState.producers: ', JSON.stringify(roomState.producers))
   } catch (e) {
     console.error('error in /signaling/consumer-set-layers', e);
     wsend({ type: msg.type, error: e });
-  }
+  }*/
+  wsend(ws, { type: msg.type, layersSet: true });
 }else if(msg.type == 'pause-producer'){
 	try {
     let { peerId, producerId } = msg,
