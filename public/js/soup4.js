@@ -876,6 +876,7 @@ async function bconsume(transport, trackKind, peerId) {
     } catch (err) {
 		console.error(err);
         note({contrent: 'Consume ERROR: ' + err, type: "error", time: 5});
+        return null
     }
     
 //console.error(data)
