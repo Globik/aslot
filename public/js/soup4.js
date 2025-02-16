@@ -270,7 +270,7 @@ async function joinRoom() {
       if(state.length > 0){
 		  
 		// let suka = []
-		  let i = 10;
+		  let i = 1000;
 		  /*
 		  state.map( async function(el){
 			 	
@@ -281,7 +281,10 @@ async function joinRoom() {
 			})*/
 			for(let item of state){
 			//	console.log(item, ' ', state);
+			setTimeout(async function(){
 			await subscribeToTrack(item.peerid, item.media)
+		}, i)
+		i+=1000;
 			}
 		//	await Promise.all(suka);
 		}
