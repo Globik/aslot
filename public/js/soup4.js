@@ -140,6 +140,8 @@ if (window.location.protocol === "https:") {
 	isSocketOpened  = false;
 	stopStreams();
 	 joined = false;
+	 $('#onlineCount').textContent = 0;
+	 $('#totalSpeakers').textContent = 0;
   }
    sock.addEventListener('message',function (e) {
 	      let a;

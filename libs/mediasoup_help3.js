@@ -294,6 +294,9 @@ wsend(ws, { type: msg.type, state: suka })
     log('close-transport', peerId, transport.appData);
 
     await closeTransport(transport);
+    if(ws.producer && ws.producer == true){
+		ws.producer = false;
+	}
     wsend(ws, { type: msg.type, closed: true });
   } catch (e) {
     console.error('error in /signaling/close-transport', e);
@@ -667,11 +670,12 @@ function wsend(obj){
     await closePeer(socket.peerId);
    // wsend({type:msg.type, left: true });
    broadcast({ type: 'bye', peerId: msg.peerId });
-   if(socket.producer){
+   if(socket.producer && socket.producer == true){
 	   TOTAL_SPEAKERS-=1;
+	   eventEmitter.emit('total_speakers', { count: TOTAL_SPEAKERS });
    }
    //broadcast_all({ type: 'total_speakers', count: TOTAL_SPEAKERS });
-   eventEmitter.emit('total_speakers', { count: TOTAL_SPEAKERS });
+   //eventEmitter.emit('total_speakers', { count: TOTAL_SPEAKERS });
   } catch (e) {
     console.error('error in /signaling/leave', e);
   //  wsend({type:msg.type, error: e });
