@@ -206,6 +206,20 @@ for (let [key, value] of Object.entries(roomState.producers)){
     console.error('error in /signaling/join-as-new-peer', e);
     wsend(ws, { type: msg.type, error: e });
   }
+}else if(msg.type == 'get_speakers'){
+	console.log(msg);
+	const { peerId } =  msg;
+	console.log('*** peerId *** ', peerId);
+	let suka = [];
+for (let [key, value] of Object.entries(roomState.producers)){
+	console.log('key value.media ',key, ' ', value.appData);
+	console.log('must 2', (peerId !== value.appData.peerId),' ', peerId, ' ', value.appData.peerId);
+	if(peerId != value.appData.peerId){
+		
+		suka.push({ peerid: value.appData.peerId, media: value.appData.mediaTag });
+	}
+}
+wsend(ws, { type: msg.type, state: suka })
 }else if(msg.type == 'add-statistic'){
 	if(msg.subtype == 'streamer'){
 		TOTAL_SPEAKERS += 1;
@@ -656,7 +670,8 @@ function wsend(obj){
    if(socket.producer){
 	   TOTAL_SPEAKERS-=1;
    }
-   broadcast_all({ type: 'total_speakers', count: TOTAL_SPEAKERS });
+   //broadcast_all({ type: 'total_speakers', count: TOTAL_SPEAKERS });
+   eventEmitter.emit('total_speakers', { count: TOTAL_SPEAKERS });
   } catch (e) {
     console.error('error in /signaling/leave', e);
   //  wsend({type:msg.type, error: e });

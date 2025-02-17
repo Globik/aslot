@@ -161,9 +161,10 @@ async function on_msg(a){
 	console.log('msg type ', a.type);
 	if(a.type == 'howmuch'){
 		$('#onlineCount').textContent = a.value;
+		$('#totalSpeakers').textContent = a.count;
 	}else if(a.type == "Newproducer"){
 		if(!joined){
-			console.log('else not joined return');
+			console.log(' not else joined, returning...');
 			return;
 		}
 		if(a.mediaTag == 'cam-video'){
@@ -257,25 +258,9 @@ $('#join-button').disabled = true;
   }
       console.log('state ', state);
       if(state.length > 0){
-		  
-		// let suka = []
-		  let i = 1000;
-		  /*
-		  state.map( async function(el){
-			 	
-				setTimeout(async function(){
-				await subscribeToTrack(el.peerid, el.media)
-				}, i);
-				i+=1000;
-			})*/
 			for(let item of state){
-			//	console.log(item, ' ', state);
-			//setTimeout(async function(){
 			await subscribeToTrack(item.peerid, item.media)
-		//}, i)
-		i+=1000;
 			}
-		//	await Promise.all(suka);
 		}
     
     joined = true;
@@ -407,6 +392,13 @@ setTimeout(function(){
 //  showCameraInfo();
 $('#send-camera').setAttribute("data-state", "end");
 $('#send-camera').disabled = false;
+let di = await sendRequest({ type: 'get_speakers' });
+console.log('speakers ', di)
+if(di.state && di.state.length > 0){
+	for(let item of di.state){
+			if(item.peerid != myPeerId)await subscribeToTrack(item.peerid, item.media)
+			}
+}
 }else{
 	stopStreams();
 }

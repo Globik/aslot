@@ -167,7 +167,8 @@ console.log(...ad)
 for(const value of ad.values()){
 	ada.push(value);
 }
-console.log('ada ',ada)
+//console.log('ada ',ada)
+var TOTALSPEAKERS = 0;
 var k=1;
   wss.on("connection", async function ws_connect(ws, req) {
 	  console.log("websocket connected");
@@ -179,7 +180,7 @@ var k=1;
 	// ws.room_id="alik";
 	 k++;
   ws.on("pong", heartbeat);
-   broadcast_all({ type: "howmuch", value: wss.clients.size });
+   broadcast_all({ type: "howmuch", value: wss.clients.size, count: TOTALSPEAKERS });
    let msg;
 	ws.on('message', async function onMessage(msgi){
 		//console.log(msgi);
@@ -198,6 +199,7 @@ if(msg.request == "mediasoup"){
 	ws.on('error', function(er){console.log(er)});
 })
   ev.on('total_speakers',(data)=>{
+	  TOTALSPEAKERS = data.count;
 	  data.type = 'total_speakers';
 	  broadcast_all(data);
   });
