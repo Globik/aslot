@@ -80,7 +80,10 @@ let device,
 			
 		});
 		t.observer.on('close', function(){
-			console.log('***** transport closed ***** ', t.id);
+			console.log('***** transport closed ***** ', t.id, ' ', t.appData);
+			if(t.appData.type == 'recv'){
+				// wsend({ type: 'minus-statistic', subtype: 'consumer', peerId: myPeerId , request: 'mediasoup' });
+			}
 		});
 		t.observer.on('newconsumer', function(c){
 			console.log('new consumer ', c.id);
@@ -135,13 +138,15 @@ if (window.location.protocol === "https:") {
   sock.onerror = function (e) {
 	  console.error(e);
   };
-  sock.onclose=function(){
+  sock.onclose = function(){
 	console.log('websocket closed');
 	isSocketOpened  = false;
 	stopStreams();
 	 joined = false;
 	 $('#onlineCount').textContent = 0;
 	 $('#totalSpeakers').textContent = 0;
+	 $('#consumerCount').textContent = 0;
+	 $('#remote-video').innerHTML = '';
   }
    sock.addEventListener('message',function (e) {
 	      let a;
@@ -164,6 +169,7 @@ async function on_msg(a){
 	if(a.type == 'howmuch'){
 		$('#onlineCount').textContent = a.value;
 		$('#totalSpeakers').textContent = a.count;
+		$('#consumerCount').textContent = a.consumerscount;
 	}else if(a.type == "Newproducer"){
 		if(!joined){
 			console.log(' not else joined, returning...');
@@ -186,9 +192,9 @@ async function on_msg(a){
 			unsubscribeFromTrack(a.peerId, 'cam-audio')
 		},100);
 	}else if(a.type == 'total_speakers'){
-		totalSpeakers.textContent = a.count;
-	}else if(a.type == 'oksync'){
-		pollAndUpdate();
+		$('#totalSpeakers').textContent = a.count;
+	}else if(a.type == 'total_consumers'){
+				$('#consumerCount').textContent = a.count;
 	}else{console.log("unknown type ", a.type);}
 
 	
@@ -231,7 +237,7 @@ async function on_msg(a){
 			}
 			else{
 				console.log(a.type);
-				//resolve();
+				
 				}
 			}
         
@@ -357,41 +363,9 @@ async function sendCameraStreams(el) {
     }
   }
   
-  /*
-  
-setTimeout(function(){
-
-			if(camVideoProducer){
-					//alert('my peerId: '+ myPeerId+' mediTag '+camVideoProducer.appData.mediaTag+' producerId: '+camVideoProducer.id);
-					wsend({ 
-						type: 'Newproducer', 
-						request: 'mediasoup',
-						 mediaTag: camVideoProducer.appData.mediaTag, 
-						 peerId: myPeerId ,
-						 id: camVideoProducer.id
-						 });
-			}else{
-				alert('cavideoProducer '+camVideoProducer);
-			}
-			},6);
-			setTimeout(function(){
-			if(camAudioProducer){
-			//	alert('my peerId: '+ myPeerId+' mediTag '+camAudioProducer.appData.mediaTag+' producerId: '+camAudioProducer.id);
-			wsend({
-			type: 'Newproducer', 
-						request: 'mediasoup',
-						 mediaTag: camAudioProducer.appData.mediaTag, 
-						 peerId: myPeerId,
-						 id: camAudioProducer.id 		
-			});
-			}else{
-				alert('camAudioProducer '+camAudioProducer);
-			}
-		},2);
-	*/
+ 
 	wsend({ type: 'add-statistic', subtype: 'streamer', peerId: myPeerId , request: 'mediasoup' });
- // $('#stop-streams').style.display = 'initial';
-//  showCameraInfo();
+ 
 $('#send-camera').setAttribute("data-state", "end");
 $('#send-camera').disabled = false;
 let di = await sendRequest({ type: 'get_speakers' });
@@ -772,6 +746,7 @@ consumer.on('trackended', function(){
 	})
 }
 }
+
 resolve('ok')
   // ask the server to create a server-side consumer object and send
   // us back the info we need to create a client-side consumer
@@ -937,19 +912,7 @@ async function pauseConsumer(consumer) {
     }
   }
 }
-/*
-async function resumeConsumer(consumer) {
-  if (consumer) {
-    console.log('resume consumer', consumer.appData.peerId, consumer.appData.mediaTag);
-    try {
-      await sendRequest({type:'resume-consumer',  consumerId: consumer.id });
-      await consumer.resume();
-    } catch (e) {
-      console.error(e);
-    }
-  }
-}
-*/
+
 async function pauseProducer(producer) {
   if (producer) {
     console.log('pause producer', producer.appData.mediaTag);
@@ -988,11 +951,34 @@ async function closeConsumer(consumer) {
 
     consumers = consumers.filter((c) => c !== consumer);
     removeVideoAudio(consumer);
+   
   } catch (e) {
     console.error(e);
   }
 }
 
+ //const ICESERVERS = {
+  //iceTransportPolicy:"relay",
+var	iceServersid = [
+	{
+      "urls": "stun:stun.l.google.com:19302"
+    },
+	{
+		"urls":[
+		"stun:rouletka.ru:3479",
+		"stun:rouletka.ru:5348"
+		]
+		},
+	{urls:[
+	"turn:rouletka.ru:3479?transport=udp",
+		"turn:rouletka.ru:3479?transport=tcp", 
+		"turn:rouletka.ru:5348?transport=udp",
+		"turn:rouletka.ru:5348?transport=tcp" //no stun
+		]
+		,username:"alik",credential:"1234"}
+		]
+		//};
+//alert(iceServersid.length)
 // utility function to create a transport and hook up signaling logic
 // appropriate to the transport's direction
 //
@@ -1006,9 +992,15 @@ async function createTransport(direction) {
   console.log ('transport options', transportOptions);
 
   if (direction === 'recv') {
+	
     transport = await device.createRecvTransport(transportOptions);
+    transport.appData.type = 'recv';
+    transport.iceServers = iceServersid;
   } else if (direction === 'send') {
+	  
     transport = await device.createSendTransport(transportOptions);
+    transport.appData.type = 'send';
+        transport.iceServers = iceServersid;
   } else {
     throw new Error(`bad transport 'direction': ${direction}`);
   }
@@ -1074,39 +1066,11 @@ async function createTransport(direction) {
     // we leave the room)
     if(state == "connected"){
 		if(direction == 'send'){
-			//alert(direction+camVideoProducer+camAudioProducer);
-			/*
-			setTimeout(function(){
-			if(camVideoProducer){
-					//alert('my peerId: '+ myPeerId+' mediTag '+camVideoProducer.appData.mediaTag+' producerId: '+camVideoProducer.id);
-					wsend({ 
-						type: 'Newproducer', 
-						request: 'mediasoup',
-						 mediaTag: camVideoProducer.appData.mediaTag, 
-						 peerId: myPeerId ,
-						 id: camVideoProducer.id
-						 });
-			}else{
-				alert('cavideoProducer '+camVideoProducer);
-			}
-			},100);
-			setTimeout(function(){
-			if(camAudioProducer){
-			//	alert('my peerId: '+ myPeerId+' mediTag '+camAudioProducer.appData.mediaTag+' producerId: '+camAudioProducer.id);
-			wsend({
-			type: 'Newproducer', 
-						request: 'mediasoup',
-						 mediaTag: camAudioProducer.appData.mediaTag, 
-						 peerId: myPeerId,
-						 id: camAudioProducer.id 		
-			});
-			}else{
-				alert('camAudioProducer '+camAudioProducer);
-			}
-		},1000); */
+			
 		$('#send-camera').textContent = "Выйти из чата";
 		}else{
-		//	alert('no send');
+			let ab = $('#send-camera').getAttribute("data-state");
+		if(ab == "start")wsend({ type: 'add-statistic', subtype: 'consumer', peerId: myPeerId , request: 'mediasoup' });
 		}
 	//	alert('connected');
 	 $('#send-camera').disbabled = false;

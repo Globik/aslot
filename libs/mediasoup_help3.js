@@ -14,6 +14,7 @@ const err = console.error;
 // and one "room" ...
 //
 var TOTAL_SPEAKERS = 0;
+var TOTAL_CONSUMERS = 0;
 
 const roomState = {
   // external
@@ -99,6 +100,7 @@ console.log('starting mediasoup');
 
 
 process.on('exit', function(c){
+	if(worker)worker.close();
 	 console.log("** EXIT ***");
  });
  process.on('SIGINT', function() {
@@ -223,14 +225,28 @@ wsend(ws, { type: msg.type, state: suka })
 }else if(msg.type == 'add-statistic'){
 	if(msg.subtype == 'streamer'){
 		TOTAL_SPEAKERS += 1;
-		//broadcast_all({ type: 'total_speakers', count: TOTAL_SPEAKERS });
 		eventEmitter.emit('total_speakers', { count: TOTAL_SPEAKERS });
+	}else if(msg.subtype == 'consumer'){
+		if(ws.producer == false){
+		TOTAL_CONSUMERS +=1;
+		eventEmitter.emit('total_consumers', { count: TOTAL_CONSUMERS });
+		ws.consumer = true;
+	}else{
+		//TOTAL_CONSUMERS -=1;
+		eventEmitter.emit('total_consumers', { count: TOTAL_CONSUMERS });
+		ws.consumer = false;
+	}
 	}
 }else if(msg.type == 'minus-statistic'){
 	if(msg.subtype == 'streamer'){
 		TOTAL_SPEAKERS -=1;
-		//broadcast_all({ type: 'total_speakers', count: TOTAL_SPEAKERS });
 		eventEmitter.emit('total_speakers', { count: TOTAL_SPEAKERS });
+	}else if(msg.subtype == 'consumer'){
+		if(ws.producer == false){
+		TOTAL_CONSUMERS -=1;
+		eventEmitter.emit('total_consumers', { count: TOTAL_CONSUMERS });
+		ws.consumer = false;
+	}
 	}
 	
 }else if(msg.type == 'leave'){
@@ -259,7 +275,7 @@ wsend(ws, { type: msg.type, state: suka })
     });
   } catch (e) {
     console.error('error in /signaling/create-transport', e);
-    wsend(ws, {type:msg.type, error: e });
+    wsend(ws, { type: msg.type, error: e });
   }
 }else if(msg.type == 'connect-transport'){
 	try {
@@ -326,7 +342,7 @@ wsend(ws, { type: msg.type, state: suka })
 }else if(msg.type == 'send-track'){
   try {
     let { peerId, transportId, kind, rtpParameters,
-          paused=false, appData } = msg,
+          paused = false, appData } = msg,
         transport = roomState.transports[transportId];
         
     if (!transport) {
@@ -382,7 +398,11 @@ wsend(ws, { type: msg.type, state: suka })
     
     
     ws.producer = true;
-    
+    if(ws.consumer == true){
+		ws.consumer = false;
+		TOTAL_CONSUMERS -=1;
+		eventEmitter.emit('total_consumers', { count: TOTAL_CONSUMERS });
+	}
     wsend(ws, { type: msg.type, id: producer.id });
    
   } catch (e) {
@@ -673,6 +693,12 @@ function wsend(obj){
    if(socket.producer && socket.producer == true){
 	   TOTAL_SPEAKERS-=1;
 	   eventEmitter.emit('total_speakers', { count: TOTAL_SPEAKERS });
+   }
+   if(socket.producer == false){
+	   if(socket.consumer == true){
+		   TOTAL_CONSUMERS -=1;
+		   eventEmitter.emit('total_consumers', { count: TOTAL_CONSUMERS });
+	   }
    }
    //broadcast_all({ type: 'total_speakers', count: TOTAL_SPEAKERS });
    //eventEmitter.emit('total_speakers', { count: TOTAL_SPEAKERS });

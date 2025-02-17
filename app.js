@@ -169,6 +169,7 @@ for(const value of ad.values()){
 }
 //console.log('ada ',ada)
 var TOTALSPEAKERS = 0;
+var TOTALCONSUMERS = 0;
 var k=1;
   wss.on("connection", async function ws_connect(ws, req) {
 	  console.log("websocket connected");
@@ -176,11 +177,13 @@ var k=1;
 	setGuest(ip);
 	 ws.isAlive = true;
 	 ws.id=k;//obid();
+	 ws.producer = false;
+	 ws.consumer = false;
 	 wsend(ws, { type: "welcome", yourid: ws.id });
 	// ws.room_id="alik";
 	 k++;
   ws.on("pong", heartbeat);
-   broadcast_all({ type: "howmuch", value: wss.clients.size, count: TOTALSPEAKERS });
+   broadcast_all({ type: "howmuch", value: wss.clients.size, count: TOTALSPEAKERS, consumerscount: TOTALCONSUMERS });
    let msg;
 	ws.on('message', async function onMessage(msgi){
 		//console.log(msgi);
@@ -201,6 +204,11 @@ if(msg.request == "mediasoup"){
   ev.on('total_speakers',(data)=>{
 	  TOTALSPEAKERS = data.count;
 	  data.type = 'total_speakers';
+	  broadcast_all(data);
+  });
+  ev.on('total_consumers', (data)=>{
+	  TOTALCONSUMERS = data.count;
+	  data.type = 'total_consumers';
 	  broadcast_all(data);
   });
   function wsend(ws, obj) {

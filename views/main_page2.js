@@ -58,7 +58,7 @@ const main_page2 = function(n){
     <script async src="https://yastatic.net/share2/share.js"></script>
      <script src="/pwabuilder-sw-register.js"></script>
     </head><body>
-    <b>online: </b><span id="onlineCount">0</span> | <b>Спикеров: </b><span id="totalSpeakers">0</span> <br> <span id="clientId"></span>
+    <b>online: </b><span id="onlineCount">0</span> | <b>Спикеров: </b><span id="totalSpeakers">0</span> | <b>Подписчиков: </b><span id="consumerCount">0</span><br> <span id="clientId"></span>
     <div><button id="send-camera" disabled="true" data-state="start" onclick="sendCameraStreams(this)">
       Войти в чат
     </button>
