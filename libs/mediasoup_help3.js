@@ -56,7 +56,7 @@ worker.observer.on('newrouter', function(r){
 			  });
 		  });
 		  t.observer.on('close', function(){
-			  console.log('*** transport closed **** ', t.id);
+			  console.log('*** transport closed **** ', t.id, ' appData ', t.appData);
 		  });
 	  });
   });
@@ -689,7 +689,7 @@ function wsend(obj){
 
     await closePeer(socket.peerId);
    // wsend({type:msg.type, left: true });
-   broadcast({ type: 'bye', peerId: msg.peerId });
+   broadcast({ type: 'bye', peerId: socket.peerId });
    if(socket.producer && socket.producer == true){
 	   TOTAL_SPEAKERS-=1;
 	   eventEmitter.emit('total_speakers', { count: TOTAL_SPEAKERS });

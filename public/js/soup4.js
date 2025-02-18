@@ -900,7 +900,18 @@ async function unsubscribeFromTrack(peerId, mediaTag) {
   // force update of ui
  // updatePeersDisplay();
 }
-
+async function resumeConsumer(consumer) {
+  if (consumer) {
+    console.log('resume consumer', consumer.appData.peerId, consumer.appData.mediaTag);
+    try {
+    
+       await sendRequest({ type: 'resume-consumer',  consumerId: consumer.id });
+      await consumer.resume();
+    } catch (e) {
+      console.error(e);
+    }
+  }
+}
 async function pauseConsumer(consumer) {
   if (consumer) {
     console.log('pause consumer', consumer.appData.peerId, consumer.appData.mediaTag);
@@ -1349,6 +1360,16 @@ function addVideoAudio(consumer) {
     }
 */
  // if (consumer.kind === 'video') {
+	let div = document.createElement('div');
+	let div2 = document.createElement('div');
+	let input = document.createElement('input');
+	input.setAttribute('type', 'checkbox');
+	input.setAttribute('checked', true);
+	input.setAttribute('data-peer', consumer.appData.peerId);
+	input.setAttribute( 'onchange' , 'soundControl(this);');
+	div2.appendChild(input);
+	div.className = 'videocontainer';
+	div.setAttribute('data-peerid', consumer.appData.peerId);
 	  let el = document.createElement(consumer.kind);
     el.setAttribute('playsinline', true);
     el.setAttribute('autoplay', true);
@@ -1364,7 +1385,9 @@ function addVideoAudio(consumer) {
  newstream.addTrack(consumer.track);
   el.srcObject = newstream;
  if(consumer.kind == 'video'){
-	  $(`#remote-${consumer.kind}`).appendChild(el);
+	 div.appendChild(el);
+	 el.after(div2);
+	  $(`#remote-${consumer.kind}`).appendChild(div);
 	 // el.play();
 	   el.volume = 1.0;
 	  
@@ -1394,14 +1417,28 @@ function addVideoAudio(consumer) {
 }
 
 function removeVideoAudio(consumer) {
-  document.querySelectorAll(consumer.kind).forEach((v) => {
+ /* document.querySelectorAll(consumer.kind).forEach((v) => {
     if (v.consumer === consumer) {
 		console.log("yes " + consumer.kind);
       v.parentNode.removeChild(v);
     }
   });
+  */
+ // let el = document.querySelector(`[data-id="${obj.id}"]`);
+  let el = document.querySelector(`[data-peerid="${consumer.appData.peerId}"]`); 
+  if(el)el.remove();
 }
-
+async function soundControl(el){
+	let peerId = el.getAttribute('data-peer');
+	let consumer = findConsumerForTrack(peerId, 'cam-audio');
+	//el.checked = !consumer.paused;
+    
+      if (el.checked) {
+        await resumeConsumer(consumer);
+      } else {
+        await pauseConsumer(consumer);
+      }
+}
 async function showCameraInfo() {
   let deviceId = await getCurrentDeviceId(),
       infoEl = $('#camera-info');
