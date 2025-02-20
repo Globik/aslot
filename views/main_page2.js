@@ -28,25 +28,12 @@ const main_page2 = function(n){
 <meta name="description" content="Крути руль и собирай по дороге сердечки"/>
     
     <!-- <link rel="icon" href="/img/w4.png"> -->
-     <link href="/css/slot.css" rel="stylesheet">
+     <link href="/css/slot2.css" rel="stylesheet">
     <link href="/css/note.css" rel="stylesheet">
     
     <link href="/css/output.css" rel="stylesheet">
     <link href="/css/login3.css" rel="stylesheet"> 
-    <style>
-    #remote-video{
-    display:flex;
-	justify-content: start;
-	flex-wrap: wrap;
-	}	
-   video{
-   width:210px;
-   height:200px;
-   border: 1px solid green;
-   object-fit:cover;
-}
-    </style>
-   
+    
     <script src="/js/globalik.js"></script>
     <script src="/js/mediasoup-client.min.js"></script>
   
@@ -57,74 +44,43 @@ const main_page2 = function(n){
     -->
     <script async src="https://yastatic.net/share2/share.js"></script>
      <script src="/pwabuilder-sw-register.js"></script>
-    </head><body>
-    <b>online: </b><span id="onlineCount">0</span> | <b>Спикеров: </b><span id="totalSpeakers">0</span> | <b>Подписчиков: </b><span id="consumerCount">0</span><br> <span id="clientId"></span>
-    <div><button id="send-camera" disabled="true" data-state="start" onclick="sendCameraStreams(this)">
+    </head><body> <main id="somemain"><nav class="vhod">
+    <b>online: </b><span id="onlineCount">0</span> <span>|</span> <b>Спикеров: </b><span id="totalSpeakers">0</span> <span>|</span> <b>Подписчиков: </b><span id="consumerCount">0</span>
+    <div><a ${n.user?`onclick="logout(this);"`:''} href="${n.user?'#':'#login'}">${n.user?'Выход':'Вход'}</a></div>
+    </nav>
+    <div class="btns">
+    <header>Групповой видеочат</header>
+    <button id="send-camera" disabled="true" data-state="start" onclick="sendCameraStreams(this)">
       Войти в чат
     </button>
      <button id="join-button" onclick="joinRoom()" disabled="true" data-state="start">
-      подписаться
+      Подписаться
     </button>
-   <!-- <button id="stop-streams" style="display:none;" onclick="stopStreams()">
-      Выйти из чата
-    </button></div> -->
-  <!-- <section id="localcamContaiiner">
-   <video id="localVideo" muted ></video>
-   </section> -->
-   <div id="remote-video"></div>
-   <div id="remote-audio"></div>
-<div id="local-control">
-<!--
-  <div id="join-control">
-    <button id="join-button" onclick="joinRoom()">
-      join room
-    </button>
-    <span class="arrow"> &#x21E2; </span>
-  </div> -->
-
-  <div id="camera-control">
-    
-    <span id="camera-info"></span>
-  <!--  <button id="share-screen" onclick="startScreenshare()">
-      share screen
-    </button> -->
-    <div id="outgoing-cam-streams-ctrl">
-     <!-- <div><input id="local-cam-checkbox" type="checkbox" checked
-                  onchange="changeCamPaused()"></input>
-           <label id="local-cam-label">camera</label>
-        <span id="camera-producer-stats" class="track-ctrl"></span>
-      </div>
-      <div><input id="local-mic-checkbox" type="checkbox" checked
-                  onchange="changeMicPaused()"></input>
-           <label id="local-mic-label">mic</label></div>
-      <div id="local-screen-pause-ctrl">
-           <input id="local-screen-checkbox" type="checkbox" checked
-                  onchange="changeScreenPaused()"></input>
-           <label id="local-screen-label">screen</label>
-           <span id="screen-producer-stats" class="track-ctrl"></span>
-      </div>      
-      <div id="local-screen-audio-pause-ctrl">
-           <input id="local-screen-audio-checkbox" type="checkbox" checked
-                  onchange="changeScreenAudioPaused()"></input>
-           <label id="local-screen-audio-label">screen audio</label>
-           <span id="screen-audio-producer-stats" class="track-ctrl"></span>
-      </div> -->
-    </div>
   </div>
-<!--
-  <button id="leave-room" onclick="leaveRoom()">
-    leave room
-  </button>
--->
-</div>
-
-<div id="available-tracks">
-</div>
+ 
+   <div id="remote-video"></div>
+ 
 
 
 
+</main>
+ <a href="#."  class="overlay" id="login"></a>
+    <output id="loginoutput" class="popi">
+        <div class="modal-header">Авторизация / Регистрация</div>
+      
+        <div class="modal-body">
+          <div class="error-message" id="errormsg"></div>
+         <form name="formlogin" id="myform">
+            <label for="name" class="lb" style="margin-top: 5px;">Имя </label>
+            <input  class="inp" name="username" type="text" placeholder="Введите имя" id="name" required minlength="2" maxlength="20">
 
-
+            <label for="name" class="lb">Пароль</label>
+            <input  class="inp" name="userpassword" type="password" autocomplete="on" placeholder="Введите пароль" id="password" required minlength="2" maxlength="20">
+			 <button  class="login-button" id="btnlogin">Войти</button>
+         <button class="register-button" id="btnregister">Зарегистрироваться</button>
+          </form> </div>
+    </output>
+    <script src="/js/login.js"></script>
   <script src="/js/soup4.js"></script>
     </body></html>`;
 }

@@ -8,7 +8,7 @@ const $$ = document.querySelectorAll.bind(document);
 
 var kK = 0;
 const myPeerId = uuidv4();
-gid('clientId').textContent = myPeerId;
+//gid('clientId').textContent = myPeerId;
 var isSocketOpened = false;
 let device,
            joined,
@@ -1232,6 +1232,7 @@ async function changeScreenPaused() {
 
 async function updatePeersDisplay(peersInfo = lastPollSyncData,
                                          sortedPeers = sortPeers(peersInfo)) {
+											 /*
   console.log('room state updated', peersInfo);
 
   $('#available-tracks').innerHTML = '';
@@ -1264,7 +1265,7 @@ async function updatePeersDisplay(peersInfo = lastPollSyncData,
       $('#available-tracks')
         .appendChild(makeTrackControlEl(peer.id, mediaTag, info));
     }
-  }
+  } */
 }
 
 function makeTrackControlEl(peerName, mediaTag, mediaInfo) {
