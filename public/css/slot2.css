@@ -10,11 +10,11 @@ html,body{
                 font-size: 12px;
                 margin:0;
                 padding:0;
-                background: #5d7a97;
+                background:#f19b9b;
             }
             main{
 				padding:10px;
-				background:#f19b9b;
+				bckground:
 				wdth:100%;
 				overflow:hidden;
 				height:100%;
@@ -25,7 +25,7 @@ html,body{
 				display:flex;
 				align-items: center;
 				justify-content: end;
-				bckground:red;
+				
 				background: #cb6f6f;
 				border-radius:5px;
 				font-size:20px;
@@ -77,5 +77,26 @@ html,body{
    width:210px;
    height:200px;
    border: 1px solid green;
+   border-radius:10px;
    object-fit:cover;
+}
+h1,h2{
+	font-size:1.5rem;
+	padding:20px;
+}
+p{
+	font-size:1.3rem;
+	line-height:1.5;
+	padding:20px;
+}
+footer{
+	background: #cb6f6f;
+	border-radius:5px;
+	padding:20px;
+	margin:20px;
+}
+footer div{
+	margin-top:1rem;
+	margin-bottom:1rem;
+	font-size:1rem;
 }

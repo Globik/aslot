@@ -1,3 +1,5 @@
+const { login } = require('./login.js');
+const { footer } = require('./footer.js');
 const main_page2 = function(n){
 	return `<!DOCTYPE html><html lang="ru"><head>
     
@@ -14,18 +16,18 @@ const main_page2 = function(n){
     
     
     
-    <meta name="description" content="Крути руль и собирай по дороге сердечки" />
+    <meta name="description" content="Добро пожаловать в Chatikon — блог, где код оживает, а технологии становятся понятными! Мы рассказываем и показываем, как создаются современные веб-приложения с использованием WebRTC" />
  
-  <meta property="og:title" content="Машина" />
+  <meta property="og:title" content="Блог" />
   <meta property="og:type" content="website" />
   <meta property="og:url" content="//chatikon.ru/" />
   <meta property="og:image" content="//chatikon.ru/img/home.jpg" />
-  <meta property="og:site_name" content="Машина" />
-  <meta property="og:description" content="Крути руль и собирай по дороге сердечки" />
+  <meta property="og:site_name" content="Блог" />
+  <meta property="og:description" content="Добро пожаловать в Chatikon — блог, где код оживает, а технологии становятся понятными! Мы рассказываем и показываем, как создаются современные веб-приложения с использованием WebRTC" />
   
-  <meta itemprop="name" content="Машина"/>
-<meta itemprop="description" content="Крути руль и собирай по дороге сердечки" />
-<meta name="description" content="Крути руль и собирай по дороге сердечки"/>
+  <meta itemprop="name" content="Блог"/>
+<meta itemprop="description" content="Добро пожаловать в Chatikon — блог, где код оживает, а технологии становятся понятными! Мы рассказываем и показываем, как создаются современные веб-приложения с использованием WebRTC" />
+<meta name="description" content="Добро пожаловать в Chatikon — блог, где код оживает, а технологии становятся понятными! Мы рассказываем и показываем, как создаются современные веб-приложения с использованием WebRTC"/>
     
     <!-- <link rel="icon" href="/img/w4.png"> -->
      <link href="/css/slot2.css" rel="stylesheet">
@@ -58,30 +60,24 @@ const main_page2 = function(n){
     </button>
   </div>
  
-   <div id="remote-video"></div>
- 
-
+   <div id="remote-video"></div><hr>
+ <h1>Статьи.</h1>
+${n.articles?get_articles(n.articles):'No articles'}
 
 
 </main>
- <a href="#."  class="overlay" id="login"></a>
-    <output id="loginoutput" class="popi">
-        <div class="modal-header">Авторизация / Регистрация</div>
-      
-        <div class="modal-body">
-          <div class="error-message" id="errormsg"></div>
-         <form name="formlogin" id="myform">
-            <label for="name" class="lb" style="margin-top: 5px;">Имя </label>
-            <input  class="inp" name="username" type="text" placeholder="Введите имя" id="name" required minlength="2" maxlength="20">
-
-            <label for="name" class="lb">Пароль</label>
-            <input  class="inp" name="userpassword" type="password" autocomplete="on" placeholder="Введите пароль" id="password" required minlength="2" maxlength="20">
-			 <button  class="login-button" id="btnlogin">Войти</button>
-         <button class="register-button" id="btnregister">Зарегистрироваться</button>
-          </form> </div>
-    </output>
-    <script src="/js/login.js"></script>
+${login({})}
   <script src="/js/soup4.js"></script>
+  ${footer({})}
     </body></html>`;
 }
 module.exports = { main_page2 }
+
+function get_articles(arr){
+	let s = '';
+	arr.forEach(function(el, i){
+		s+=`<h2>${el.name}</h2><br><br>
+		<p>${el.txt.substring(0,400)}...</p><p><a href="/blog/${el.slug}">Читать дальше</a></p>`;
+	});
+	return s;
+}

@@ -1,19 +1,24 @@
 const Router = require('koa-router');
 const shortid = require('shortid');
 const passport = require('koa-passport');
-
+const articles = require('../views/articles.js');
 const pub = new Router();
 
 pub.get('/', async ctx => {
     let db = ctx.db;
     console.log("USER ", ctx.state.user);
-    ctx.body = await ctx.render('main_page2', {randomStr: shortid.generate() })
+    ctx.body = await ctx.render('main_page2', {randomStr: shortid.generate(), articles })
+})
+
+pub.get('/blog/:slug', async ctx=>{
+	let a = articles.find(el=>{return el.slug === ctx.params.slug});
+	ctx.body = await ctx.render('slug', { a });
 })
 
 pub.get('/subscribe', async ctx => {
     let db = ctx.db;
-    console.log("USER ", ctx.state.user);
-    ctx.body = await ctx.render('subscribe', {randomStr: shortid.generate() })
+   // console.log("USER ", articles);
+    ctx.body = await ctx.render('subscribe', {randomStr: shortid.generate()  })
 }) 
 
 pub.post('/login', (ctx, next) => {
