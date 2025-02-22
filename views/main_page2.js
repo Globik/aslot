@@ -4,7 +4,7 @@ const main_page2 = function(n){
 	return `<!DOCTYPE html><html lang="ru"><head>
     
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-    <title>Машина</title>
+    <title>Видеочат</title>
    <meta name="viewport" content="width=device-width,initial-scale=1.0"> 
     
     <link rel="icon" type="image/png" href="/img3/favicon-96x96.png" sizes="96x96" />

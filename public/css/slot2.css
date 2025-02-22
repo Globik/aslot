@@ -2,7 +2,7 @@
 	border-box;
 }
 html,body{
-	width:100%;
+	width: 100%;
 	height:100%;
 }
  body {
@@ -14,10 +14,8 @@ html,body{
             }
             main{
 				padding:10px;
-				bckground:
-				wdth:100%;
-				overflow:hidden;
-				height:100%;
+				
+				height:auto;
 			}
 			nav.vhod{
 				width:100%;
@@ -98,5 +96,5 @@ footer{
 footer div{
 	margin-top:1rem;
 	margin-bottom:1rem;
-	font-size:1rem;
+	font-size:1rem
 }

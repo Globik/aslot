@@ -5,7 +5,7 @@ const slug = function(n){
 	return `<!DOCTYPE html><html lang="ru"><head>
     
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-    <title>Машина</title>
+    <title>${a.name}</title>
    <meta name="viewport" content="width=device-width,initial-scale=1.0"> 
     
     <link rel="icon" type="image/png" href="/img3/favicon-96x96.png" sizes="96x96" />
@@ -16,8 +16,8 @@ const slug = function(n){
     <meta name="description" content="${a.txt.substring(0,200)}" />
   <meta property="og:title" content="${a.name}" />
   <meta property="og:type" content="website" />
-  <meta property="og:url" content="//chatikon.ru/" />
-  <meta property="og:image" content="//chatikon.ru/img/home.jpg" />
+  <meta property="og:url" content="https://chatikon.ru/" />
+  <meta property="og:image" content="https://chatikon.ru/img/home.jpg" />
   <meta property="og:site_name" content="${a.name}" />
   <meta property="og:description" content="${a.txt.substring(0,200)}" />
   

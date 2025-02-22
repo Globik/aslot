@@ -15,6 +15,10 @@ pub.get('/blog/:slug', async ctx=>{
 	ctx.body = await ctx.render('slug', { a });
 })
 
+pub.get('/rules', async ctx=>{
+	ctx.body = await ctx.render('rules', {});
+})
+
 pub.get('/subscribe', async ctx => {
     let db = ctx.db;
    // console.log("USER ", articles);
