@@ -20,8 +20,8 @@ const main_page2 = function(n){
  
   <meta property="og:title" content="Блог" />
   <meta property="og:type" content="website" />
-  <meta property="og:url" content="//chatikon.ru/" />
-  <meta property="og:image" content="//chatikon.ru/img/home.jpg" />
+  <meta property="og:url" content="https://chatikon.ru/" />
+  <meta property="og:image" content="https://chatikon.ru/img/home.jpg" />
   <meta property="og:site_name" content="Блог" />
   <meta property="og:description" content="Добро пожаловать в Chatikon — блог, где код оживает, а технологии становятся понятными! Мы рассказываем и показываем, как создаются современные веб-приложения с использованием WebRTC" />
   
@@ -77,7 +77,7 @@ function get_articles(arr){
 	let s = '';
 	arr.forEach(function(el, i){
 		s+=`<h2>${el.name}</h2><br><br>
-		<p>${el.txt.substring(0,400)}...</p><p><a href="/blog/${el.slug}">Читать дальше</a></p>`;
+		<p>${el.txt.substring(0,400)}...</p><p><a href="/blog/${el.slug}">Читать дальше</a></p><hr>`;
 	});
 	return s;
 }

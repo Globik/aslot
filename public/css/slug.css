@@ -2,10 +2,42 @@ h1{
 	font-size:2.2rem;
 	text-align:center;
 	padding:30px;
+	line-height:1.6;
 }
 main{
 	font-size:1.4rem;
 	line-height:1.6;
 	padding:50px;
 	height:auto;
+}
+pre{
+	width:99%;
+	overflow-x:scroll;
+}
+section.table{
+	width:99%;
+	overflow-x:scroll;
+}
+table{
+	min-width:99%;
+	overflow-x:scroll;
+	
+}
+code{
+	font-size:0.9rem;
+}
+@media screen and (max-width: 452px) and (orientation: portrait){
+	main{
+		padding:5px;
+	}
+	h1{
+		font-size:1.5rem;
+	}
+	article,article p{
+		padding:10px;
+		margin:5px;
+	}
+	footer{
+		margin:5px;
+	}
 }
