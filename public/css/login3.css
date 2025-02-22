@@ -25,14 +25,14 @@ form * {
 label.lb {
   display: block;
   margin-top: 15px;
-  font-size: 1.8rem;
+  font-size: 1rem;
   font-weight: 500;
   color:black;
 }
 
 input.inp {
   display: block;
-  height: 50px;
+  height: 40px;
   width: 100%;
   border-radius: 10px;
   padding: 0px 8px;
@@ -44,19 +44,20 @@ input.inp {
 }
 
 span.model-header-label {
-  float: right;
+  foat: right;
   font-weight: bold;
   color: #ff5722;
-  font-size:1.8rem;
+  font-size:1rem;
 }
 
 .login-button {
-height:60px;
+height:50px;
   margin-top: 10px;
   width: 100%;
   background: linear-gradient(#446ca2,#446ca2 25%,#184076);
   color: #fff;
-  padding: 12px 0;
+  padding-top: 12px;
+  padding-bottom:12px;
   font-size: 18px;
   font-weight: 600;
   border-radius: 10px;
@@ -64,7 +65,7 @@ height:60px;
 }
 
 .register-button {
-height:60px;
+height:50px;
   margin-top: 25px;
   width: 100%;
   background: green;/*#4caf50;*/
@@ -105,7 +106,7 @@ height:60px;
 
 .modal-header {
   padding: 14px;
-  font-size: 1.8rem;
+  font-size: 1rem;
   font-weight: 600;
   border-bottom: 1px solid rgba(0, 0, 0, .2);
   color:black;
@@ -151,26 +152,30 @@ button.login-button,button.register-button {
 .flex {
   display: flex;
 }
-@media screen and (max-width: calc(452px * 60)) and (orientation: portrait){
 
+@media screen and (max-width: 452px) and (orientation: portrait){
 html{
 
 }
 #loginoutput{
 	width:90%;
-	ackground:red;
-	font-size:5rem;
+	font-size:1rem;
+	height:auto;
 }
 .modal-body{
-	width:95%;
 }
 .login-button , .register-button{
-	height:6rem;
-	font-size:2.5rem;
-	width:100%;
-	margin:0;
+	margin-top:15px;
+}
+form{
+
+height:auto;
+
 }
 input.inp {
-	height:6rem;
+	font-size:1rem;
+}
+.modal-body {
+	padding:0;
 }
 }

@@ -32,10 +32,14 @@ code{
 	}
 	h1{
 		font-size:1.5rem;
+		padding-left:5px;
+		margin-left:5px;
 	}
 	article,article p{
 		padding:10px;
 		margin:5px;
+		font-size:1rem;
+		width:92%;
 	}
 	footer{
 		margin:5px;
