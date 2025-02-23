@@ -7,13 +7,14 @@ const pub = new Router();
 pub.get('/', async ctx => {
     let db = ctx.db;
     console.log("USER ", ctx.state.user);
-    ctx.body = await ctx.render('main_page2', {randomStr: shortid.generate(), articles })
+    ctx.body = await ctx.render('main_page2', {randomStr: shortid.generate(), articles: articles[1] })
 })
 
+/*
 pub.get('/blog/:slug', async ctx=>{
 	let a = articles.find(el=>{return el.slug === ctx.params.slug});
 	ctx.body = await ctx.render('slug', { a });
-})
+})*/
 
 pub.get('/rules', async ctx=>{
 	ctx.body = await ctx.render('rules', {});

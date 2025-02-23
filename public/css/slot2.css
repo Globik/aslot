@@ -16,7 +16,10 @@ html,body{
             main{
 				padding:50px;
 				
-				height:auto;
+				min-height:100%;
+			}
+			header{
+				padding-right:10px;
 			}
 			nav.vhod{
 				width:100%;
