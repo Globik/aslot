@@ -1,6 +1,6 @@
  const login = function(n){
-	 return `<a href="#."  class="overlay" id="login"></a>
-    <output id="loginoutput" class="popi">
+	 return `${n.ohne?``:`<a href="#."  class="overlay" id="login"></a>`}
+    <output id="loginoutput" class="${n.ohne?'popi2':'popi'}">
         <div class="modal-header">Авторизация / Регистрация</div>
       
         <div class="modal-body">
@@ -15,6 +15,6 @@
          <button class="register-button" id="btnregister">Зарегистрироваться</button>
           </form> </div>
     </output>
-    <script src="/js/login.js"></script>`;
+    `;
 }
 module.exports = { login }

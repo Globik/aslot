@@ -1,10 +1,11 @@
 const { login } = require('./login.js');
-const { footer } = require('./footer.js');
-const main_page2 = function(n){
+const { wallet_v } = require('./wallet_v.js');
+
+const wallet = function(n){
 	return `<!DOCTYPE html><html lang="ru"><head>
     
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-    <title>Видеочат</title>
+    <title>Wallet</title>
    <meta name="viewport" content="width=device-width,initial-scale=1.0"> 
     
  <!--   <link rel="icon" type="image/png" href="/img3/favicon-96x96.png" sizes="96x96" />
@@ -30,14 +31,14 @@ const main_page2 = function(n){
 <meta name="description" content="Групповой видеочат на десятерых"/>
     
      <link rel="icon" href="/img/favicon.png"> 
-     <link href="/css/slot2.css" rel="stylesheet">
+    
     <link href="/css/note.css" rel="stylesheet">
     
     <link href="/css/output.css" rel="stylesheet">
     <link href="/css/login3.css" rel="stylesheet"> 
-    
+     <link href="/css/wallet.css" rel="stylesheet">
     <script src="/js/globalik.js"></script>
-    <script src="/js/mediasoup-client.min.js"></script>
+    
   
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -47,39 +48,15 @@ const main_page2 = function(n){
     <script async src="https://yastatic.net/share2/share.js"></script>
      <script src="/pwabuilder-sw-register.js"></script>
     </head><body> <main id="somemain"><nav class="vhod">
-    <b>online: </b><span id="onlineCount">0</span> <span>|</span> <b>Спикеров: </b><span id="totalSpeakers">0</span> <span>|</span> <b>Подписчиков: </b><span id="consumerCount">0</span>
-    <div><a ${n.user?`onclick="logout(this);"`:''} href="${n.user?'#':'#login'}">${n.user?'Выход':'Вход'}</a></div>
-    </nav>
-    <a href="/wallet" style="padding-left:10px;font-size:1rem;">Криптокошелек</a>
-    <div class="btns">
-    <header>Пoкер-рум</header>
-    <button id="send-camera" disabled="true" data-state="start" onclick="sendCameraStreams(this)">
-      Войти в чат
-    </button>
-     <button id="join-button" onclick="joinRoom()" disabled="true" data-state="start">
-      Подписаться
-    </button>
-  </div>
- 
-   <div id="remote-video"></div><hr>
- <article>
- <h1>${n.articles.name}</h1>
-${n.articles.txt}
-</article>
-
-</main>
-${login({})}
-  <script src="/js/soup4.js"></script>
-  ${footer({})}
+     <div id="settings" class="ita" onclick="panelOpen(this);"><img class="setimg" src="/img/set2.svg"></div>
+     <div id="settingspanel">
+     ${n.user?'<div class="settingspanel" ><a href="#" onclick="logout(this);">Выход</a></div>':``}
+     </div>
+    </nav><!-- <a href="/" style="padding-left:10px;font-size:1rem;">Назад</a> -->
+    <section id="contentContainer" class="${n.user?'wallet-flex':''}">
+      ${n.user?wallet_v({}):login({ ohne: true })}
+      </section>
+</main><script src="/js/login.js"></script><script src="/js/wallet.js"></script>
     </body></html>`;
 }
-module.exports = { main_page2 }
-
-function get_articles(arr){
-	let s = '';
-	arr.forEach(function(el, i){
-		s+=`<h2>${el.name}</h2><br><br>
-		<p>${el.txt.substring(0,400)}...</p><p><a href="/blog/${el.slug}">Читать дальше</a></p><hr>`;
-	});
-	return s;
-}
+module.exports = { wallet }

@@ -1,0 +1,144 @@
+*box-sizing{
+	border-box;
+}
+html,body{
+	width: 100%;
+	height:100%;
+	font-size:1.1rem;
+	margin:0;
+	padding:0;
+}
+ body {
+                font-family: 'Roboto Condensed', sans-serif;
+                font-size: 12px;
+                margin:0;
+                padding:0;
+                background:#f19b9b;
+            }
+            main{
+				padding:0px;
+				
+				min-height:100%;
+			}
+			nav.vhod{
+				width:100%;
+				height:40px;
+				display:flex;
+				align-items: center;
+				justify-content: end;
+				position:relative;
+				background: #cb6f6f;
+				border-radius:5px;
+				font-size:20px;
+				font-weight:bold;
+				color:rgb(6,9,8);
+			}
+			nav.vhod a{
+				color:#ebee82;
+			}
+			nav.vhod div{
+				margin-right:10px;
+			}
+			nav.vhod b, nav.vhod span{
+				font-size:0.8rem;
+				color:white;
+				padding-right:1rem;
+			}
+			#contentContainer{
+				width:100%;
+				height:calc(100vh - 40px);
+				display:flex;
+				align-items: center;
+				justify-content:center;
+				position:relative;
+				bakground:yellow;
+			}
+			#contentContainer.wallet-flex{
+			align-items:start;
+				justify-content:start;
+				
+			}
+#loginoutput.popi2{
+display:block;
+	width:25vw;
+	boder:1px solid green;
+}
+#settings{
+		bakground:blue;
+		width:40px;
+		height:40px;
+		color:brown;
+	}
+	#settingspanel{
+	display: none;
+	position:absolute;
+	right:0px;
+	top:40px;
+	width:50vw;
+	margin-right:8px;
+	bckground:brown;
+	z-index:1000;
+	color:blue;
+	
+	
+	height: 0;
+	border-bottom-right-radius:10px 10px;
+	border-bottom-left-radius: 10px 10px;
+	ont-size:1.5rem;
+	
+}
+#settingspanel.open{
+	display:block;
+	z-index:1000;
+}
+.settingspanel{
+	width:calc(50vw - 12px);
+	background:rgba(220,207,255,0.96);
+	line-height:1.2;
+	font-size:1.5rem;
+	padding:10px;
+	color:black;
+	border-bottom:1px solid #dfb0b0;
+	z-index:1000;
+}
+.settingspanel:hover{
+background:rgb(255,255,255);
+}
+.setimg{
+	width:70%;
+	padding-top:6px;
+}
+
+#walletVidget{
+	width:50%;
+	background:green;
+	font-size:1.1rem;
+	line-height:1.5;
+	color:white;
+}
+.coin-container{
+	width:100%;
+	height:40px;
+	display: grid;
+	grid-template-columns:50% 50%;
+	justfy-content: end;
+	justify-items: center;
+	align-items: center;
+}
+.coff{
+	padding-left:10px;
+}
+@media screen and (max-width: 452px) and (orientation: portrait){
+	#loginoutput.popi2{
+		width:98%;
+	}
+	#settingspanel{
+	width:100%;
+}
+.settingspanel{
+width:100%;
+}
+#walletVidget{
+	width:100%;
+	}
+}

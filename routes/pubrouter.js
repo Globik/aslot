@@ -20,6 +20,10 @@ pub.get('/rules', async ctx=>{
 	ctx.body = await ctx.render('rules', {});
 })
 
+pub.get('/wallet', async ctx=>{
+	ctx.body = await ctx.render('wallet', {});
+})
+
 pub.get('/subscribe', async ctx => {
     let db = ctx.db;
    // console.log("USER ", articles);
