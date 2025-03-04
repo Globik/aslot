@@ -380,6 +380,39 @@ if(di.state && di.state.length > 0){
 }
 }
 
+function Screenshot2() {
+	if(!localCam) return;
+	let localVideo = gid('localVideo');
+    if(!localVideo)return;
+    let cnv = document.createElement('canvas');
+    let w = 180;
+    let h = 180;
+   
+    let c = cnv.getContext('2d');
+    
+    let ww = localVideo.videoWidth;
+    let hh = localVideo.videoHeight;
+     cnv.width = ww;
+    cnv.height = hh;
+    c.drawImage(localVideo, 0, 0, ww, hh);
+    let imgdata = cnv.toDataURL('image/png', 1.0);
+    /*
+    let file = null;
+let blob = cnv.toBlob(function(blob) {
+				file = new File([blob], 'image.png', { type: 'image/png' });
+				 console.log('file ', file);
+				 //wsend({clientId: userId.value, pile: JSON.stringify(file), type: "file", request: "mediasoup"});
+			}, 'image/png');
+console.log('blob: ', blob)
+   // wsend({clientId: userId.value, file: blob, type: "file", request: "mediasoup"});
+    
+    */
+    cnv.remove();
+    return imgdata;
+    
+}
+
+
 async function startScreenshare() {
   console.log('start screen share');
  // $('#share-screen').style.display = 'none';
@@ -1079,6 +1112,8 @@ async function createTransport(direction) {
 		if(direction == 'send'){
 			
 		$('#send-camera').textContent = "Выйти из чата";
+		 let img_data = Screenshot2();
+		 if(img_data)wsend({ request: 'mediasoup', img_data: img_data, type: 'pic' });
 		}else{
 			let ab = $('#send-camera').getAttribute("data-state");
 		if(ab == "start")wsend({ type: 'add-statistic', subtype: 'consumer', peerId: myPeerId , request: 'mediasoup' });

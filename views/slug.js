@@ -1,5 +1,7 @@
 const { login } = require('./login.js');
 const { footer } = require('./footer.js');
+const { yametrika } = require('./yametrika.js');
+
 const slug = function(n){
 	let { a } = n;
 	return `<!DOCTYPE html><html lang="ru"><head>
@@ -38,10 +40,10 @@ const slug = function(n){
     <script src="https://yandex.ru/ads/system/context.js" async></script>
     -->
     <script async src="https://yastatic.net/share2/share.js"></script>
-    
+    ${yametrika({})}
     </head><body> <main id="somemain"><nav class="vhod">
     <div><a ${n.user?`onclick="logout(this);"`:''} href="${n.user?'#':'#login'}">${n.user?'Выход':'Вход'}</a></div>
-    </nav><a href="/">Home</a>
+    </nav><a href="/">На главную</a>&nbsp;|&nbsp;<a href="/blog">Блог</a>
     <article><h1>${a.name}</h1>${a.txt}</article>
     </main>${login({})}${footer({})}</body></html>`;
 }

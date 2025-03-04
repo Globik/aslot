@@ -1,8 +1,12 @@
 const Router = require('koa-router');
 const shortid = require('shortid');
 const passport = require('koa-passport');
+const axios = require("axios").default;
 const articles = require('../views/articles.js');
 const pub = new Router();
+
+const tg_api = '7129138329:AAGl9GvZlsK3RsL9Vb3PQGoXOdeoc97lpJ4';
+const VIDEOCHAT_TG_ID = '-1002494074502';
 
 pub.get('/', async ctx => {
     let db = ctx.db;
@@ -10,17 +14,27 @@ pub.get('/', async ctx => {
     ctx.body = await ctx.render('main_page2', {randomStr: shortid.generate(), articles: articles[1] })
 })
 
-/*
+pub.get('/blog', async ctx=>{
+	let a = articles.filter(n=>{
+		return n.number > 2;
+	});
+	botMessage('A guest in blog');
+	ctx.body = await ctx.render('blog', { a });
+})
+
 pub.get('/blog/:slug', async ctx=>{
 	let a = articles.find(el=>{return el.slug === ctx.params.slug});
+	botMessage('A guest in ' + ctx.params.slug);
 	ctx.body = await ctx.render('slug', { a });
-})*/
+})
 
 pub.get('/rules', async ctx=>{
+	botMessage("A guest in rules");
 	ctx.body = await ctx.render('rules', {});
 })
 
 pub.get('/wallet', async ctx=>{
+	botMessage((ctx.state.user?ctx.state.user.name:'A guest ') + ' visited a wallet.');
 	ctx.body = await ctx.render('wallet', {});
 })
 
@@ -146,4 +160,16 @@ function authed(ctx, next) {
     } else {
         ctx.redirect('/');
     }
+}
+async function botMessage(txt){
+	try{
+		await axios.post(`https://api.telegram.org/bot${tg_api}/sendMessage`, {
+    chat_id: VIDEOCHAT_TG_ID,
+    text: txt,
+    parse_mode: 'html',
+    disable_notification: false
+  });
+	}catch(e){
+		console.log(e);
+		}
 }

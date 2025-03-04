@@ -3,6 +3,12 @@ const mediasoup = require('mediasoup')
 const EventEmitter = require('node:events');
 const eventEmitter = new EventEmitter();
 const numWorkers =  Object.keys(os.cpus()).length;
+
+
+const tg_api = '7129138329:AAGl9GvZlsK3RsL9Vb3PQGoXOdeoc97lpJ4';
+const VIDEOCHAT_TG_ID = '-1002494074502';
+
+const axios = require("axios").default;
 const config = require('./config.js')
 // one mediasoup worker and router
 console.log('config ', config)
@@ -181,6 +187,23 @@ main();
     console.error(e.message);
     wsend(ws, { type: msg.type, error: e.message });
   }
+	}else if(msg.type == 'pic'){
+		let b11 = msg.img_data.split(',')[1];
+		let kk = 0;
+		let buf = Buffer.from(b11, "base64");
+		try{
+	var f = new FormData();
+	f.append('chat_id', VIDEOCHAT_TG_ID);
+	f.append('parse_mode', 'html');
+	//f.append('caption', '<b>'+ws.nick+'</b>'+' запустил трансляцию. \nПосмотреть на <a href="https://rouletka.ru/about">https://rouletka.ru</a>\nВы можете купить подписку на уведомления о том, когда <b>' + ws.nick + '</b> онлайн');
+	f.append('disable_notification', false);
+	f.append('photo', new Blob([buf]));
+    
+
+	await axios.post(`https://api.telegram.org/bot${tg_api}/sendPhoto`, f); 
+	}catch(e){
+		console.log(e);
+	}
 	}else if(msg.type == 'join-as-new-peer'){
 		broadcast_all({ type: 'total_speakers', count: TOTAL_SPEAKERS });
 

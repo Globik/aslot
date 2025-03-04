@@ -1,12 +1,12 @@
+const { yametrika } = require('./yametrika');
 const { login } = require('./login.js');
-const { wallet_v } = require('./wallet_v.js');
-const { yametrika } = require('./yametrika.js');
+const { footer } = require('./footer.js'); 
 
-const wallet = function(n){
+const blog = function(n){
 	return `<!DOCTYPE html><html lang="ru"><head>
     
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-    <title>Wallet</title>
+    <title>Блог</title>
    <meta name="viewport" content="width=device-width,initial-scale=1.0"> 
     
  <!--   <link rel="icon" type="image/png" href="/img3/favicon-96x96.png" sizes="96x96" />
@@ -32,33 +32,36 @@ const wallet = function(n){
 <meta name="description" content="Групповой видеочат на десятерых"/>
     
      <link rel="icon" href="/img/favicon.png"> 
-    
+     <link href="/css/slot2.css" rel="stylesheet">
     <link href="/css/note.css" rel="stylesheet">
-    
     <link href="/css/output.css" rel="stylesheet">
     <link href="/css/login3.css" rel="stylesheet"> 
-     <link href="/css/wallet.css" rel="stylesheet">
     <script src="/js/globalik.js"></script>
     
   
     
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    
    <!-- <script>window.yaContextCb=window.yaContextCb||[]</script>
     <script src="https://yandex.ru/ads/system/context.js" async></script>
     -->
-    <script async src="https://yastatic.net/share2/share.js"></script>
-     <script src="/pwabuilder-sw-register.js"></script>
+    <!-- <script async src="https://yastatic.net/share2/share.js"></script> -->
+    
      ${yametrika({})}
     </head><body> <main id="somemain"><nav class="vhod">
-     <div id="settings" class="ita" onclick="panelOpen(this);"><img class="setimg" src="/img/set2.svg"></div>
-     <div id="settingspanel">
-     ${n.user?'<div class="settingspanel" ><a href="#" onclick="logout(this);">Выход</a></div>':``}
-     </div>
-    </nav><!-- <a href="/" style="padding-left:10px;font-size:1rem;">Назад</a> -->
-    <section id="contentContainer" class="${n.user?'wallet-flex':''}">
-      ${n.user?wallet_v({}):login({ ohne: true })}
-      </section>
+     <div><a ${n.user?`onclick="logout(this);"`:''} href="${n.user?'#':'#login'}">${n.user?'Выход':'Вход'}</a></div>
+    </nav><a href="/" style="padding-left:10px;font-size:1rem;">На главную</a> 
+    <section id="articlesArea">${n.a?get_articles(n.a):'<b>Нет пока статей.</b>'}</section>
+      ${login({ })}
+      
 </main><script src="/js/login.js"></script><script src="/js/wallet.js"></script>
-    </body></html>`;
+    ${footer({})} </body></html>`;
 }
-module.exports = { wallet }
+module.exports = { blog }
+function get_articles(arr){
+	let s = '';
+	arr.forEach(function(el, i){
+		s+=`<article><h2>${el.name}</h2><br><br>
+		<p>${el.txt.substring(0,400)}...</p><p><a href="/blog/${el.slug}">Читать дальше</a></p></article><hr>`;
+	});
+	return s;
+}

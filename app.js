@@ -25,6 +25,9 @@ const PS = require('pg-pubsub');
 const pgtypes = require('pg').types;
 const render = require('./libs/render.js');
 
+const tg_api = '7129138329:AAGl9GvZlsK3RsL9Vb3PQGoXOdeoc97lpJ4';
+const VIDEOCHAT_TG_ID = '-1002494074502';
+
 const serve = require('koa-static');
 const session = require('koa-session');
 const pubrouter = require('./routes/pubrouter.js');
@@ -183,6 +186,7 @@ var k=1;
 	// ws.room_id="alik";
 	 k++;
   ws.on("pong", heartbeat);
+  botMessage('A guest joined chatikon.ru');
    broadcast_all({ type: "howmuch", value: wss.clients.size, count: TOTALSPEAKERS, consumerscount: TOTALCONSUMERS });
    let msg;
 	ws.on('message', async function onMessage(msgi){
@@ -275,4 +279,16 @@ setTimeout(function(){
 	
 })
 }, 1000)
+}
+async function botMessage(txt){
+	try{
+		await axios.post(`https://api.telegram.org/bot${tg_api}/sendMessage`, {
+    chat_id: VIDEOCHAT_TG_ID,
+    text: txt,
+    parse_mode: 'html',
+    disable_notification: false
+  });
+	}catch(e){
+		console.log(e);
+		}
 }

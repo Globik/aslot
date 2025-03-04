@@ -12,7 +12,7 @@ main{
 }
 pre{
 	width:99%;
-	overflow-x:scroll;
+	oerflow-x:scroll;
 }
 section.table{
 	width:99%;
@@ -44,4 +44,8 @@ code{
 	footer{
 		margin:5px;
 	}
+	pre{
+	width:99%;
+	overflow-x:scroll;
+}
 }

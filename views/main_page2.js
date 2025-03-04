@@ -1,5 +1,7 @@
 const { login } = require('./login.js');
 const { footer } = require('./footer.js');
+const { yametrika } = require('./yametrika.js');
+
 const main_page2 = function(n){
 	return `<!DOCTYPE html><html lang="ru"><head>
     
@@ -46,6 +48,7 @@ const main_page2 = function(n){
     -->
     <script async src="https://yastatic.net/share2/share.js"></script>
      <script src="/pwabuilder-sw-register.js"></script>
+     ${yametrika({})}
     </head><body> <main id="somemain"><nav class="vhod">
     <b>online: </b><span id="onlineCount">0</span> <span>|</span> <b>Спикеров: </b><span id="totalSpeakers">0</span> <span>|</span> <b>Подписчиков: </b><span id="consumerCount">0</span>
     <div><a ${n.user?`onclick="logout(this);"`:''} href="${n.user?'#':'#login'}">${n.user?'Выход':'Вход'}</a></div>
@@ -75,11 +78,3 @@ ${login({})}
 }
 module.exports = { main_page2 }
 
-function get_articles(arr){
-	let s = '';
-	arr.forEach(function(el, i){
-		s+=`<h2>${el.name}</h2><br><br>
-		<p>${el.txt.substring(0,400)}...</p><p><a href="/blog/${el.slug}">Читать дальше</a></p><hr>`;
-	});
-	return s;
-}

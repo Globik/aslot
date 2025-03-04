@@ -1,5 +1,7 @@
 const { footer } = require('./footer.js');
 const { login } = require('./login.js');
+const { yametrika } = require('./yametrika.js');
+
 const rules = function(n){
 	let { a } = n;
 	return `<!DOCTYPE html><html lang="ru"><head>
@@ -38,10 +40,10 @@ const rules = function(n){
     <script src="https://yandex.ru/ads/system/context.js" async></script>
     -->
     <script async src="https://yastatic.net/share2/share.js"></script>
-    
+    ${yametrika({})}
     </head><body> <main id="somemain"><nav class="vhod">
     <div><a ${n.user?`onclick="logout(this);"`:''} href="${n.user?'#':'#login'}">${n.user?'Выход':'Вход'}</a></div>
-    </nav><a href="/">Home</a>
+    </nav><a href="/">На главную</a>
     <article><h1>Правила пользования групповым видеочатом</h1>
    <p> 1. <strong>Уважение к другим участникам</strong>  
    - Не допускается оскорбление, унижение, дискриминация или травля других пользователей.  
