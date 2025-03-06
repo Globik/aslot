@@ -188,6 +188,7 @@ main();
     wsend(ws, { type: msg.type, error: e.message });
   }
 	}else if(msg.type == 'pic'){
+		if(process.env.DEVELOPMENT == 'yes')return;
 		let b11 = msg.img_data.split(',')[1];
 		let kk = 0;
 		let buf = Buffer.from(b11, "base64");

@@ -281,6 +281,7 @@ setTimeout(function(){
 }, 1000)
 }
 async function botMessage(txt){
+	if(process.env.DEVELOPMENT == 'yes')return;
 	try{
 		await axios.post(`https://api.telegram.org/bot${tg_api}/sendMessage`, {
     chat_id: VIDEOCHAT_TG_ID,

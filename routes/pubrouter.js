@@ -34,7 +34,7 @@ pub.get('/rules', async ctx=>{
 })
 
 pub.get('/wallet', async ctx=>{
-	botMessage((ctx.state.user?ctx.state.user.name:'A guest ') + ' visited a wallet.');
+	botMessage((ctx.state.user?ctx.state.user.bname:'A guest ') + ' visited a wallet.');
 	ctx.body = await ctx.render('wallet', {});
 })
 
@@ -162,6 +162,7 @@ function authed(ctx, next) {
     }
 }
 async function botMessage(txt){
+	if(process.env.DEVELOPMENT == 'yes')return;
 	try{
 		await axios.post(`https://api.telegram.org/bot${tg_api}/sendMessage`, {
     chat_id: VIDEOCHAT_TG_ID,
