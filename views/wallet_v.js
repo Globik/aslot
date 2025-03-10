@@ -8,7 +8,7 @@ const wallet_v = function(n){
 	<form name="btcform" method="post" onsubmit="sendBTC(this);">
 	<div><input type="text" name="btcadr" placeholder="btc address" required/></div>
 	<div><input type="number" name="btcamount" placeholder="amount" required /></div>
-	<div><button>Отправить</button>
+	<div><button>Отправить</button></div>
 	</form>
 	</section>
 	<div onclick="getBTCadr(this);">Получить</div>
@@ -18,9 +18,11 @@ const wallet_v = function(n){
 	<section>
 	<div onclick="createLTCWallet(this);">Создать LTC кошелек</div>
 	<div>Отправить</div>
-	<section><form name="ltcform" method="post" onsubmit="sendLTC(this);"><div><input name="ltcadr" type="text" placeholder="ltc address" required/></div>
+	<section><form name="ltcform" method="post" onsubmit="sendLTC(this);">
+	<div><input name="ltcadr" type="text" placeholder="ltc address" required/></div>
 	<div><input name="ltcamount" type="number" placeholder="amount" required /></div>
-	<div><button>Отправить</button></form>
+	<div><button>Отправить</button></div>
+	</form>
 	</section>
 	<div>Получить</div>
 	<section><div>some address</div><div onclick="copyLTCadr(this);">Copy</div></section>
@@ -31,7 +33,7 @@ const wallet_v = function(n){
 	<div>Отправить</div>
 	<section><form name="ethform" method="post" onsubmit="sendETH(this);"><div><input name="ethadr" type="text" placeholder="eth address" required/></div>
 	<div><input name="ethamount" type="number" placeholder="amount" required /></div>
-	<div><button>Отправить</button></form>
+	<div><button>Отправить</button></div></form>
 	</section>
 	<div>Получить</div>
 	<section><div>some address</div><div onclick="copyETHadr(this);">Copy</div></section>
@@ -40,9 +42,12 @@ const wallet_v = function(n){
 	<section>
 	<div onclick="createUSDTWallet(this);">Создать USDT кошелек</div>
 	<div>Отправить</div>
-	<section><form name="usdtform" method="post" onsubmit="sendUSDT(this);"><div><input name="usdtadr" type="text" placeholder="usdt address" required/></div>
+	<section>
+	<form name="usdtform" method="post" onsubmit="sendUSDT(this);">
+	<div><input name="usdtadr" type="text" placeholder="usdt address" required/></div>
 	<div><input name="usdtamount" type="number" placeholder="amount" required /></div>
-	<div><button>Отправить</button</form>
+	<div><button>Отправить</button></div>
+	</form>
 	</section>
 	<div>Получить</div>
 	<section><div>some address</div><div onclick="copyUSDTadr(this);">Copy</div></section>
@@ -51,9 +56,12 @@ const wallet_v = function(n){
 	<section>
 	<div onclick="createUSDCWallet(this);">Создать USDC кошелек</div>
 	<div>Отправить</div>
-	<section><form name="usdcform" method="post" onsubmit="sendUSDC(this);"><div><input name="usdcadr" type="text" placeholder="usdc address" required/></div>
+	<section>
+	<form name="usdcform" method="post" onsubmit="sendUSDC(this);">
+	<div><input name="usdcadr" type="text" placeholder="usdc address" required/></div>
 	<div><input name="usdcamount" type="number" placeholder="amount" required /></div>
-	<div><button>Отправить</button></form>
+	<div><button>Отправить</button></div>
+	</form>
 	</section>
 	<div>Получить</div>
 	<section><div>some address</div><div onclick="copyUSDCadr(this);">Copy</div></section>

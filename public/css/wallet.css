@@ -132,6 +132,19 @@ background:rgb(255,255,255);
 .coff{
 	padding-left:1px;
 }
+section > section{
+	width:100%;
+	background:red;
+}
+section form{
+	wdth:100%;
+	background:violet;
+	padding:20px;
+}
+section form input[type=text]{
+	width:98%;
+	height:40px;
+}
 @media screen and (max-width: 452px) and (orientation: portrait){
 	#loginoutput.popi2{
 		width:98%;
