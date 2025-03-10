@@ -18,8 +18,8 @@ done(e)
 }
 })
 
-passport.use(new LocalStrategy({usernameField:'username',passwordField:'password'}, (username, password, done)=>{
-	console.log("USERNAME AND PASSWORD: ",username,password);
+passport.use(new LocalStrategy({usernameField:'username', passwordField:'password'}, (username, password, done)=>{
+	console.log("USERNAME AND PASSWORD: ", username, password);
 process.nextTick(async()=>{ 
 	try{ 
 let user=await db.query('select id from users where bname=$1 and pwd=$2',[username, password]) 

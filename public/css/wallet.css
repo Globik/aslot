@@ -129,22 +129,81 @@ background:rgb(255,255,255);
 	justify-items: end;
 	align-items: center;
 }
+.coin-container.odd{
+	background:#90afee;
+}
+.coin-container.even{
+	background:#90afee;
+}
 .coff{
 	padding-left:1px;
 }
 section > section{
 	width:100%;
-	background:red;
 }
-section form{
+
+section form.f{
 	wdth:100%;
-	background:violet;
+	background:#eede82;
 	padding:20px;
 }
 section form input[type=text]{
 	width:98%;
 	height:40px;
 }
+section form input[type=number]{
+	height:40px;
+	margin-top:3px;
+}
+section form button{
+	height:40px;
+	margin-top:3px;
+	width:100%;
+	font-weight:bold;
+	font-size:1.1rem;
+	height:40px;
+	pdding:15px;
+}
+.setka{
+	padding:20px;
+	text-align:center;	
+	}
+	.setka.create{
+		background:green;
+	}
+.setka.send{
+	background:orange;
+}
+.setka.receive{
+	background:#27653e;
+}
+.setka.copy{
+	background:#4caf50;
+}
+.setka.adr{
+	background:white;
+	border:1px solid lightgreen;
+	color:black;
+	overflow-x: scroll;
+}
+
+
+@keyframes puls {
+    from {
+        background: green;
+    }
+    to {
+        background: lightgreen;
+    }
+}
+
+div.puls,form.puls{
+	animation-name: puls;
+    animation-duration: 1s;
+    animation-direction: alternate;
+    animation-iteration-count: infinite;
+}
+
 @media screen and (max-width: 452px) and (orientation: portrait){
 	#loginoutput.popi2{
 		width:98%;
@@ -167,6 +226,9 @@ width:100%;
 	}
 	.modal-body form{
 		height:auto;
+		
+	}
+	.setka{
 		
 	}
 }

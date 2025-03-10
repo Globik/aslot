@@ -42,23 +42,25 @@ const wallet = function(n){
     
   
     
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <!--  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script> -->
    <!-- <script>window.yaContextCb=window.yaContextCb||[]</script>
     <script src="https://yandex.ru/ads/system/context.js" async></script>
     -->
     <script async src="https://yastatic.net/share2/share.js"></script>
      <script src="/pwabuilder-sw-register.js"></script>
-     ${yametrika({})}
+     ${process.env.DEVELOPMENT=='yes'?'':yametrika({})}
     </head><body> <main id="somemain"><nav class="vhod">
      <div id="settings" class="ita" onclick="panelOpen(this);"><img class="setimg" src="/img/set2.svg"></div>
      <div id="settingspanel">
      ${n.user?'<div class="settingspanel" ><a href="#" onclick="logout(this);">Выход</a></div>':``}
      </div>
     </nav><!-- <a href="/" style="padding-left:10px;font-size:1rem;">Назад</a> -->
+    <input type="hidden" id="userId" value="${n.user?n.user.id:'0'}" />
+	<input type="hidden" id="userName" value="${n.user?n.user.bname:null}" />
     <section id="contentContainer" class="${n.user?'wallet-flex':''}">
       ${n.user?wallet_v({}):login({ ohne: true })}
       </section>
-</main><script src="/js/login.js"></script><script src="/js/wallet.js"></script>
+</main><script src="/js/login.js"></script>${n.user?'<script src="/js/wallet.js"></script>':''}
     </body></html>`;
 }
 module.exports = { wallet }

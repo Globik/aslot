@@ -143,6 +143,24 @@ pub.post("/api/deleteList", async ctx=>{
 	ctx.body = { message: "OK, deleted"}
 })
 
+pub.post('/api/sendCoin', auth, async ctx=>{
+	console.log('body : ', ctx.request.body);
+	let { wallet, adr, amount, userid, username } = ctx.request.body;
+	if(!wallet || !adr || !amount)ctx.throw(400, 'Not enough data.');
+	ctx.body = { info: ctx.request.body };
+})
+pub.post('/api/createWallet', auth, async ctx=>{
+	let a = ctx.request.body;
+	console.log(a);
+	let { wallet, userid, username } = ctx.request.body;
+	if(!wallet)ctx.throw(400, 'No wallet');
+	ctx.body = {info: a };
+})
+pub.post('/api/createAddresse', auth, async ctx=>{
+	let { wallet, userid, username } = ctx.request.body;
+	if(!wallet)ctx.throw(400, 'No wallet');
+	ctx.body = { info: ctx.request.body };
+})
 module.exports = pub;
 
 function auth(ctx, next) {

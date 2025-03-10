@@ -1,5 +1,5 @@
 var isOpen = false;
-
+var userId = gid('userId');
 function panelOpen(el){
 			var settingspanel = document.getElementById("settingspanel");
 			if(!isOpen){
@@ -10,3 +10,145 @@ function panelOpen(el){
 				isOpen = false;
 			}
 		}
+		let kk = 0;
+function openSection(el){
+	let c = el.getAttribute('data-section');
+	const section = gid(`${c}`);
+	let state = el.getAttribute('data-state');
+	let b = el.getAttribute('data-span');
+	let arrow = gid(`${b}`);
+	if(state == 'close'){
+		section.style.display = 'block';
+		el.setAttribute('data-state', 'open');
+		arrow.innerHTML = '&#9650;';
+		let dataForm = el.getAttribute('data-form');
+		if(dataForm){
+			let su = gid(`${dataForm}`);
+			if(su){
+				su.reset();
+				su.setAttribute('data-click', 'no');
+			}
+		}
+		let wallet = el.getAttribute('data-wallet');
+		let isClicked = el.getAttribute('data-click');
+		let adr = el.getAttribute('data-receiver');
+		let addresse = gid(`${adr}`);
+		//alert(4);
+		console.log(adr,' ', isClicked,' ',wallet);
+		if(adr&&isClicked&&wallet){
+			let entry = localStorage.getItem(wallet);
+			if(entry){
+				addresse.textContent = entry;
+			}else{
+			if(isClicked == 'yes') return;
+			let data = {};
+			data.wallet = wallet;
+			data.userid = userId.value;
+			data.username = userName.value;
+			vax('post','/api/createAddresse', data, on_create_addresse, on_create_wallet_error, el, false);
+	el.setAttribute('data-click', 'yes');
+	el.classList.add('puls');
+}
+		}
+	}else{
+		section.style.display = 'none';
+		el.setAttribute('data-state', 'close');
+		el.setAttribute('data-click', 'yes');
+		arrow.innerHTML = '&#9660;';
+	}
+}
+
+function on_create_addresse(l, ev){
+	ev.classList.remove('puls');
+	if(l.error){
+		note({ content: l.error, type: 'error', time: 5 });
+		ev.setAttribute('data-click', 'no');
+		return;
+	}
+	let adr = ev.getAttribute('data-receiver');
+	let wallet = ev.getAttribute('data-wallet');
+	let addresse = gid(`${adr}`);
+	kk++;
+	addresse.textContent = l.addresse?l.addresse:'some empty addresse '+kk;
+	note({ content: l.info, type: 'info', time: 5 });
+	/*
+	 localStorage.setItem(wallet, l.addresse);
+	 */ 
+}
+
+function createWallet(el){
+	const was = el.getAttribute('data-wallet');
+	let isClicked = el.getAttribute('data-click');
+	if(isClicked && isClicked == 'yes') return;
+	//alert(was);
+	let d = {};
+	d.wallet = was;
+	d.userid = userId.value;
+	d.username = userName.value;
+	vax('post','/api/createWallet', d, on_create_wallet, on_create_wallet_error, el, false);
+	el.setAttribute('data-click', 'yes');
+	el.classList.add('puls');
+}
+function on_create_wallet(l, ev){
+	ev.classList.remove('puls');
+	if(l.error){
+		//ev.disabled = false;
+		let a = ev.getAttribute('data-click');
+		if(a && a == 'yes') a.setAttribute('data-click', 'no');
+		note({ content: l.error, type: 'error', time: 5 });
+		return;
+	}
+	console.log('info: ', l.info);
+	note({ content: l.info.wallet, type: 'info', time: 5 });
+	if(!ev.name){
+		ev.remove();
+	}else{
+		ev.reset();
+	}
+	
+} 
+function on_create_wallet_error(l, ev){
+	note({ content: l, type: 'error', time: 5 });
+	ev.classList.remove('puls');
+	//ev.disabled = false;
+	let a = ev.getAttribute('data-click');
+	if(a && a == 'yes') a.setAttribute('data-click', 'no');
+}
+function sendCoin(el){
+	try{
+	//alert(el.name+' '+el.adr.value+' '+el.amount.value);
+	let isClicked = el.getAttribute('data-click');
+	if(isClicked && isClicked == 'yes') return false;
+	let d = {};
+	d.wallet = el.name;
+	d.adr = el.adr.value;
+	d.amount = el.amount.value;
+	d.userid = userId.value;
+	d.username = userName.value;
+	vax('post','/api/sendCoin', d, on_create_wallet, on_create_wallet_error, el, false);
+	el.classList.add('puls');
+	//el.disabled = true;
+	el.setAttribute('data-click', 'yes');
+	return false;
+}catch(err){
+	alert(err);
+	return false;
+}
+}
+function copyAdr(el){
+	let content = el.getAttribute('data-receiver');
+	//alert(content);
+	let a = gid(`${content}`);
+	let b = a.textContent;
+	if(!b)return;
+	navigator.clipboard.writeText(b).then(function(){
+		note({ content: "OK, copied!", type: "info", time: 5 });
+	}, function(err){
+		//alert(err);
+		note({ content: err, type: "error", time: 5 });
+		console.log(err);
+	});
+}
+/*
+ {btcw:'aaa', isbtc: true, ltcw: 'aa', isltc: true, ethw: 'aa', iseth: true, usdtw: 'aaa', isusdt: true, usdcw: 'v', isusdc: true }
+ */
