@@ -156,7 +156,13 @@ function sendCoin(el){
 		 note({ content: 'Не валидный адрес!', type: 'error', time: 5 });
 		 return false;
 	 }
- }else{}
+ }else{
+	 valid = WAValidator.validate(d.adr, 'ethereum');
+	 if(!valid){
+		 note({ content: 'Не валидный адрес!', type: 'error', time: 5 });
+		 return false;
+	 }
+ }
 	d.amount = el.amount.value;
 	d.userid = userId.value;
 	d.username = userName.value;
@@ -184,6 +190,18 @@ function copyAdr(el){
 		console.log(err);
 	});
 }
-/*
- {btcw:'aaa', isbtc: true, ltcw: 'aa', isltc: true, ethw: 'aa', iseth: true, usdtw: 'aaa', isusdt: true, usdcw: 'v', isusdc: true }
- */
+async function check(){
+	const wallet_id = 'ETHviSjvcPsm4epXYza7yMAKaTrw8UmFM3mEbNq91ApGgBUMQceDe';
+	const url = 'https://api.bitaps.com/eth/testnet/v1/wallet/state/' + wallet_id;
+	try {
+    const response = await fetch(url);
+    if (!response.ok) {
+      throw new Error(`Response status: ${response.status}`);
+    }
+
+    const json = await response.json();
+    console.log(json);
+  } catch (error) {
+    console.error(error.message);
+  }
+}

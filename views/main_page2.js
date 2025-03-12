@@ -72,6 +72,7 @@ ${n.articles.txt}
 
 </main>
 ${login({})}
+<script src="/js/login.js"></script>
   <script src="/js/soup4.js"></script>
   ${footer({})}
     </body></html>`;
