@@ -47,6 +47,7 @@ const wallet = function(n){
     <script src="https://yandex.ru/ads/system/context.js" async></script>
     -->
     <script async src="https://yastatic.net/share2/share.js"></script>
+    ${n.user?'<script src="/js/wallet-address-validator.min.js"></script>':''}
      <script src="/pwabuilder-sw-register.js"></script>
      ${process.env.DEVELOPMENT=='yes'?'':yametrika({})}
     </head><body> <main id="somemain"><nav class="vhod">
@@ -58,7 +59,7 @@ const wallet = function(n){
     <input type="hidden" id="userId" value="${n.user?n.user.id:'0'}" />
 	<input type="hidden" id="userName" value="${n.user?n.user.bname:null}" />
     <section id="contentContainer" class="${n.user?'wallet-flex':''}">
-      ${n.user?wallet_v({}):login({ ohne: true })}
+      ${n.user?wallet_v(n):login({ ohne: true })}
       </section>
 </main><script src="/js/login.js"></script>${n.user?'<script src="/js/wallet.js"></script>':''}
     </body></html>`;

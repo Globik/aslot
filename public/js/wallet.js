@@ -12,6 +12,14 @@ function panelOpen(el){
 		}
 		let kk = 0;
 function openSection(el){
+	let criddata = el.getAttribute('data-cr');
+		if(criddata){
+		let bel = gid(`${criddata}`);
+		if(bel.style.display == 'block'){
+			note({ content: 'Сперва создайте кошелек!', type: 'error', time: 5 });
+			return;
+		}
+	}
 	let c = el.getAttribute('data-section');
 	const section = gid(`${c}`);
 	let state = el.getAttribute('data-state');
@@ -69,11 +77,11 @@ function on_create_addresse(l, ev){
 	let wallet = ev.getAttribute('data-wallet');
 	let addresse = gid(`${adr}`);
 	kk++;
-	addresse.textContent = l.addresse?l.addresse:'some empty addresse '+kk;
+	addresse.textContent = l.address?l.address:'some empty addresse '+kk;
 	note({ content: l.info, type: 'info', time: 5 });
-	/*
-	 localStorage.setItem(wallet, l.addresse);
-	 */ 
+	
+	 localStorage.setItem(wallet, l.address);
+	  
 }
 
 function createWallet(el){
@@ -94,12 +102,12 @@ function on_create_wallet(l, ev){
 	if(l.error){
 		//ev.disabled = false;
 		let a = ev.getAttribute('data-click');
-		if(a && a == 'yes') a.setAttribute('data-click', 'no');
+		if(a && a == 'yes') ev.setAttribute('data-click', 'no');
 		note({ content: l.error, type: 'error', time: 5 });
 		return;
 	}
 	console.log('info: ', l.info);
-	note({ content: l.info.wallet, type: 'info', time: 5 });
+	note({ content: l.info, type: 'info', time: 5 });
 	if(!ev.name){
 		ev.remove();
 	}else{
@@ -112,16 +120,43 @@ function on_create_wallet_error(l, ev){
 	ev.classList.remove('puls');
 	//ev.disabled = false;
 	let a = ev.getAttribute('data-click');
-	if(a && a == 'yes') a.setAttribute('data-click', 'no');
+	if(a && a == 'yes') ev.setAttribute('data-click', 'no');
 }
 function sendCoin(el){
 	try{
+		let criddata = el.getAttribute('data-cr');
+		if(criddata){
+		let bel = gid(`${criddata}`);
+		if(bel.style.display == 'block'){
+			note({ content: 'Сперва создайте кошелек!', type: 'error', time: 5 });
+			return false;
+		}
+	}
 	//alert(el.name+' '+el.adr.value+' '+el.amount.value);
 	let isClicked = el.getAttribute('data-click');
 	if(isClicked && isClicked == 'yes') return false;
-	let d = {};
+	let d = {}; var valid;
 	d.wallet = el.name;
 	d.adr = el.adr.value;
+	if(d.wallet == 'btc'){
+	 valid = WAValidator.validate(d.adr, 'bitcoin');
+	 if(!valid){
+		 note({ content: 'Не валидный адрес!', type: 'error', time: 5 });
+		 return false;
+	 }
+ }else if(d.wallet == 'eth'){
+	 valid = WAValidator.validate(d.adr, 'ethereum');
+	 if(!valid){
+		 note({ content: 'Не валидный адрес!', type: 'error', time: 5 });
+		 return false;
+	 }
+ }else if(d.wallet == 'ltc'){
+	  valid = WAValidator.validate(d.adr, 'litecoin');
+	 if(!valid){
+		 note({ content: 'Не валидный адрес!', type: 'error', time: 5 });
+		 return false;
+	 }
+ }else{}
 	d.amount = el.amount.value;
 	d.userid = userId.value;
 	d.username = userName.value;

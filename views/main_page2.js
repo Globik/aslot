@@ -53,9 +53,9 @@ const main_page2 = function(n){
     <b>online: </b><span id="onlineCount">0</span> <span>|</span> <b>Спикеров: </b><span id="totalSpeakers">0</span> <span>|</span> <b>Подписчиков: </b><span id="consumerCount">0</span>
     <div><a ${n.user?`onclick="logout(this);"`:''} href="${n.user?'#':'#login'}">${n.user?'Выход':'Вход'}</a></div>
     </nav>
-    <a href="/wallet" style="padding-left:10px;font-size:1rem;">Криптокошелек</a>
+    ${n.user?'<a href="/wallet" style="padding-left:10px;font-size:1rem;">Криптокошелек</a>':''}
     <div class="btns">
-    <header>Пoкер-рум</header>
+    <header>Групповой видеочат</header>
     <button id="send-camera" disabled="true" data-state="start" onclick="sendCameraStreams(this)">
       Войти в чат
     </button>
