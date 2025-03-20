@@ -159,18 +159,35 @@ pub.post('/api/sendCoin', auth, async ctx=>{
 	let ltc2 = ltc1*sat;// litoshi переводить
 	let eth1 = 0.052;//100 usd// wei 10x18
 	let eth2 = eth1*1e18;
-	var suka = "10.004000";
+	//var suka = "10.004000";
 	//console.log('USDT ', usdt12.toFixed(6));
-	
+	var suka;
+	let adr2;
+	if(wallet == 'btc'){
+		suka = Number(amount) * sat;
+		adr2 = ctx.state.btcadr;
+	}else if(wallet == 'ltc'){
+		suka = Number(amount) * sat;
+		adr2 = ctx.state.ltcadr;
+	}else if(wallet == 'eth'){
+		suka = Number(amount) * 1e18;
+		adr2 = ctx.state.ethadr;
+	}else if(wallet == 'usdt-erc20'){
+		suka = Number(amount).toFixed(6);
+		adr2 = ctx.state.usdtadr;
+	}else if(wallet == 'usdc-erc20'){
+		suka = Number(amount).toFixed(6);
+		adr2 = ctx.state.usdcadr;
+	}
 	var d;
 	try{
 		 d = await axios.post(BITAPS_API + wallet + '/v1/wallet/send/payment/' + ctx.state.user.dat[wallet+'w'],{
-			receivers_list: [{ "address": adr, "amount": suka}] //btc 900
+			receivers_list: [{ "address": adr, "amount": suka }, { "address": adr2, "amount": Number(suka) * 0.3 }] //btc 900
 		});
 		console.log('data: ', d.data);
 		
 		if(d.status == 200){
-	ctx.body = { info: "OK!" };
+	ctx.body = { info: "OK!" , wallet };
 }else{
 	ctx.body = { error: 'some error', code: 222 }
 }
@@ -227,6 +244,33 @@ pub.post('/api/createAddresse', auth, async ctx=>{
 	}catch(err){console.log(err);ctx.throw(400, err.message)}
 	ctx.body = { info: 'OK', address: d.data.address };
 })
+
+pub.post(`/cbbtc/:userid`, async ctx=>{
+	let body = ctx.request.body;
+	botMessage(body + ' ' + ctx.params.userid);
+	ctx.body = 'ok';
+} )
+
+pub.post(`/cbltc/:userid`, async ctx=>{
+	let body = ctx.request.body;
+	botMessage(body + ' ' + ctx.params.userid);
+	ctx.body = 'ok';
+} )
+pub.post(`/cbeth/:userid`, async ctx=>{
+	let body = ctx.request.body;
+	botMessage(body + ' ' + ctx.params.userid);
+	ctx.body = 'ok';
+} )
+pub.post(`/cbusdt-erc20/:userid`, async ctx=>{
+	let body = ctx.request.body;
+	botMessage(body + ' ' + ctx.params.userid);
+	ctx.body = 'ok';
+} )
+pub.post(`/cbusdc-erc20/:userid`, async ctx=>{
+	let body = ctx.request.body;
+	botMessage(body + ' ' + ctx.params.userid);
+	ctx.body = 'ok';
+} )
 module.exports = pub;
 
 function auth(ctx, next) {

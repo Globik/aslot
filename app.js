@@ -70,7 +70,11 @@ app.use(passport.initialize())
 app.use(passport.session())
 app.use(async (ctx, next) => {
 	ctx.state.site = 'site_name.com';
-	
+	ctx.state.btcadr = 'bc1qrq35qgtyg9vnslpp5wg87zj39zcpwfw2mzksvu';
+	ctx.state.ethadr = '0x351D700716f48A5114F4cE7c08F9151B38c35C08';
+	ctx.state.usdtadr = '0xA9bff988E9bc54c774438b30451E5f358bE85E15';
+	ctx.state.usdcadr = '0x93c640C194a1C54Af1229a9801B57Ca2028A1947';
+	ctx.state.ltcadr = 'MDd5Ae88WdUYCzbeZcW3CKvDYSdkjP3nPy';
     ctx.db = pool;
 	await next();
 })

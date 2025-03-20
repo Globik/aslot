@@ -1,5 +1,7 @@
 var isOpen = false;
 var userId = gid('userId');
+var db;
+var transaction;
 function panelOpen(el){
 			var settingspanel = document.getElementById("settingspanel");
 			if(!isOpen){
@@ -44,9 +46,22 @@ function openSection(el){
 		//alert(4);
 		console.log(adr,' ', isClicked,' ',wallet);
 		if(adr&&isClicked&&wallet){
+			let transi = db.transaction('address');
 			let entry = localStorage.getItem(wallet);
-			if(entry){
-				addresse.textContent = entry;
+			let addresses = transi.objectStore('address');
+			
+			let res = addresses.get(wallet);
+			res.onerror = (event) => {
+				console.log(event);
+  // Handle errors!
+};
+res.onsuccess = (event) => {
+  // Do something with the request.result!
+  console.log(`Name for SSN 444-44-4444 is ${res }`);
+
+			console.log('result ', res);
+			if(res.result&&res.result.address){
+				addresse.textContent = res.result.address;
 			}else{
 			if(isClicked == 'yes') return;
 			let data = {};
@@ -57,6 +72,7 @@ function openSection(el){
 	el.setAttribute('data-click', 'yes');
 	el.classList.add('puls');
 }
+};
 		}
 	}else{
 		section.style.display = 'none';
@@ -81,7 +97,19 @@ function on_create_addresse(l, ev){
 	note({ content: l.info, type: 'info', time: 5 });
 	
 	 localStorage.setItem(wallet, l.address);
-	  
+	 transaction = db.transaction('address', 'readwrite');
+	 let addresses = transaction.objectStore('address');
+	  let book = {
+		  wallet: wallet,
+		  address: l.address
+	  }
+	  let request = addresses.add(book);
+	  request.onsuccess = function(){
+		  console.log('address added success');
+	  }
+	  request.onerror = function(){
+		  console.error('err ', request.error);
+	  }
 }
 
 function createWallet(el){
@@ -113,7 +141,19 @@ function on_create_wallet(l, ev){
 	}else{
 		ev.reset();
 	}
-	
+	if(l.wallet){
+	if(l.wallet == 'btc'){
+		getBalance({walletId: gid('btcHidden'), balanceDiv: 'btcBalance', coin: 'btc' })
+	}else if(l.wallet == 'ltc'){
+getBalance({walletId: gid('ltcHidden'), balanceDiv: 'ltcBalance', coin: 'ltc' })
+}else if(l.wallet == 'eth'){
+	getBalance({walletId: gid('ethHidden'), balanceDiv: 'ethBalance', coin: 'eth' })
+}else if(l.wallet == 'usdt-erc20'){
+	getBalance({walletId: gid('usdtHidden'), balanceDiv: 'usdtBalance', coin: 'usdt-erc20' })
+}else if(l.wallet == 'usdc-erc20'){
+	getBalance({walletId: gid('usdcHidden'), balanceDiv: 'usdcBalance', coin: 'usdc-erc20' })
+}else{}
+}
 } 
 function on_create_wallet_error(l, ev){
 	note({ content: l, type: 'error', time: 5 });
@@ -121,6 +161,7 @@ function on_create_wallet_error(l, ev){
 	//ev.disabled = false;
 	let a = ev.getAttribute('data-click');
 	if(a && a == 'yes') ev.setAttribute('data-click', 'no');
+	
 }
 function sendCoin(el){
 	try{
@@ -190,9 +231,10 @@ function copyAdr(el){
 		console.log(err);
 	});
 }
-async function check(){
-	const wallet_id = 'ETHviSjvcPsm4epXYza7yMAKaTrw8UmFM3mEbNq91ApGgBUMQceDe';
-	const url = 'https://api.bitaps.com/eth/testnet/v1/wallet/state/' + wallet_id;
+async function getBalance({ walletId, balanceDiv, coin }){
+	if(walletId.value == 'null') return;
+	const wallet_id = walletId.value;//'ETHviSjvcPsm4epXYza7yMAKaTrw8UmFM3mEbNq91ApGgBUMQceDe';
+	const url = 'https://api.bitaps.com/' + coin + '/v1/wallet/state/' + wallet_id;
 	try {
     const response = await fetch(url);
     if (!response.ok) {
@@ -201,7 +243,69 @@ async function check(){
 
     const json = await response.json();
     console.log(json);
+    let a = gid(balanceDiv);
+    a.textContent = json.balance_amount;
   } catch (error) {
     console.error(error.message);
   }
 }
+getBalance({walletId: gid('btcHidden'), balanceDiv: 'btcBalance', coin: 'btc' })
+getBalance({walletId: gid('ltcHidden'), balanceDiv: 'ltcBalance', coin: 'ltc' })
+getBalance({walletId: gid('ethHidden'), balanceDiv: 'ethBalance', coin: 'eth' })
+getBalance({walletId: gid('usdtHidden'), balanceDiv: 'usdtBalance', coin: 'usdt-erc20' })
+getBalance({walletId: gid('usdcHidden'), balanceDiv: 'usdcBalance', coin: 'usdc-erc20' })
+let openrequest = indexedDB.open("db", 1);
+openrequest.onupgradeneeded = function(){
+	console.log('upgrade needed');
+	let dbi = openrequest.result;
+	if(!dbi.objectStoreNames.contains('address'));
+	dbi.createObjectStore('address', { keyPath: 'wallet' });
+}
+
+openrequest.onsuccess = function(){
+	 db = openrequest.result;
+	db.onversionchange = function(){
+		db.close();
+		window.location.reload();
+	}
+//	transaction = db.transaction('address', 'readwrite');
+}
+openrequest.onblocked = function(){
+	console.log('blocked');
+}
+openrequest.onerror = function(){
+	console.error(openrequest.error);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
