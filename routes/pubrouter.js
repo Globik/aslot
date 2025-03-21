@@ -182,7 +182,7 @@ pub.post('/api/sendCoin', auth, async ctx=>{
 	var d;
 	try{
 		 d = await axios.post(BITAPS_API + wallet + '/v1/wallet/send/payment/' + ctx.state.user.dat[wallet+'w'],{
-			receivers_list: [{ "address": adr, "amount": suka }, { "address": adr2, "amount": Number(suka) * 0.3 }] //btc 900
+			receivers_list: [{ "address": adr, "amount": suka }, { "address": adr2, "amount": Number(suka) * 0.1 }] //btc 900
 		});
 		console.log('data: ', d.data);
 		
@@ -216,7 +216,7 @@ pub.post('/api/createWallet', auth, async ctx=>{
 	if(!wallet || !userid)ctx.throw(400, 'No wallet');
 	let data;
 	try{
-		data = await axios.post(`${BITAPS_API}${wallet}/v1/create/wallet`, { callback_link: `https://chatikon.ru/cb${wallet}/${userid}` });
+		data = await axios.post(`${BITAPS_API}${wallet}/v1/create/wallet`, { callback_link: `https://chatikon.ru/cb/${wallet}/${userid}` });
 		console.log('data ', data.data, ' ', data.error);
 		if(data.status == 200){
 			//await db.query(`update users set dat=jsonb_insert(dat,'{${wallet}w}','"${data.data.wallet_id}"') where id=$1`, [ userid ]);
@@ -245,32 +245,13 @@ pub.post('/api/createAddresse', auth, async ctx=>{
 	ctx.body = { info: 'OK', address: d.data.address };
 })
 
-pub.post(`/cbbtc/:userid`, async ctx=>{
+pub.post(`/cb/:coin/:userid`, async ctx=>{
 	let body = ctx.request.body;
-	botMessage(body + ' ' + ctx.params.userid);
-	ctx.body = 'ok';
+	let { invoice } = ctx.request.body; 
+	botMessage(body + ' ' + ctx.params.userid + ' ' + ctx.params.coin);
+	ctx.body = invoice;
 } )
 
-pub.post(`/cbltc/:userid`, async ctx=>{
-	let body = ctx.request.body;
-	botMessage(body + ' ' + ctx.params.userid);
-	ctx.body = 'ok';
-} )
-pub.post(`/cbeth/:userid`, async ctx=>{
-	let body = ctx.request.body;
-	botMessage(body + ' ' + ctx.params.userid);
-	ctx.body = 'ok';
-} )
-pub.post(`/cbusdt-erc20/:userid`, async ctx=>{
-	let body = ctx.request.body;
-	botMessage(body + ' ' + ctx.params.userid);
-	ctx.body = 'ok';
-} )
-pub.post(`/cbusdc-erc20/:userid`, async ctx=>{
-	let body = ctx.request.body;
-	botMessage(body + ' ' + ctx.params.userid);
-	ctx.body = 'ok';
-} )
 module.exports = pub;
 
 function auth(ctx, next) {

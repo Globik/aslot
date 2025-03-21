@@ -173,6 +173,31 @@ section form button{
 	}
 .setka.send{
 	background:orange;
+	position:relative;
+}
+.emoinfo{
+	display:inline-block;
+	position:absolute;
+	top:5px;
+	right:15px;
+	border:2px solid white;
+	border-radius:5px;
+	width:30px;
+}
+.emoinfo .tooltiptext{
+visibility:hidden;
+	width:60vw;
+	text-align: center;
+	padding: 5px 0;
+	border-radius:6px;
+	position:absolute;
+	z-index:1;
+	background:black;
+	top:-3px;
+	left:-60vw;
+}
+.emoinfo:hover .tooltiptext{
+	visibility: visible;
 }
 .setka.receive{
 	background:#27653e;

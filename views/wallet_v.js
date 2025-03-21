@@ -10,7 +10,8 @@ const wallet_v = function(n){
 	<section>
 	<div id="crbtc" style="${n.user.dat&&n.user.dat.btcw?'display:none;':'display:block;'}" onclick="createWallet(this);" class="setka create" data-click="no" data-wallet="btc">Создать BTC кошелек</div>
 	<aside id="btcaside" style="display:none;">
-	<div class="setka send"  data-form="idbtc" data-state="close" data-section="btcsectionsend" data-span="sendbtcspan" onclick="openSection(this);">Отправить&nbsp;&nbsp;<span id="sendbtcspan">&#9660;</span></div>
+	<div class="setka send"  data-form="idbtc" data-state="close" data-section="btcsectionsend" data-span="sendbtcspan" onclick="openSection(this);">Отправить&nbsp;&nbsp;<span id="sendbtcspan">&#9660;</span>
+	<div class="emoinfo">&#8505;<span class="tooltiptext">The fee depends on the withdrawal amount:<br>Service fee for Bitcoin instant outgoing 0.00045 BTC</span></div></div>
 	<section id="btcsectionsend" style="display:none;">
 	<form class="f" data-cr="crbtc"  id="idbtc" name="btc" data-click="no" method="post" onsubmit="return sendCoin(this);">
 	<div><input type="text" name="adr" placeholder="btc address" required/></div>
@@ -20,7 +21,7 @@ const wallet_v = function(n){
 	</section>
 	<div class="setka receive" data-cr="crbtc" data-state="close" data-click="no" data-wallet="btc" data-receiver="btcReceiveAdr" data-section="btcsectionreceive" data-span="receivebtcspan" onclick="openSection(this);">Получить&nbsp;&nbsp;<span id="receivebtcspan">&#9660;</span></div>
 	<section id="btcsectionreceive" style="display:none;">
-	<div id="btcReceiveAdr" class="setka adr">some address</div>
+	<div id="btcReceiveAdr" class="setka adr">Генерируем адрес</div>
 	<div data-receiver="btcReceiveAdr" onclick="copyAdr(this);" class="setka copy">Copy</div></section>
 	</section>
 	</aside>
@@ -28,7 +29,8 @@ const wallet_v = function(n){
 	<section>
 	<div id="crltc" style="${n.user.dat&&n.user.dat.ltcw?'display:none;':'display:block;'}" onclick="createWallet(this);" data-click="no" data-wallet="ltc" class="setka create">Создать LTC кошелек</div>
 	<aside id="ltcaside" style="display:none;">
-	<div class="setka send" data-form="idltc" data-state="close" data-section="ltcsectionsend" data-span="sendltcspan" onclick="openSection(this);">Отправить&nbsp;&nbsp;<span id="sendltcspan">&#9660;</span></div>
+	<div class="setka send" data-form="idltc" data-state="close" data-section="ltcsectionsend" data-span="sendltcspan" onclick="openSection(this);">Отправить&nbsp;&nbsp;<span id="sendltcspan">&#9660;</span>
+	<div class="emoinfo">&#8505;<span class="tooltiptext">Service fee 0.0004 LTC, min tx value 0.000000546 LTC + service fee</span></div></div>
 	<section id="ltcsectionsend" style="display:none;">
 	<form class="f" data-cr="crltc" id="idltc" name="ltc" data-click="no" method="post" onsubmit="return sendCoin(this);">
 	<div><input name="adr" type="text" placeholder="ltc address" required/></div>
@@ -38,7 +40,7 @@ const wallet_v = function(n){
 	</section>
 	<div class="setka receive" data-cr="crltc" data-click="no" data-wallet="ltc" data-receiver="ltcReceiveAdr" data-state="close" data-section="ltcsectionreceive" data-span="receiveltcspan" onclick="openSection(this);">Получить&nbsp;&nbsp;<span id="receiveltcspan">&#9660;</span></div>
 	<section id="ltcsectionreceive" style="display:none;">
-	<div id="ltcReceiveAdr" class="setka adr">some address</div>
+	<div id="ltcReceiveAdr" class="setka adr">Генерируем адрес</div>
 	<div data-receiver="ltcReceiveAdr" onclick="copyAdr(this);" class="setka copy">Copy</div></section>
 	</aside>
 	</section>
@@ -46,7 +48,8 @@ const wallet_v = function(n){
 	<section>
 	<div class="setka create" id="creth" data-click="no" style="${n.user.dat&&n.user.dat.ethw?'display:none;':'display:block;'}" onclick="createWallet(this);" data-wallet="eth">Создать ETH кошелек</div>
 	<aside id="ethaside" style="display:none;">
-	<div class="setka send" data-form="ideth" data-state="close" data-section="ethsectionsend" data-span="sendethspan" onclick="openSection(this);">Отправить&nbsp;&nbsp;<span id="sendethspan">&#9660;</span></div>
+	<div class="setka send" data-form="ideth" data-state="close" data-section="ethsectionsend" data-span="sendethspan" onclick="openSection(this);">Отправить&nbsp;&nbsp;<span id="sendethspan">&#9660;</span>
+	<div class="emoinfo">&#8505;<span class="tooltiptext">Service fee 0.0015 ETH, min tx value 0.001 ETH + service fee</span></div></div>
 	<section id="ethsectionsend" style="display:none;">
 	<form class="f" data-cr="creth" id="ideth" name="eth" data-click="no" method="post" onsubmit="return sendCoin(this);">
 	<div><input name="adr" type="text" placeholder="eth address" required/></div>
@@ -55,7 +58,7 @@ const wallet_v = function(n){
 	</section>
 	<div class="setka receive" data-cr="creth" data-click="no" data-wallet="eth" data-receiver="ethReceiveAdr" data-state="close" data-section="ethsectionreceive" data-span="receiveethspan" onclick="openSection(this);">Получить&nbsp;&nbsp;<span id="receiveethspan">&#9660;</span></div>
 	<section id="ethsectionreceive" style="display:none;">
-	<div class="setka adr" id="ethReceiveAdr">some address</div>
+	<div class="setka adr" id="ethReceiveAdr">Генерируем адрес</div>
 	<div class="setka copy" data-receiver="ethReceiveAdr" onclick="copyAdr(this);">Copy</div></section>
 	</aside>
 	</section>
@@ -63,7 +66,8 @@ const wallet_v = function(n){
 	<section>
 	<div class="setka create" id="crusdt" style="${n.user.dat&&n.user.dat['usdt-erc20w']?'display:none;':'display:block;'}" data-click="no" onclick="createWallet(this);" data-wallet="usdt-erc20">Создать USDT кошелек</div>
 	<aside id="usdtaside" style="display:none;">
-	<div class="setka send" data-form="idusdt" data-state="close" data-section="usdtsectionsend" data-span="sendusdtspan" onclick="openSection(this);">Отправить&nbsp;&nbsp;<span id="sendusdtspan">&#9660;</span></div>
+	<div class="setka send" data-form="idusdt" data-state="close" data-section="usdtsectionsend" data-span="sendusdtspan" onclick="openSection(this);">Отправить&nbsp;&nbsp;<span id="sendusdtspan">&#9660;</span>
+	<div class="emoinfo">&#8505;<span class="tooltiptext">Service fee 7 USDT, min tx value 1 USDT + service fee</span></div></div>
 	<section id="usdtsectionsend" style="display:none;">
 	<form class="f" id="idusdt" data-cr="crusdt" name="usdt-erc20" data-click="no" method="post" onsubmit="return sendCoin(this);">
 	<div><input name="adr" type="text" placeholder="usdt address" required/></div>
@@ -73,7 +77,7 @@ const wallet_v = function(n){
 	</section>
 	<div class="setka receive" data-cr="crusdt" data-wallet="usdt-erc20" data-click="no" data-receiver="usdtReceiveAdr" data-state="close" data-section="usdtsectionreceive" data-span="receiveusdtspan" onclick="openSection(this);">Получить&nbsp;&nbsp;<span id="receiveusdtspan">&#9660;</span></div>
 	<section id="usdtsectionreceive" style="display:none;">
-	<div class="setka adr" id="usdtReceiveAdr">some address</div>
+	<div class="setka adr" id="usdtReceiveAdr">Генерируем адрес</div>
 	<div class="setka copy" data-receiver="usdtReceiveAdr" onclick="copyAdr(this);">Copy</div></section>
 	</aside>
 	</section>
@@ -81,7 +85,8 @@ const wallet_v = function(n){
 	<section>
 	<div class="setka create" id="crusdc" style="${n.user.dat&&n.user.dat['usdc-erc20w']?'display:none;':'display:block;'}" data-click="no" onclick="createWallet(this);" data-wallet="usdc-erc20">Создать USDC кошелек</div>
 	<aside id="usdcaside" style="display:none;">
-	<div class="setka send" data-form="idusdc" data-state="close" data-section="usdcsectionsend" data-span="sendusdcspan" onclick="openSection(this);">Отправить&nbsp;&nbsp;<span id="sendusdcspan">&#9660;</span></div>
+	<div class="setka send" data-form="idusdc" data-state="close" data-section="usdcsectionsend" data-span="sendusdcspan" onclick="openSection(this);">Отправить&nbsp;&nbsp;<span id="sendusdcspan">&#9660;</span>
+	<div class="emoinfo">&#8505;<span class="tooltiptext">Service fee 7 USDC, min tx value 1 USDC + service fee</span></div></div>
 	<section id="usdcsectionsend" style="display:none;">
 	<form class="f" data-cr="crusdc" id="idusdc" name="usdc-erc20" data-click="no" method="post" onsubmit="return sendCoin(this);">
 	<div><input name="adr" type="text" placeholder="usdc address" required/></div>
@@ -91,7 +96,7 @@ const wallet_v = function(n){
 	</section>
 	<div class="setka receive" data-cr="crusdc" data-wallet="usdc-erc20" data-receiver="usdcReceiveAdr" data-click="no" data-state="close" data-section="usdcsectionreceive" data-span="receiveusdcspan" onclick="openSection(this);">Получить&nbsp;&nbsp;<span id="receiveusdcspan">&#9660;</span></div>
 	<section id="usdcsectionreceive" style="display:none;">
-	<div class="setka adr" id="usdcReceiveAdr">some address</div>
+	<div class="setka adr" id="usdcReceiveAdr">Генерируем адрес</div>
 	<div class="setka copy" data-receiver="usdcReceiveAdr" onclick="copyAdr(this);">Copy</div></section>
 	</aside>
 	</section>
