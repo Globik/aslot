@@ -1,6 +1,7 @@
 {
-  "name": "Chat828",
-  "short_name": "Chat828",
+  "name": "Bitmom",
+  "short_name": "Bitmom",
+  "id": 2,
   "start_url": "https://chatikon.ru/wallet",
   "icons": [
     {
