@@ -14,7 +14,7 @@ const main_page2 = function(n){
 <link rel="shortcut icon" href="/img3/favicon.ico" />
 <link rel="apple-touch-icon" sizes="180x180" href="/img3/apple-touch-icon.png" /> -->
 <meta name="apple-mobile-web-app-title" content="Chatikon" />
-<link rel="manifest" href="/img3/site.webmanifest" />
+
     
     
     
@@ -47,7 +47,7 @@ const main_page2 = function(n){
     <script src="https://yandex.ru/ads/system/context.js" async></script>
     -->
     <script async src="https://yastatic.net/share2/share.js"></script>
-     <script src="/pwabuilder-sw-register.js"></script>
+     
      ${yametrika({})}
     </head><body> <main id="somemain"><nav class="vhod">
     <b>online: </b><span id="onlineCount">0</span> <span>|</span> <b>Спикеров: </b><span id="totalSpeakers">0</span> <span>|</span> <b>Подписчиков: </b><span id="consumerCount">0</span>
