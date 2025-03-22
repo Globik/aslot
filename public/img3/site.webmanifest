@@ -1,8 +1,9 @@
 {
   "name": "Bitmom",
   "short_name": "Bitmom",
-  "id": 2,
-  "start_url": "https://chatikon.ru/wallet",
+  "id": 4,
+  "version": 4,
+  "start_url": "https://chatikon.ru/wallet?id=4",
   "icons": [
     {
       "src": "https://chatikon.ru/android/android-launchericon-192-192.png",
