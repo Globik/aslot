@@ -508,6 +508,7 @@ async function startScreenshare() {
   vi.play();
   getVideo('/video/girl1.webm');
   getVideo('/video/girl2.webm');
+  getVideo('/video/boy.webm');
 
   } catch (e) {
     console.error('start camera error', e);
