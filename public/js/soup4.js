@@ -499,22 +499,29 @@ async function startScreenshare() {
     // localVideo.play();
      let vi = document.createElement('video');
   // replace the tracks we are sending
-   var li = document.getElementById('remote-video');
+   let li = document.getElementById('remote-video');
   
   vi.srcObject = localCam;
   vi.id = 'localVideo';
   vi.volume = 0;
   li.appendChild(vi);
   vi.play();
-  
-  
+  getVideo('/video/girl1.mp4');
+  getVideo('/video/girl2.mp4');
 
   } catch (e) {
     console.error('start camera error', e);
   }
 
 }
-
+function getVideo(src){
+	 let li = document.getElementById('remote-video');
+	let viw = document.createElement('video');
+	viw.src = src;
+  viw.loop = true;
+  viw.play();
+  li.appendChild(viw);
+}
 // switch to sending video from the "next" camera device in our device
 // list (if we have multiple cameras)
 var curd = undefined;
