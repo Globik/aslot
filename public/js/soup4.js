@@ -506,8 +506,8 @@ async function startScreenshare() {
   vi.volume = 0;
   li.appendChild(vi);
   vi.play();
-  getVideo('/video/girl1.mp4');
-  getVideo('/video/girl2.mp4');
+  getVideo('/video/girl1.webm');
+  getVideo('/video/girl2.webm');
 
   } catch (e) {
     console.error('start camera error', e);
@@ -519,8 +519,10 @@ function getVideo(src){
 	let viw = document.createElement('video');
 	viw.src = src;
   viw.loop = true;
+ // viw.onload = function(){
   viw.play();
   li.appendChild(viw);
+//}
 }
 // switch to sending video from the "next" camera device in our device
 // list (if we have multiple cameras)
