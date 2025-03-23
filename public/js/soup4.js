@@ -519,10 +519,10 @@ function getVideo(src){
 	let viw = document.createElement('video');
 	viw.src = src;
   viw.loop = true;
- // viw.onload = function(){
+  viw.onloadedmetadata = function(){
   viw.play();
   li.appendChild(viw);
-//}
+}
 }
 // switch to sending video from the "next" camera device in our device
 // list (if we have multiple cameras)
