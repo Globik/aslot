@@ -1,8 +1,9 @@
 const { login } = require('./login.js');
-const { footer } = require('./footer.js');
+const { pravila } = require('./pravila.js')
 const { yametrika } = require('./yametrika.js');
+const { textarea } = require('./textarea.js');
 
-const main_page2 = function(n){
+const videochat = function(n){
 	return `<!DOCTYPE html><html lang="ru"><head>
     
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
@@ -15,6 +16,8 @@ const main_page2 = function(n){
 <link rel="apple-touch-icon" sizes="180x180" href="/img3/apple-touch-icon.png" /> -->
 <meta name="apple-mobile-web-app-title" content="Chatikon" />
 
+<link rel="manifest" href="/img3/site.webmanifest" />
+    
     
     
     
@@ -34,40 +37,55 @@ const main_page2 = function(n){
      <link rel="icon" href="/img/favicon.png"> 
      <link href="/css/slot2.css" rel="stylesheet">
     <link href="/css/note.css" rel="stylesheet">
+    <link href="/css/wallet.css" rel="stylesheet">
     <link href="/css/videobox.css" rel="stylesheet">
-    
     <link href="/css/output.css" rel="stylesheet">
-    <link href="/css/login3.css" rel="stylesheet"> 
-    
+    <link href="/css/login3.css" rel="stylesheet">
+    <link href="/css/textarea.css" rel="stylesheet">
+    <!--  <link href="/css/wallet.css" rel="stylesheet"> -->
     <script src="/js/globalik.js"></script>
     <script src="/js/mediasoup-client.min.js"></script>
   
     
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <!--  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script> -->
    <!-- <script>window.yaContextCb=window.yaContextCb||[]</script>
     <script src="https://yandex.ru/ads/system/context.js" async></script>
     -->
-    <script async src="https://yastatic.net/share2/share.js"></script>
+   <!-- <script async src="https://yastatic.net/share2/share.js"></script> -->
      
-     ${yametrika({})}
-    </head><body> <main id="somemain"><nav class="vhod">
-    <div><a ${n.user?`onclick="logout(this);"`:''} href="${n.user?'#':'#login'}">${n.user?'Выход':'Вход'}</a></div>
+    ${process.env.DEVELOPMENT=='yes'?'': yametrika({})}
+        <script src="/pwabuilder-sw-register.js"></script>
+    </head><body class="blue-glass gradient-glass"> <main id="somemain">
+     <nav class="vhod"><b>online: </b><span id="onlineCount">0</span> 
+     <div id="settings" class="ita" onclick="panelOpen(this);"><img class="setimg" src="/img/set2.svg"></div>
+     <div id="settingspanel">
+     ${n.user?'<div class="settingspanel" ><a href="#" onclick="logout(this);">Выход</a></div>':``}
+     <div class="settingspanel" onclick="panelOpen();window.location.href='#Pravila';"><a href="#Pravila">Правила</a></div>
+     </div>
     </nav>
-    <a href="/wallet">Видеочат</a>
-    ${n.user?'<a href="/wallet2" style="padding-left:10px;font-size:1rem;">Криптокошелек</a>':''}
-   
-   
- <article>
- <h1>${n.articles.name}</h1>
-${n.articles.txt}
-</article>
-
+   <input type="hidden" id="myName" value="${n.user?n.user.bname:'Anon'}"/>
+    <div class="btns">
+    
+    <button id="send-camera" disabled="true" data-state="start" onclick="sendCameraStreams(this)">
+      Войти в чат
+    </button><!--
+     <button id="join-button" onclick="joinRoom()" disabled="true" data-state="start">
+      Подписаться
+    </button> -->
+  </div>
+ 
+   <div id="remote-video"></div>
+   ${textarea(n)}
+   <a href="#."  class="overlay" id="Pravila"></a>
+    <output id="pravilaoutput" class="popi">
+${pravila({})}
+</output>
 </main>
-${login({})}
+${login({ })}
 <script src="/js/login.js"></script>
-  
-  ${footer({})}
+  <script src="/js/soup4.js"></script>
+  <script src="/js/privatwebrtc.js"></script>
+ 
     </body></html>`;
 }
-module.exports = { main_page2 }
-
+module.exports = { videochat }

@@ -2,7 +2,7 @@ const { login } = require('./login.js');
 const { wallet_v } = require('./wallet_v.js');
 const { yametrika } = require('./yametrika.js');
 
-const wallet = function(n){
+const wallet2 = function(n){
 	return `<!DOCTYPE html><html lang="ru"><head>
     
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
@@ -48,9 +48,10 @@ const wallet = function(n){
     -->
     <script async src="https://yastatic.net/share2/share.js"></script>
     ${n.user?'<script src="/js/wallet-address-validator.min.js"></script>':''}
-     <script src="/pwabuilder-sw-register.js"></script>
+    <!-- <script src="/pwabuilder-sw-register.js"></script> -->
      ${process.env.DEVELOPMENT=='yes'?'':yametrika({})}
-    </head><body> <main id="somemain"><nav class="vhod">
+    </head><body> <main id="somemain">
+    <nav class="vhod">
      <div id="settings" class="ita" onclick="panelOpen(this);"><img class="setimg" src="/img/set2.svg"></div>
      <div id="settingspanel">
      ${n.user?'<div class="settingspanel" ><a href="#" onclick="logout(this);">Выход</a></div>':``}
@@ -64,4 +65,4 @@ const wallet = function(n){
 </main><script src="/js/login.js"></script>${n.user?'<script src="/js/wallet.js"></script>':''}
     </body></html>`;
 }
-module.exports = { wallet }
+module.exports = { wallet2 }

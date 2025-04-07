@@ -1,0 +1,84 @@
+.header{
+background:rgba(0,0,0,0);
+padding:20px;
+font-size:1rem;
+letter-spacing:1px;
+font-weight:bold;	
+}
+hr{
+	background:rgba(0,0,0,0);
+}
+#chatWrapper{
+	height: 500px;
+	with:100%;
+	background: rgba(0,0,0,0);
+	brder:10px solid green;
+	display:block;
+	position:relative;
+}
+section#chatBox{
+	height:400px;
+	width:100%;
+	background:rgba(0,0,0,0);
+	brder:5px solid red;
+}
+div#chat{
+height:400px;
+	hight:calc(100% - 90px);
+	overflow-y: auto;
+	background:rgba(0,0,0,0);
+}
+div#textArea{
+	height:100px;
+	display:block;
+	position:relative;
+}
+div#text{
+	height:50px;
+	background:rgba(0,0,0,0);
+	brder:1px solid silver;
+	display:flex;
+	align-items: center;
+justify-content: space-around;
+	position:relative;
+}
+.text-span{
+	overflow:auto;
+	font-size:1rem;
+	padding:10px;
+}
+div#text textarea{
+	width:99%;
+	height:80%;
+	padding:10px;
+	display:block;
+	margin-bottom:0;
+	resize:none;
+	border:2px solid rgb(167,57,160);
+	border-radius:6px;
+	box-shadow:4px 4px 4px rgb(167,57,160);
+}
+div#btnBox{
+mrgin:0;
+pdding:0;
+display:flex;
+	height:50px;
+	background:rgba(0,0,0,0);
+	boder:1px solid brown;
+	align-items: center;
+justify-content: end;
+
+	position:relative;
+}
+button.chat-btn{
+	height: 40px;
+	padding-left:5px;
+	padding-right:5px;
+	pdding-top:0;
+	pdding-bottom:0;
+	mrgin-top:0px;
+	mrgin-bottom:0;
+	margin-right:5px;
+	line-height:0;
+	font-size:0.8rem;
+}

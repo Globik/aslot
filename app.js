@@ -183,7 +183,7 @@ var k=1;
 	const ip = req.socket.remoteAddress;
 	setGuest(ip);
 	 ws.isAlive = true;
-	 ws.id=k;//obid();
+	 ws.id = obid();
 	 ws.producer = false;
 	 ws.consumer = false;
 	 wsend(ws, { type: "welcome", yourid: ws.id });
@@ -201,6 +201,9 @@ var k=1;
 if(msg.request == "mediasoup"){
 	handleMediasoup( ws, msg, WebSocket, wss, pool ).mediasoup_t();
 	return;
+} 
+if(msg.target && msg.target !== undefined && msg.target.length !==0){
+	send_to_one(ws, msg.target, msg);
 }
 	});
 	ws.on('close', async function onClose(){
@@ -232,7 +235,17 @@ function broadcast_all(obj) {
     wsend(client, obj);
   });
 }
-
+function send_to_one(ws, target, msg){
+	for(let el of wss.clients){
+		if(el.id == target){
+			wsend(el, msg);
+			return;
+		}
+	}
+	if(msg.type == 'einladen'){
+		wsend(ws, { type: "no_target" });
+	}
+}
 const abstract_key = "7f87b155a0ca434a9d43ac2266264ad6";
 
 const re = /([0-9]{1,3}[\.]){3}[0-9]{1,3}/;

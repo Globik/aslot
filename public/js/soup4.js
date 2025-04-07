@@ -2,12 +2,23 @@
 var videoInput1, videoInput2;
 const $ = document.querySelector.bind(document);
 const $$ = document.querySelectorAll.bind(document);
-
+var isOpen = false;
+function panelOpen(el){
+	//alert(1);
+			var settingspanel = document.getElementById("settingspanel");
+			if(!isOpen){
+			settingspanel.className = "open";
+			isOpen = true;	
+			}else{
+				settingspanel.className = "";
+				isOpen = false;
+			}
+		}
 
 //const localVideo = gid('localVideo');
 
 var kK = 0;
-const myPeerId = uuidv4();
+var myPeerId;// = uuidv4();
 //gid('clientId').textContent = myPeerId;
 var isSocketOpened = false;
 let device,
@@ -23,6 +34,7 @@ let device,
            currentActiveSpeaker = {},
            lastPollSyncData = {},
            consumers = [];
+           var histarget;
 
 //
 // entry point -- called by document.body.onload
@@ -132,7 +144,7 @@ if (window.location.protocol === "https:") {
 	// alert('open');
 	isSocketOpened  = true;
 	 $('#send-camera').disabled = false;
-	 $('#join-button').disabled = false;
+	// $('#join-button').disabled = false;
 //joinRoom()
   };
   sock.onerror = function (e) {
@@ -144,8 +156,8 @@ if (window.location.protocol === "https:") {
 	stopStreams();
 	 joined = false;
 	 $('#onlineCount').textContent = 0;
-	 $('#totalSpeakers').textContent = 0;
-	 $('#consumerCount').textContent = 0;
+//	 $('#totalSpeakers').textContent = 0;
+//	 $('#consumerCount').textContent = 0;
 	 $('#remote-video').innerHTML = '';
   }
    sock.addEventListener('message',function (e) {
@@ -168,8 +180,10 @@ async function on_msg(a){
 	console.log('msg type ', a.type);
 	if(a.type == 'howmuch'){
 		$('#onlineCount').textContent = a.value;
-		$('#totalSpeakers').textContent = a.count;
-		$('#consumerCount').textContent = a.consumerscount;
+	//	$('#totalSpeakers').textContent = a.count;
+	//	$('#consumerCount').textContent = a.consumerscount;
+	}else if(a.type == 'welcome'){
+		myPeerId = a.yourid;
 	}else if(a.type == "Newproducer"){
 		if(!joined){
 			console.log(' not else joined, returning...');
@@ -192,13 +206,18 @@ async function on_msg(a){
 			unsubscribeFromTrack(a.peerId, 'cam-audio')
 		},100);
 	}else if(a.type == 'total_speakers'){
-		$('#totalSpeakers').textContent = a.count;
+	//	$('#totalSpeakers').textContent = a.count;
 	}else if(a.type == 'total_consumers'){
-				$('#consumerCount').textContent = a.count;
+			//	$('#consumerCount').textContent = a.count;
+	}else if(a.type == 'no_target'){
+		note({ content: "Нет в эфире!", type: 'info', time: 5 });
+	}else if(a.type == 'msg'){
+		handlePrivat(a);
 	}else{console.log("unknown type ", a.type);}
 
 	
 }
+
  function sendRequest(obj) {
     return new Promise((resolve, reject) => {
 		if(!isSocketOpened){
@@ -247,13 +266,19 @@ async function on_msg(a){
 }
 
 
+function getPrivat(el){
+	let a = el.getAttribute('data-hispeerid');
+	if(!a)return;
+	wsend({ target: a, type: "einladen", fromid: myPeerId, fromname: gid('myName').value });
+}
+
 
 
 async function joinRoom() {
   if (joined) {
     return;
   }
-$('#join-button').disabled = true;
+//$('#join-button').disabled = true;
   console.log('join room');
   //$('#join-control').style.display = 'none';
 
@@ -494,21 +519,40 @@ async function startScreenshare() {
       video: true,
       audio: true
     });
-   // localVideo.srcObject = localCam;
-   // localVideo.volume = 0;
-    // localVideo.play();
-     let vi = document.createElement('video');
+  
+    let vi = document.createElement('video');
   // replace the tracks we are sending
    let li = document.getElementById('remote-video');
-  
-  vi.srcObject = localCam;
-  vi.id = 'localVideo';
-  vi.volume = 0;
-  li.appendChild(vi);
+  let anotherdiv = document.createElement('div');
+  anotherdiv.setAttribute('data-peerid', myPeerId);
+ 
+  let mynamediv = document.createElement('div');
+  mynamediv.className = "for-name";
+  mynamediv.textContent ="myname";
+  anotherdiv.appendChild(mynamediv);
+  anotherdiv.className = "video-box";
+ vi.srcObject = localCam;
+ vi.id = 'localVideo';
+ vi.volume = 0;
   vi.play();
+ anotherdiv.appendChild(vi);
+ let div2 = document.createElement('div');
+	let input = document.createElement('input');
+	input.setAttribute('type', 'checkbox');
+	input.setAttribute('checked', true);
+	input.setAttribute('data-peer', '123');
+	input.setAttribute( 'onchange' , 'soundControl(this);');
+	div2.appendChild(input);
+ let btndiv = document.createElement('div');
+ btndiv.className = "for-privat";
+ btndiv.innerHTML = `<div class="donbtn" onclick="getPrivat(this);" data-hispeerid="${myPeerId}" ><span class="trubka">&#128222;</span></div>`
+ anotherdiv.appendChild(div2);
+ anotherdiv.appendChild(btndiv);
+  li.appendChild(anotherdiv);
+
   getVideo('/video/girl1.webm');
-  getVideo('/video/girl2.webm');
-  getVideo('/video/boy.webm');
+	getVideo('/video/girl2.webm');
+	getVideo('/video/boy.webm');
 
   } catch (e) {
     console.error('start camera error', e);
@@ -517,12 +561,34 @@ async function startScreenshare() {
 }
 function getVideo(src){
 	 let li = document.getElementById('remote-video');
+	 let anotherdiv = document.createElement('div');
 	let viw = document.createElement('video');
+	anotherdiv.setAttribute('data-peerid', myPeerId);
+	anotherdiv.className = "video-box";
+   let mynamediv = document.createElement('div');
+   mynamediv.className = "for-name";
+  mynamediv.textContent ="myname";
+  anotherdiv.appendChild(mynamediv);
+  let div2 = document.createElement('div');
+  
+	let input = document.createElement('input');
+	input.setAttribute('type', 'checkbox');
+	input.setAttribute('checked', true);
+	input.setAttribute('data-peer', '1234');
+	input.setAttribute( 'onchange' , 'soundControl(this);');
+	div2.appendChild(input);
 	viw.src = src;
   viw.loop = true;
   viw.onloadedmetadata = function(){
   viw.play();
-  li.appendChild(viw);
+  anotherdiv.appendChild(viw);
+  let btndiv = document.createElement('div');
+  btndiv.className = "for-privat";
+ btndiv.innerHTML = `<div class="donbtn" onclick="getPrivat(this);" data-hispeerid="${myPeerId}" ><span class="trubka">&#128222;</span></div>`
+ anotherdiv.appendChild(div2);
+ anotherdiv.appendChild(btndiv);
+
+li.appendChild(anotherdiv);
 }
 }
 // switch to sending video from the "next" camera device in our device
@@ -1010,10 +1076,7 @@ async function closeConsumer(consumer) {
     console.error(e);
   }
 }
-
- //const ICESERVERS = {
-  //iceTransportPolicy:"relay",
-var	iceServersid = [
+const	iceServersid = [
 	{
       "urls": "stun:stun.l.google.com:19302"
     },
@@ -1031,6 +1094,9 @@ var	iceServersid = [
 		]
 		,username:"alik",credential:"1234"}
 		]
+ //const ICESERVERS = {
+  //iceTransportPolicy:"relay",
+
 		//};
 //alert(iceServersid.length)
 // utility function to create a transport and hook up signaling logic
@@ -1395,71 +1461,46 @@ function addVideoAudio(consumer) {
 	  alert('no track');
     return;
   }
- // let el = document.createElement(consumer.kind);
-  // set some attributes on our audio and video elements to make
-  // mobile Safari happy. note that for audio to play you need to be
-  // capturing from the mic/camera
-/*   if (video.srcObject) {
-		
-        video.srcObject.addTrack(track);
-        return;
-    }
-*/
- // if (consumer.kind === 'video') {
-	let div = document.createElement('div');
+
+  let anotherdiv = document.createElement('div');
+  anotherdiv.setAttribute('data-peerid', consumer.appData.peerId);
+ 
+  let mynamediv = document.createElement('div');
+  mynamediv.className = "for-name";
+  mynamediv.textContent ="myname";
+  anotherdiv.appendChild(mynamediv);
+  anotherdiv.className = "video-box";
+  
+	
 	let div2 = document.createElement('div');
 	let input = document.createElement('input');
 	input.setAttribute('type', 'checkbox');
 	input.setAttribute('checked', true);
 	input.setAttribute('data-peer', consumer.appData.peerId);
 	input.setAttribute( 'onchange' , 'soundControl(this);');
+	div2.className = "input-div";
 	div2.appendChild(input);
-	div.className = 'videocontainer';
-	div.setAttribute('data-peerid', consumer.appData.peerId);
+	
 	  let el = document.createElement(consumer.kind);
     el.setAttribute('playsinline', true);
     el.setAttribute('autoplay', true);
     el.setAttribute('muted', true);
-  //}
-  /* else {
-    el.setAttribute('playsinline', true);
-    el.setAttribute('autoplay', true);
-    el.setAttribute('muted', true);
-  }*/
- // $(`#remote-${consumer.kind}`).appendChild(el);
+ 
  let newstream = new MediaStream(/*[ consumer.track.clone() ]*/);
  newstream.addTrack(consumer.track);
   el.srcObject = newstream;
  if(consumer.kind == 'video'){
-	 div.appendChild(el);
-	 el.after(div2);
-	  $(`#remote-${consumer.kind}`).appendChild(div);
-	 // el.play();
-	   el.volume = 1.0;
-	  
+	 anotherdiv.appendChild(el);
+	
+	  // el.volume = 1.0;
+	   anotherdiv.appendChild(div2);
+	    let btndiv = document.createElement('div');
+	    btndiv.className = "for-privat";
+ btndiv.innerHTML = `<div class="donbtn" onclick="getPrivat(this);" data-hispeerid="${consumer.appData.peerId}" ><span class="trubka">&#128222;</span></div>`
+	  anotherdiv.appendChild(btndiv);
+	   $(`#remote-${consumer.kind}`).appendChild(anotherdiv);
    }
   el.consumer = consumer;
-  
- if(el.srcObject){
-//	 alert('schon hats srcObject '+ consumer.kind);
-//	 el.srcObject.addTrack(consumer.kind);
-//	 return;
- }
- // el.srcObject = newstream;
- // el.consumer = consumer;
-  //el.volume = 1.0;
-  
-//}else{
-	//el.srcObject.addTrack(consumer.track);
-//}
-  // let's "yield" and return before playing, rather than awaiting on
-  // play() succeeding. play() will not succeed on a producer-paused
-  // track until the producer unpauses.
- /* el.play()
-    .then(()=>{})
-    .catch((e) => {
-      console.error(e);
-    });*/
 }
 
 function removeVideoAudio(consumer) {
@@ -1470,10 +1511,18 @@ function removeVideoAudio(consumer) {
     }
   });
   */
+ // alert(consumer.appData.peerId);
  // let el = document.querySelector(`[data-id="${obj.id}"]`);
   let el = document.querySelector(`[data-peerid="${consumer.appData.peerId}"]`); 
+ 
   if(el)el.remove();
 }
+
+
+
+
+
+
 async function soundControl(el){
 	let peerId = el.getAttribute('data-peer');
 	let consumer = findConsumerForTrack(peerId, 'cam-audio');
