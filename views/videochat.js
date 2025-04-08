@@ -61,6 +61,7 @@ const videochat = function(n){
      <div id="settingspanel">
      ${n.user?'<div class="settingspanel" ><a href="#" onclick="logout(this);">Выход</a></div>':``}
      <div class="settingspanel" onclick="panelOpen();window.location.href='#Pravila';"><a href="#Pravila">Правила</a></div>
+     <div class="settingspanel"><a ${n.user?`onclick="logout(this);"`:''} href="${n.user?'#':'#login'}">${n.user?'Выход':'Вход'}</a></div>
      </div>
     </nav>
    <input type="hidden" id="myName" value="${n.user?n.user.bname:'Anon'}"/>

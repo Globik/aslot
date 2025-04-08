@@ -48,15 +48,23 @@ justify-content: space-around;
 	padding:10px;
 }
 div#text textarea{
-	width:99%;
+	width:95%;
 	height:80%;
-	padding:10px;
+	padding-left:10px;
 	display:block;
-	margin-bottom:0;
+	margn-bottom:0;
 	resize:none;
-	border:2px solid rgb(167,57,160);
+	border:2px solid rgb(195 103 60);;
 	border-radius:6px;
-	box-shadow:4px 4px 4px rgb(167,57,160);
+	box-shadow:4px 4px 4px rgb(195 103 60);;
+	 text-shadow:
+    1px 1px 2px black,
+    0 0 1em blue,
+    0 0 0.2em blue;
+  color: #e7b9b9f2;
+  font:
+    1.5em Georgia,
+    serif;
 }
 div#btnBox{
 mrgin:0;
@@ -78,7 +86,7 @@ button.chat-btn{
 	pdding-bottom:0;
 	mrgin-top:0px;
 	mrgin-bottom:0;
-	margin-right:5px;
+	margin-right:10px;
 	line-height:0;
 	font-size:0.8rem;
 }

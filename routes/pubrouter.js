@@ -36,13 +36,13 @@ pub.get('/rules', async ctx=>{
 
 pub.get('/wallet', async ctx=>{
 	console.log("USER ", ctx.state.user);
-	botMessage((ctx.state.user?ctx.state.user.bname:'A guest ') + ' visited a wallet.');
+	botMessage((ctx.state.user?ctx.state.user.bname:'A guest ') + ' visited a viddeochat.');
 	ctx.body = await ctx.render('videochat', {});
 })
 
 pub.get('/wallet2', async ctx=>{
 	console.log("USER ", ctx.state.user);
-	botMessage((ctx.state.user?ctx.state.user.bname:'A guest ') + ' visited a videochat.');
+	botMessage((ctx.state.user?ctx.state.user.bname:'A guest ') + ' visited a wallet.');
 	ctx.body = await ctx.render('wallet2', {});
 })
 

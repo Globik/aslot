@@ -4,29 +4,27 @@ box-sizing: border-box;
 }
 
 html,body{
-	width: 100vw;
+	
 	height:100%;
 	font-size:1.1rem;
                 font-family: 'Roboto Condensed', sans-serif;
                 
                 margin:0;
                 padding:0;
-               
+                background: linear-gradient(135deg, rgba(255,255,255,0.8) 0%, rgba(255,255,255,0.2) 50%, rgba(255,255,255,0.25) 100%);
+                backdrop-filter: blur(10px);
+                -webkit-bakdrop-filter: blur(10px);
+               background-color: rgba(235,109,16,0.71);
             }
             
-            main{
-				padding:50px;
-				width:100%;
-				min-height:100%;
-			}
+           
 			header{
 				padding-right:10px;
 			}
 			  main{
-            
-				padding:0px;
-				bakground:rgba(255,255,255,0.1);
-				min-height:100%;
+            padding:50px;
+		
+				height:100vh;
 				background: linear-gradient(135deg, rgba(255,255,255,0.8) 0%, rgba(255,255,255,0.2) 50%, rgba(255,255,255,0.25) 100%);
                 backdrop-filter: blur(10px);
                 -webkit-bakdrop-filter: blur(10px);
@@ -106,10 +104,11 @@ width:60%;
 	margin-left:60px;
 }
 footer{
-	background: #cb6f6f;
+	background: rgba(0,0,0,0);
+	border:1px solid #cb6f6f;
 	border-radius:5px;
 	padding:20px;
-	margin:20px;
+	mrgin:20px;
 }
 footer div{
 	margin-top:1rem;
