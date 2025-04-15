@@ -96,6 +96,27 @@ h1,h2{
 	margin-left:60px;
 	line-height:1.6;
 }
+.openchatbox{
+	display:flex;
+	align-items: center;
+	justify-content: space-around;
+	margin-top:30px;
+	margin-bottom:30px;
+	
+}
+.openchatbox div{
+	background:#d37b4d;
+	font-size:2rem;
+	line-height:1.6;
+	font-weight:bold;
+	letter-spacing:1px;
+	padding:30px;
+	border-radius:6px;
+}
+.openchatbox div a{
+	color:#f3e2e6;
+	text-decoration:none;
+}
 p{
 width:60%;
 	font-size:1.3rem;

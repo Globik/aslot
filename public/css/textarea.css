@@ -57,14 +57,14 @@ div#text textarea{
 	border:2px solid rgb(195 103 60);;
 	border-radius:6px;
 	box-shadow:4px 4px 4px rgb(195 103 60);;
-	 text-shadow:
+	/* text-shadow:
     1px 1px 2px black,
     0 0 1em blue,
     0 0 0.2em blue;
   color: #e7b9b9f2;
   font:
     1.5em Georgia,
-    serif;
+    serif;*/
 }
 div#btnBox{
 mrgin:0;
@@ -89,4 +89,17 @@ button.chat-btn{
 	margin-right:10px;
 	line-height:0;
 	font-size:0.8rem;
+}
+.msg-container{
+	padding:10px;
+}
+.msg-container b{
+	color:yellow;
+	font-size: 1rem;
+	font-weight:bold;
+}
+.msg-container span{
+	color:black;
+	font-size: 1rem;
+	font-weight:bold;
 }

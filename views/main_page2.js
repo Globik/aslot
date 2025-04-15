@@ -53,7 +53,7 @@ const main_page2 = function(n){
     </head><body> <main id="somemain"><nav class="vhod">
     <div><a ${n.user?`onclick="logout(this);"`:''} href="${n.user?'#':'#login'}">${n.user?'Выход':'Вход'}</a></div>
     </nav>
-    <a href="/wallet">Видеочат</a>
+    <div class="openchatbox"><div><a href="/wallet">Начать Видеочат</a></div></div>
     ${n.user?'<a href="/wallet2" style="padding-left:10px;font-size:1rem;">Криптокошелек</a>':''}
    
    

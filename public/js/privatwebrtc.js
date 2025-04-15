@@ -175,21 +175,34 @@ function send(){
 	chat.appendChild(div);
     chat.scrollTop = chat.clientHeight + chat.scrollHeight;
 }
-
-function on_receive_message(event){
-console.log('data channel: ', event.data);
-
+function insertMessage(obj){
 var div = document.createElement("div");
+div.className = "msg-container";
 try{
 //msg_came();
-var a = JSON.parse(event.data);
-div.innerHTML = '<b>' + a.from + ':</b> ' + a.msg;
+var a = JSON.parse(obj);
+div.innerHTML = '<b>' + a.from + ': </b><span>' + a.msg + '</span>';
 }catch(e){return;}
-//privatchat.appendChild(div);
-//privatchat.scrollTop = privatchat.clientHeight + privatchat.scrollHeight;
+chat.appendChild(div);
+chat.scrollTop = chat.clientHeight + chat.scrollHeight;
+let btnSend = gid('btnSend');
+//btnSend.classList.remove('puls');
+}
+function on_receive_message(event){
+console.log('data channel: ', event.data);
+insertMessage(event.data)
 }
 
-
+function sendText(el){
+	let Area = gid('Area');
+	let myName = gid('myName');
+	
+	if(!Area.value)return;
+	//el.classList.add('puls');
+	send_channel({ type: "privatmsg", msg: Area.value , from: myName.value });
+	insertMessage(JSON.stringify({ msg: Area.value, from: "You" }));
+	Area.value = "";
+}
 function send_channel(obj){
 if(dc){
 	try{
@@ -302,12 +315,12 @@ pc.setRemoteDescription(sdp);
 
 function stopVideo(){
 console.log('stop video');
-if(remoteVideo.srcObject){
+if(remoteVideo&&remoteVideo.srcObject){
 remoteVideo.srcObject.getTracks().forEach(function(track){track.stop();
 })
 remoteVideo.srcObjetc = null;
 }
-if(localVideo.srcObject){
+if(localVideo&&localVideo.srcObject){
 localVideo.srcObject.getTracks().forEach(function(track){track.stop();
 	})
 localVideo.srcObject = null;
