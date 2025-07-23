@@ -2,7 +2,7 @@ const { login } = require('./login.js');
 const { pravila } = require('./pravila.js')
 const { yametrika } = require('./yametrika.js');
 const { textarea } = require('./textarea.js');
-
+const { adv, yareklama } = require('./yareklama.js')
 const videochat = function(n){
 	return `<!DOCTYPE html><html lang="ru"><head>
     
@@ -51,6 +51,7 @@ const videochat = function(n){
    <!-- <script>window.yaContextCb=window.yaContextCb||[]</script>
     <script src="https://yandex.ru/ads/system/context.js" async></script>
     -->
+    ${yareklama()}
    <!-- <script async src="https://yastatic.net/share2/share.js"></script> -->
      
     ${process.env.DEVELOPMENT=='yes'?'': yametrika({})}
@@ -68,7 +69,7 @@ const videochat = function(n){
     <div class="btns">
     
     <button id="send-camera" disabled="true" data-state="start" onclick="sendCameraStreams(this)">
-      Войти в чат
+      Войти в чат 
     </button><!--
      <button id="join-button" onclick="joinRoom()" disabled="true" data-state="start">
       Подписаться
@@ -86,7 +87,7 @@ ${login({ })}
 <script src="/js/login.js"></script>
   <script src="/js/soup4.js"></script>
   <script src="/js/privatwebrtc.js"></script>
- 
+ <script>${adv()}</script>
     </body></html>`;
 }
 module.exports = { videochat }

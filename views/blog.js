@@ -1,7 +1,7 @@
 const { yametrika } = require('./yametrika');
 const { login } = require('./login.js');
 const { footer } = require('./footer.js'); 
-
+const { adv, yareklama } = require('./yareklama.js')
 const blog = function(n){
 	return `<!DOCTYPE html><html lang="ru"><head>
     
@@ -44,6 +44,7 @@ const blog = function(n){
    <!-- <script>window.yaContextCb=window.yaContextCb||[]</script>
     <script src="https://yandex.ru/ads/system/context.js" async></script>
     -->
+    ${yareklama()}
     <!-- <script async src="https://yastatic.net/share2/share.js"></script> -->
     
      ${yametrika({})}
@@ -54,7 +55,7 @@ const blog = function(n){
       ${login({ })}
       
 </main><script src="/js/login.js"></script><script src="/js/wallet.js"></script>
-    ${footer({})} </body></html>`;
+    ${footer({})} </body><script>${adv()}</script></html>`;
 }
 module.exports = { blog }
 function get_articles(arr){

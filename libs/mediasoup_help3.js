@@ -206,12 +206,12 @@ main();
 		console.log(e);
 	}
 	}else if(msg.type == 'join-as-new-peer'){
-		broadcast_all({ type: 'total_speakers', count: TOTAL_SPEAKERS });
+		//broadcast_all({ type: 'total_speakers', count: TOTAL_SPEAKERS });
 
   try {
 	  
     let { peerId } = msg;
-    console.log('join-as-new-peer peerId ', peerId);
+    console.log('here join-as-new-peer peerId ', peerId);
         now = Date.now();
     //log('join-as-new-peer', peerId);
 socket.peerId = peerId;
@@ -577,6 +577,7 @@ console.log('roomState.producers: ', JSON.stringify(roomState.producers))
     wsend(ws, { type: msg.type, error: e });
   }
 }else if(msg.type == 'close-consumer'){
+	//console.og
 	try {
   let { peerId, consumerId } = msg,
       consumer = roomState.consumers.find((c) => c.id === consumerId);
